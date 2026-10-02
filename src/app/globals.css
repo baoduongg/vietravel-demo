@@ -1,0 +1,167 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-heading: var(--font-sans);
+  --color-sky: var(--sky);
+  --color-ink: var(--ink);
+  --color-ocean: var(--ocean);
+  --color-cloud: var(--cloud);
+  --color-sunset: var(--sunset);
+  --color-sale: var(--sale);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  /* Bảng màu lấy từ CSS của travel.com.vn. */
+  --sky: #f7f7f7;
+  --ink: #191919;
+  --ocean: #0046c1;
+  --cloud: #d9eeff;
+  --sunset: #0391ff;
+  --sale: #ed1d24;
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --background: var(--sky);
+  --foreground: var(--ink);
+  --card: #ffffff;
+  --card-foreground: var(--ink);
+  --popover: #ffffff;
+  --popover-foreground: var(--ink);
+  --primary: var(--ocean);
+  --primary-foreground: #ffffff;
+  --secondary: #eef6ff;
+  --secondary-foreground: var(--ink);
+  --muted: #f1f3f6;
+  --muted-foreground: #636363;
+  --accent: #e8f3ff;
+  --accent-foreground: var(--ink);
+  --destructive: #c4161c;
+  --border: #d9eeff;
+  --input: #e3e6eb;
+  --ring: #0391ff;
+  --radius: 0.875rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+}
+
+@keyframes cloud-drift {
+  from {
+    transform: translateX(-12%);
+  }
+  to {
+    transform: translateX(12%);
+  }
+}
+
+@keyframes speaking-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--sunset) 45%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in oklab, var(--sunset) 0%, transparent);
+  }
+}
+
+@keyframes listening-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--ocean) 55%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 14px color-mix(in oklab, var(--ocean) 0%, transparent);
+  }
+}
+
+@utility animate-cloud-drift {
+  animation: cloud-drift 38s ease-in-out infinite alternate;
+}
+
+@utility animate-speaking-glow {
+  animation: speaking-glow 1.6s ease-in-out infinite;
+}
+
+@utility animate-listening-pulse {
+  animation: listening-pulse 1.3s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-cloud-drift,
+  .animate-speaking-glow,
+  .animate-listening-pulse {
+    animation: none;
+  }
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hiện dần từ dưới lên khi tải trang; đặt --reveal-delay để so le từng khối. */
+@utility animate-reveal {
+  animation: reveal-up 0.8s var(--ease-out-soft) both;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+
+@utility ease-soft {
+  transition-timing-function: var(--ease-out-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-reveal {
+    animation: none;
+  }
+}
