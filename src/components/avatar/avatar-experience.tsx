@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect } from "react"
 import dynamic from "next/dynamic"
-import { ArrowRightIcon, RotateCwIcon } from "lucide-react"
+import { RotateCwIcon } from "lucide-react"
 import { toast } from "sonner"
 
 import { AvatarModelSwitch } from "@/components/avatar/avatar-model-switch"
@@ -85,6 +85,10 @@ export function AvatarExperience(): React.JSX.Element {
   const controlsDisabled = !started || !engineReady
   const notice = !speech.supported ? NOTICES.unsupported : speech.issue ? NOTICES[speech.issue] : null
 
+  useEffect(() => {
+    if (engineReady && !started && !loadError) start()
+  }, [engineReady, started, loadError, start])
+
   return (
     <div className="flex min-h-dvh flex-col lg:h-dvh">
       <SiteHeader />
@@ -128,24 +132,9 @@ export function AvatarExperience(): React.JSX.Element {
                     </button>
                   </>
                 ) : (
-                  <>
-                    <button
-                      type="button"
-                      onClick={start}
-                      disabled={!engineReady}
-                      className="group inline-flex h-14 items-center gap-3 rounded-xl bg-ocean pr-2 pl-6 text-base font-bold text-white shadow-[0_14px_30px_-14px_rgba(0,70,193,0.8)] transition-transform duration-300 ease-soft outline-none hover:bg-[#003a9f] focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.97] disabled:opacity-60"
-                    >
-                      Trò chuyện với {company.persona.name}
-                      <span className="flex size-10 items-center justify-center rounded-lg bg-white/15 transition-transform duration-300 ease-soft group-hover:translate-x-0.5">
-                        <ArrowRightIcon aria-hidden strokeWidth={1.75} className="size-5" />
-                      </span>
-                    </button>
-                    <p aria-live="polite" className="text-xs font-semibold text-muted-foreground">
-                      {engineReady
-                        ? `Bật loa để nghe ${company.persona.name} tư vấn nhé`
-                        : `Đang chuẩn bị ${company.persona.name}… ${loadProgress}%`}
-                    </p>
-                  </>
+                  <p aria-live="polite" className="text-xs font-semibold text-muted-foreground">
+                    {engineReady ? `${company.persona.name} đang chào Quý khách…` : `Đang chuẩn bị ${company.persona.name}… ${loadProgress}%`}
+                  </p>
                 )}
               </div>
             )}
