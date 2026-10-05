@@ -1,6 +1,6 @@
 # Tripi: Trợ lý du lịch AI cho Vietravel
 
-02/10/2026 · baoduongg
+05/10/2026 · baoduongg
 
 ## Tổng quan
 
@@ -12,7 +12,7 @@ Bản demo dùng **154 tour đang mở bán** lấy từ travel.com.vn ngày 02/
 
 ## Tính năng và điểm mạnh
 
-- **Linh vật Tripi 3D:** mũ tai bèo Vietravel, mặt LED chớp mắt, liếc nhìn, vẫy tay và nháy mắt khi chào; miệng LED mở theo giọng nói.
+- **2 kiểu avatar, đổi tức thời:** nút “Robot / Người” ở góc trên phải màn hình. Robot là linh vật Tripi 3D, mũ tai bèo Vietravel, mặt LED chớp mắt, liếc nhìn, vẫy tay và nháy mắt khi chào, miệng LED mở theo giọng nói. Người là avatar 3D tạo hình người thật (TalkingHead), khẩu hình khớp giọng nói. Đổi avatar thì bắt đầu lại hội thoại.
 - **Giọng Việt chuẩn:** xưng “em”, gọi “Quý khách”; đọc giá tour, ngày khởi hành và số tổng đài như người thật.
 - **Tư vấn đúng nhu cầu:** thiếu thông tin thì hỏi lại điểm đến, nơi khởi hành, thời gian hoặc ngân sách; đủ thì gợi ý tối đa 2 tour phù hợp nhất. Nhớ 10 lượt hội thoại để hiểu câu hỏi nối tiếp.
 - **Thẻ tour thật:** tour được nhắc tới hiện thành thẻ gồm ảnh, dòng tour, ngày đi, giá, ưu đãi giờ chót; bấm “Xem chi tiết” mở đúng trang tour trên travel.com.vn.
@@ -70,7 +70,8 @@ Video và ảnh chụp từ một lượt chạy thật ngày 02/10/2026. Câu c
 | Web app | Next.js 15, React 19, Tailwind CSS 4 |
 | AI hội thoại | Claude (Anthropic) |
 | Giọng nói | Saydi TTS tiếng Việt |
-| Linh vật Tripi 3D | Three.js, mặt LED vẽ theo âm lượng giọng nói |
+| Avatar Robot | Three.js, mặt LED vẽ theo âm lượng giọng nói |
+| Avatar Người | TalkingHead, khẩu hình 3D khớp giọng nói |
 | Dữ liệu tour | Lấy từ travel.com.vn bằng script Python |
 | Nhận dạng giọng nói | Web Speech API (Chrome, Edge), đang tạm ẩn |
 
