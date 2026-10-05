@@ -1,5 +1,5 @@
 import { company, MAX_RECOMMENDED_TOURS, TOUR_TAG, type CompanyConfig } from "@/config/company"
-import { getUpcomingTours, scrapedAt, todayIso } from "@/data/tours"
+import { todayIso } from "@/data/tours"
 import type { Tour } from "@/types/tour"
 
 function formatPrice(priceVnd: number): string {
@@ -20,21 +20,28 @@ function describeTour(tour: Tour): string {
     `khởi hành từ ${tour.departureCity}`,
     `${tour.days} ngày ${tour.nights} đêm`,
     `ngày đi ${tour.departureDates.map(formatDate).join(", ")}`,
-    `giá từ ${formatPrice(tour.priceVnd)}`,
+    `giá từ ${formatPrice(tour.deal?.priceVnd ?? tour.priceVnd)}`,
     tour.tourLine,
     tour.transport && `đi bằng ${tour.transport.toLowerCase()}`,
   ]
-  if (tour.deal) {
-    parts.push(
-      `${tour.deal.title}: còn ${formatPrice(tour.deal.priceVnd)}, giá gốc ${formatPrice(tour.deal.originalPriceVnd)}, khởi hành ${formatDate(tour.deal.departureDate)}`,
-    )
-  }
+  if (tour.deal) parts.push(`${tour.deal.title}, giá gốc ${formatPrice(tour.deal.originalPriceVnd)}, khởi hành ${formatDate(tour.deal.departureDate)}`)
   return parts.filter(Boolean).join(" | ")
+}
+
+export function buildTourContext(
+  tours: Tour[],
+  matchState: { criteriaRecognized: boolean; hasExactMatches: boolean },
+): string {
+  if (!matchState.criteriaRecognized) return "Chưa nhận diện được nhu cầu cụ thể. Chưa gợi ý tour; hãy hỏi khách đúng một câu ngắn về tiêu chí quan trọng còn thiếu."
+  if (tours.length === 0) return "Không tìm thấy tour phù hợp trong dữ liệu hiện tại. Nói rõ chưa có tour khớp và mời khách gọi tổng đài nếu cần hỗ trợ."
+  const heading = matchState.hasExactMatches
+    ? "TOUR PHÙ HỢP VỚI TIÊU CHÍ KHÁCH ĐÃ NÊU"
+    : "PHƯƠNG ÁN GẦN NHẤT, KHÔNG KHỚP ĐẦY ĐỦ; NÓI RÕ ĐIỂM CHƯA KHỚP"
+  return `${heading}\n${tours.map(describeTour).join("\n")}`
 }
 
 export function buildSystemPrompt(today: string = todayIso(), config: CompanyConfig = company): string {
   const { persona } = config
-  const tours = getUpcomingTours(today)
   const faqs = config.faqs.map((faq) => `- Hỏi: ${faq.question}\n  Đáp: ${faq.answer}`).join("\n")
 
   return `Bạn là ${persona.name}, ${persona.role} của ${config.brand}, giọng ${persona.gender === "female" ? "nữ" : "nam"}. Bạn đang nói chuyện trực tiếp với khách qua giọng nói. Luôn xưng "${persona.selfPronoun}" và gọi khách là "${persona.customerPronoun}". Giọng điệu ${persona.tone}.
@@ -55,10 +62,6 @@ THÔNG TIN CÔNG TY
 
 CÂU HỎI THƯỜNG GẶP
 ${faqs}
-
-DANH SÁCH TOUR ĐANG MỞ BÁN (cập nhật từ website ngày ${formatDate(scrapedAt)}, chỉ có đúng ${tours.length} tour này)
-Mỗi dòng: mã tour | tên | điểm nhấn | phạm vi, vùng | nơi khởi hành | thời lượng | các ngày đi | giá | dòng tour | phương tiện | ưu đãi nếu có
-${tours.map(describeTour).join("\n")}
 
 CÁCH TƯ VẤN
 1. Nếu khách chưa nói rõ nhu cầu, hỏi lại đúng 1 câu ngắn về điều còn thiếu quan trọng nhất: điểm đến, nơi khởi hành, thời gian đi hoặc ngân sách.

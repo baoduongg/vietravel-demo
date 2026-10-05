@@ -1,46 +1,40 @@
 import { NextResponse } from "next/server"
 
 import { company, MAX_RECOMMENDED_TOURS, TOUR_TAG } from "@/config/company"
-import { findToursByCode, inferToursFromReply, todayIso } from "@/data/tours"
-import { buildSystemPrompt } from "@/lib/system-prompt"
+import { findToursByCode, getUpcomingTours, inferToursFromReply, scrapedAt, todayIso } from "@/data/tours"
+import { selectRelevantTours } from "@/lib/tour-matching"
+import { buildSystemPrompt, buildTourContext } from "@/lib/system-prompt"
 import type { ApiError, ChatMessage, ChatResponse } from "@/types/chat"
 
 export const runtime = "nodejs"
 
-const ANTHROPIC_MESSAGES_URL = "https://code.runagent.click/v1/messages"
-const ANTHROPIC_VERSION = "2023-06-01"
-const FALLBACK_BETA = "server-side-fallback-2026-07-01"
-const DEFAULT_MODEL = "claude-opus-5-5"
+const GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta/models"
+const GEMINI_CACHE_URL = "https://generativelanguage.googleapis.com/v1beta/cachedContents"
+const DEFAULT_MODEL = "gemini-3.5-flash-lite"
 const REQUEST_TIMEOUT_MS = 30000
 const MAX_RETRIES = 2
-const FALLBACK_MODELS = new Set(["claude-fable-5-1", "claude-opus-5-5", "claude-opus-5", "claude-sonnet-5-5"])
 const MAX_TURNS = 10
 const MAX_SENTENCES = 3
 const MAX_MESSAGE_LENGTH = 1000
+const SYSTEM_CACHE_TTL_SECONDS = 3600
 /** Ranh giới câu, trừ dấu chấm sau chữ viết tắt như "TP." trong "TP. Hồ Chí Minh". */
 const SENTENCE_BREAK = /(?<=[.!?…])(?<!(?:^|\s)(?:TP|Tp|Q|P|TX|TT)\.)\s+/
 
-interface ClaudeMessage {
-  role: "user" | "assistant"
-  content: string
+interface GeminiContent {
+  role: "user" | "model"
+  parts: { text: string }[]
 }
 
-interface ClaudeContentBlock {
-  type: string
-  text?: string
+interface GeminiResponse {
+  candidates?: { content?: GeminiContent; finishReason?: string }[]
 }
 
-interface ClaudeResponse {
-  content: ClaudeContentBlock[]
-  stop_reason: string | null
-}
-
-class ClaudeHttpError extends Error {
+class GeminiHttpError extends Error {
   constructor(
     readonly status: number,
     readonly body: string,
   ) {
-    super(`Anthropic API ${status}: ${body}`)
+    super(`Gemini API ${status}: ${body}`)
   }
 }
 
@@ -60,13 +54,19 @@ function parseMessages(body: unknown): ChatMessage[] | null {
   }))
 }
 
-function toClaudeMessages(messages: ChatMessage[]): ClaudeMessage[] {
+function toGeminiContents(messages: ChatMessage[], dynamicTourContext: string): GeminiContent[] {
   const recent = messages.slice(-MAX_TURNS * 2)
   const firstUserIndex = recent.findIndex((message) => message.role === "user")
-  return recent.slice(Math.max(firstUserIndex, 0)).map((message) => ({
-    role: message.role,
-    content: message.content,
+  const contents = recent.slice(Math.max(firstUserIndex, 0)).map((message) => ({
+    role: message.role === "assistant" ? "model" as const : "user" as const,
+    parts: [{ text: message.content }],
   }))
+  const latestUserMessage = contents.pop()
+  return [
+    ...contents,
+    { role: "user", parts: [{ text: `[DỮ LIỆU TOUR ĐƯỢC HỆ THỐNG CHỌN]\n${dynamicTourContext}` }] },
+    latestUserMessage!,
+  ]
 }
 
 function isRetryable(status: number): boolean {
@@ -79,30 +79,66 @@ function retryDelayMs(response: Response, attempt: number): number {
   return 500 * 2 ** attempt + Math.random() * 250
 }
 
-async function callClaude(apiKey: string, useFallbacks: boolean, body: Record<string, unknown>): Promise<ClaudeResponse> {
+async function callGemini(apiKey: string, model: string, body: Record<string, unknown>): Promise<GeminiResponse> {
   const headers: Record<string, string> = {
-    "x-api-key": apiKey,
-    "anthropic-version": ANTHROPIC_VERSION,
+    "x-goog-api-key": apiKey,
     "content-type": "application/json",
   }
-  if (useFallbacks) headers["anthropic-beta"] = FALLBACK_BETA
+  const url = `${GEMINI_API_BASE}/${model}:generateContent`
 
   for (let attempt = 0; ; attempt += 1) {
-    const response = await fetch(ANTHROPIC_MESSAGES_URL, {
+    const response = await fetch(url, {
       method: "POST",
       headers,
       body: JSON.stringify(body),
       cache: "no-store",
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     })
-    if (response.ok) return (await response.json()) as ClaudeResponse
+    if (response.ok) return (await response.json()) as GeminiResponse
     if (attempt >= MAX_RETRIES || !isRetryable(response.status)) {
-      throw new ClaudeHttpError(response.status, await response.text())
+      throw new GeminiHttpError(response.status, await response.text())
     }
     const delay = retryDelayMs(response, attempt)
     await response.body?.cancel()
     await new Promise((resolve) => setTimeout(resolve, delay))
   }
+}
+
+interface SystemCacheEntry {
+  key: string
+  name: string
+  expiresAt: number
+}
+
+let systemCache: SystemCacheEntry | null = null
+
+/** System prompt (155 tour + FAQ) đổi nhiều nhất 1 lần/ngày, nên cache qua Gemini cachedContents thay vì gửi lại full mỗi lượt chat. */
+async function getCachedSystemInstruction(apiKey: string, model: string, today: string): Promise<string | null> {
+  const key = `${model}:${today}:${scrapedAt}`
+  if (systemCache && systemCache.key === key && systemCache.expiresAt > Date.now()) {
+    return systemCache.name
+  }
+  const response = await fetch(GEMINI_CACHE_URL, {
+    method: "POST",
+    headers: { "x-goog-api-key": apiKey, "content-type": "application/json" },
+    body: JSON.stringify({
+      model: `models/${model}`,
+      systemInstruction: { parts: [{ text: buildSystemPrompt(today) }] },
+      ttl: `${SYSTEM_CACHE_TTL_SECONDS}s`,
+    }),
+    cache: "no-store",
+  })
+  if (!response.ok) {
+    console.error("[api/avatar/chat] cache create failed", response.status, await response.text())
+    return null
+  }
+  const data = (await response.json()) as { name: string }
+  systemCache = { key, name: data.name, expiresAt: Date.now() + (SYSTEM_CACHE_TTL_SECONDS - 60) * 1000 }
+  return data.name
+}
+
+function isCacheMissError(error: unknown): boolean {
+  return error instanceof GeminiHttpError && error.status === 404 && error.body.includes("cachedContent")
 }
 
 function hotlineReply(): string {
@@ -144,8 +180,8 @@ function errorResponse(error: string, status: number): NextResponse<ApiError> {
 }
 
 export async function POST(request: Request): Promise<NextResponse<ChatResponse | ApiError>> {
-  const apiKey = process.env.ANTHROPIC_API_KEY
-  if (!apiKey) return errorResponse("Máy chủ chưa được cấu hình ANTHROPIC_API_KEY.", 500)
+  const apiKey = process.env.GEMINI_API_KEY
+  if (!apiKey) return errorResponse("Máy chủ chưa được cấu hình GEMINI_API_KEY.", 500)
 
   let body: unknown
   try {
@@ -159,25 +195,45 @@ export async function POST(request: Request): Promise<NextResponse<ChatResponse 
     return errorResponse("Cần gửi danh sách messages, tin nhắn cuối phải của người dùng.", 400)
   }
 
-  const model = process.env.ANTHROPIC_MODEL || DEFAULT_MODEL
-  const useFallbacks = FALLBACK_MODELS.has(model)
+  const model = process.env.GEMINI_MODEL || DEFAULT_MODEL
   const today = todayIso()
 
   try {
-    const response = await callClaude(apiKey, useFallbacks, {
-      model,
-      max_tokens: 16000,
-      system: [{ type: "text", text: buildSystemPrompt(today), cache_control: { type: "ephemeral" } }],
-      messages: toClaudeMessages(messages),
-      ...(model.startsWith("claude-haiku") ? {} : { output_config: { effort: "low" } }),
-      ...(useFallbacks ? { fallbacks: "default" } : {}),
-    })
+    const match = selectRelevantTours(getUpcomingTours(today), messages.slice(-MAX_TURNS * 2), today)
+    const dynamicTourContext = buildTourContext(match.tours, match)
+    const contents = toGeminiContents(messages, dynamicTourContext)
+    const generationConfig = { maxOutputTokens: 500, thinkingConfig: { thinkingBudget: 0 } }
+    const cacheName = await getCachedSystemInstruction(apiKey, model, today)
 
-    if (response.stop_reason === "refusal") return NextResponse.json({ reply: hotlineReply(), tours: [] })
+    const response = await (async () => {
+      if (!cacheName) {
+        return callGemini(apiKey, model, {
+          contents,
+          systemInstruction: { parts: [{ text: buildSystemPrompt(today) }] },
+          generationConfig,
+        })
+      }
+      try {
+        return await callGemini(apiKey, model, { contents, cachedContent: cacheName, generationConfig })
+      } catch (error) {
+        if (!isCacheMissError(error)) throw error
+        systemCache = null
+        return callGemini(apiKey, model, {
+          contents,
+          systemInstruction: { parts: [{ text: buildSystemPrompt(today) }] },
+          generationConfig,
+        })
+      }
+    })()
 
-    const text = response.content
-      .filter((block) => block.type === "text" && typeof block.text === "string")
-      .map((block) => block.text)
+    const candidate = response.candidates?.[0]
+    if (candidate?.finishReason === "SAFETY" || candidate?.finishReason === "RECITATION") {
+      return NextResponse.json({ reply: hotlineReply(), tours: [] })
+    }
+
+    const text = (candidate?.content?.parts ?? [])
+      .map((part) => part.text)
+      .filter((value): value is string => typeof value === "string")
       .join(" ")
     const { speech, codes } = splitTourTag(text)
     const reply = toSpokenText(speech)
@@ -186,9 +242,9 @@ export async function POST(request: Request): Promise<NextResponse<ChatResponse 
     return NextResponse.json({ reply, tours })
   } catch (error: unknown) {
     console.error("[api/avatar/chat]", error)
-    if (error instanceof ClaudeHttpError) {
-      if (error.status === 401 || error.status === 403) return errorResponse("ANTHROPIC_API_KEY không hợp lệ.", 500)
-      if (error.status === 404) return errorResponse(`Không tìm thấy model ${model}, kiểm tra lại ANTHROPIC_MODEL.`, 500)
+    if (error instanceof GeminiHttpError) {
+      if (error.status === 401 || error.status === 403) return errorResponse("GEMINI_API_KEY không hợp lệ.", 500)
+      if (error.status === 404) return errorResponse(`Không tìm thấy model ${model}, kiểm tra lại GEMINI_MODEL.`, 500)
       if (error.status === 429) return errorResponse("Hệ thống đang quá tải, Quý khách thử lại sau ít phút nhé.", 429)
       if (error.status >= 500) return errorResponse("Dịch vụ AI đang bận, Quý khách thử lại sau giây lát nhé.", 503)
     }

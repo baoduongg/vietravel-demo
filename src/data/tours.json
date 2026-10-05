@@ -32,9 +32,9 @@
       "departureCity": "TP. Hồ Chí Minh",
       "departureDates": [
         "2026-10-12",
-        "2026-10-19",
         "2026-10-26",
-        "2026-11-02"
+        "2026-11-02",
+        "2026-11-09"
       ],
       "days": 6,
       "nights": 5,
@@ -268,10 +268,10 @@
       "scope": "domestic",
       "departureCity": "TP. Hồ Chí Minh",
       "departureDates": [
-        "2026-10-13",
         "2026-10-20",
         "2026-10-27",
-        "2026-11-03"
+        "2026-11-03",
+        "2026-11-10"
       ],
       "days": 3,
       "nights": 2,
@@ -290,10 +290,10 @@
       "scope": "domestic",
       "departureCity": "TP. Hồ Chí Minh",
       "departureDates": [
-        "2026-10-11",
         "2026-10-18",
         "2026-10-26",
-        "2026-11-02"
+        "2026-11-02",
+        "2026-11-06"
       ],
       "days": 5,
       "nights": 4,
@@ -378,10 +378,10 @@
       "scope": "domestic",
       "departureCity": "TP. Hồ Chí Minh",
       "departureDates": [
-        "2026-10-13",
         "2026-10-20",
         "2026-10-27",
-        "2026-11-03"
+        "2026-11-03",
+        "2026-11-17"
       ],
       "days": 4,
       "nights": 3,
@@ -420,10 +420,10 @@
       "scope": "domestic",
       "departureCity": "Hà Nội",
       "departureDates": [
-        "2026-10-17",
         "2026-10-24",
         "2026-11-11",
-        "2026-11-15"
+        "2026-11-15",
+        "2026-11-25"
       ],
       "days": 4,
       "nights": 3,
@@ -611,27 +611,6 @@
       }
     },
     {
-      "code": "NDCTH4026",
-      "name": "Nha Trang - Hòn Lao - Suối Khoáng Nóng I-Resort - VinWonders - Đà lạt - Tám Trình Coffee - Puppy Farm - Đường Hầm Đất Sét",
-      "highlight": "",
-      "region": "Liên tuyến Miền Trung",
-      "scope": "domestic",
-      "departureCity": "Cần Thơ",
-      "departureDates": [
-        "2026-10-07",
-        "2026-11-04",
-        "2026-12-09"
-      ],
-      "days": 5,
-      "nights": 4,
-      "priceVnd": 5790000,
-      "tourLine": "Tour giá tốt",
-      "transport": "Xe",
-      "rating": 4.7,
-      "imageUrl": "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__2_7324_quang-truong-lam-vien-1.webp",
-      "url": "https://travel.com.vn/chuong-trinh/hanh-trinh-bien-va-hoa-nha-trang-hon-lao-vinwonders-da-lat-fresh-garden-puppy-farm-duong-ham-dat-set-khach-san-3-sao-4-sao-pid-7324"
-    },
-    {
       "code": "NDSGN524",
       "name": "Nha Trang - Đà Lạt: Hòn Lao Đảo Khỉ - Nha Trang Xưa - Biệt Thự Phi Ánh - God Valley - Chinh Phục Langbiang",
       "highlight": "",
@@ -652,6 +631,27 @@
       "rating": 4.7,
       "imageUrl": "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__1_4777_shutterstock1033277632.webp",
       "url": "https://travel.com.vn/chuong-trinh/nha-trang-da-lat-hon-lao-dao-khi-nha-trang-xua-biet-thu-phi-anh-god-valley-chinh-phuc-langbiang-pid-4777"
+    },
+    {
+      "code": "NDCTH4026",
+      "name": "Nha Trang - Hòn Lao - Suối Khoáng Nóng I-Resort - VinWonders - Đà lạt - Tám Trình Coffee - Puppy Farm - Đường Hầm Đất Sét",
+      "highlight": "",
+      "region": "Liên tuyến Miền Trung",
+      "scope": "domestic",
+      "departureCity": "Cần Thơ",
+      "departureDates": [
+        "2026-10-07",
+        "2026-11-04",
+        "2026-12-09"
+      ],
+      "days": 5,
+      "nights": 4,
+      "priceVnd": 5790000,
+      "tourLine": "Tour giá tốt",
+      "transport": "Xe",
+      "rating": 4.7,
+      "imageUrl": "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__2_7324_quang-truong-lam-vien-1.webp",
+      "url": "https://travel.com.vn/chuong-trinh/hanh-trinh-bien-va-hoa-nha-trang-hon-lao-vinwonders-da-lat-fresh-garden-puppy-farm-duong-ham-dat-set-khach-san-3-sao-4-sao-pid-7324"
     },
     {
       "code": "NDCTH4134",
@@ -1052,10 +1052,10 @@
       "scope": "domestic",
       "departureCity": "TP. Hồ Chí Minh",
       "departureDates": [
-        "2026-10-06",
         "2026-10-13",
         "2026-10-15",
-        "2026-10-17"
+        "2026-10-17",
+        "2026-10-20"
       ],
       "days": 4,
       "nights": 3,
@@ -1131,25 +1131,6 @@
       "rating": 4.7,
       "imageUrl": "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__2_13010_con-son-vuon-trai-cay.webp",
       "url": "https://travel.com.vn/chuong-trinh/mien-tay-vinh-long-can-tho-thuong-thuc-dac-san-vinh-long-top-am-thuc-tieu-bieu-viet-nam-nghi-duong-cantho-eco-resort-pid-13010"
-    },
-    {
-      "code": "NDCTH861",
-      "name": "Miền Tây: Bến Tre - Nông trại Hải Vân - Rừng nguyên sinh Vàm Hồ",
-      "highlight": "",
-      "region": "Tây Nam Bộ",
-      "scope": "domestic",
-      "departureCity": "Cần Thơ",
-      "departureDates": [
-        "2026-10-10"
-      ],
-      "days": 1,
-      "nights": 0,
-      "priceVnd": 790000,
-      "tourLine": "Tour giá tốt",
-      "transport": "Xe",
-      "rating": 4.7,
-      "imageUrl": "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__1_12205_nong-trai-hai-van---vam-ho-11.webp",
-      "url": "https://travel.com.vn/chuong-trinh/mien-tay-can-tho-ben-tre-nong-trai-hai-van-rung-nguyen-sinh-vam-ho-pid-12205"
     },
     {
       "code": "NDSGN860",
@@ -1332,10 +1313,10 @@
       "scope": "domestic",
       "departureCity": "Vinh",
       "departureDates": [
-        "2026-10-08",
         "2026-10-15",
         "2026-10-22",
-        "2026-10-29"
+        "2026-10-29",
+        "2026-11-05"
       ],
       "days": 4,
       "nights": 3,
@@ -1530,10 +1511,10 @@
       "scope": "international",
       "departureCity": "TP. Hồ Chí Minh",
       "departureDates": [
-        "2026-10-06",
         "2026-10-09",
         "2026-10-20",
-        "2026-10-22"
+        "2026-10-22",
+        "2026-10-27"
       ],
       "days": 5,
       "nights": 4,
@@ -1542,13 +1523,7 @@
       "transport": "Máy bay",
       "rating": 4.7,
       "imageUrl": "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__0_2666_cung-dien-hoang-gia-thai-lan-1.webp",
-      "url": "https://travel.com.vn/chuong-trinh/thai-lan-bangkok-pattaya-tham-quan-hoang-cung-chua-phat-ngoc-vuon-lan-nong-nooch-dao-san-ho-tang-buffet-baiyoke-sky-ve-xem-show-alcazar-pid-2666",
-      "deal": {
-        "title": "Ưu đãi giờ chót",
-        "originalPriceVnd": 8590000,
-        "priceVnd": 7590000,
-        "departureDate": "2026-10-06"
-      }
+      "url": "https://travel.com.vn/chuong-trinh/thai-lan-bangkok-pattaya-tham-quan-hoang-cung-chua-phat-ngoc-vuon-lan-nong-nooch-dao-san-ho-tang-buffet-baiyoke-sky-ve-xem-show-alcazar-pid-2666"
     },
     {
       "code": "NNSGN1331",
@@ -1592,7 +1567,13 @@
       "transport": "Máy bay",
       "rating": 4.7,
       "imageUrl": "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__1_2671_safari-bangkok-ho.webp",
-      "url": "https://travel.com.vn/chuong-trinh/thai-lan-pattaya-bangkok-vuon-thu-safari-world-thuy-cung-underwater-world-bao-tang-lighting-art-vuon-khinh-khi-cau-thuong-thuc-bua-toi-tren-du-thuyen-song-chao-phraya-tang-cafe-banh-phu-vang-pid-2671"
+      "url": "https://travel.com.vn/chuong-trinh/thai-lan-pattaya-bangkok-vuon-thu-safari-world-thuy-cung-underwater-world-bao-tang-lighting-art-vuon-khinh-khi-cau-thuong-thuc-bua-toi-tren-du-thuyen-song-chao-phraya-tang-cafe-banh-phu-vang-pid-2671",
+      "deal": {
+        "title": "Ưu đãi giờ chót",
+        "originalPriceVnd": 8990000,
+        "priceVnd": 7990000,
+        "departureDate": "2026-10-07"
+      }
     },
     {
       "code": "NNSGN827",
@@ -1952,10 +1933,10 @@
       "scope": "international",
       "departureCity": "TP. Hồ Chí Minh",
       "departureDates": [
-        "2026-10-08",
         "2026-10-15",
         "2026-10-22",
-        "2026-10-29"
+        "2026-10-29",
+        "2026-11-05"
       ],
       "days": 5,
       "nights": 4,
@@ -1996,19 +1977,19 @@
       "scope": "international",
       "departureCity": "Hà Nội",
       "departureDates": [
-        "2026-10-15",
         "2026-11-26",
         "2026-12-31",
-        "2027-02-04"
+        "2027-02-04",
+        "2027-02-08"
       ],
       "days": 5,
       "nights": 4,
-      "priceVnd": 13990000,
-      "tourLine": "Tour giá tốt",
+      "priceVnd": 14990000,
+      "tourLine": "Tour tiêu chuẩn",
       "transport": "Máy bay",
       "rating": 4.7,
       "imageUrl": "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__2_12449_shutterstock1017675346.webp",
-      "url": "https://travel.com.vn/chuong-trinh/malaysia-singapore-cung-dien-hoang-gia-cao-nguyen-genting-tang-ve-xem-phim-4d-adventure-land-dao-sentosa-flash-sale-10-cho-dau-tien-giam-ngay-1000000-khach-pid-12449"
+      "url": "https://travel.com.vn/chuong-trinh/malaysia-singapore-cung-dien-hoang-gia-cao-nguyen-genting-tang-ve-xem-phim-4d-adventure-land-dao-sentosa-pid-12449"
     },
     {
       "code": "NNSGN225",
@@ -2428,7 +2409,6 @@
       "scope": "international",
       "departureCity": "TP. Hồ Chí Minh",
       "departureDates": [
-        "2026-10-21",
         "2026-10-28"
       ],
       "days": 5,
@@ -2492,10 +2472,10 @@
       "scope": "international",
       "departureCity": "TP. Hồ Chí Minh",
       "departureDates": [
-        "2026-10-16",
         "2026-11-04",
         "2026-11-18",
-        "2026-11-25"
+        "2026-11-25",
+        "2026-12-16"
       ],
       "days": 4,
       "nights": 3,
@@ -2534,10 +2514,10 @@
       "scope": "international",
       "departureCity": "TP. Hồ Chí Minh",
       "departureDates": [
-        "2026-10-20",
         "2026-10-27",
         "2026-11-10",
-        "2026-11-17"
+        "2026-11-17",
+        "2026-11-24"
       ],
       "days": 4,
       "nights": 3,
@@ -2568,48 +2548,47 @@
       "url": "https://travel.com.vn/chuong-trinh/han-quoc-seoul-dao-nami-truot-tuyet-elysian-ski-resort-cong-vien-lotte-world-lang-hanok-namsan-thap-n-seoul-3-dem-khach-san-le-hoi-cau-ca-tren-bang-hwacheon-sancheoneo-trai-nghiem-mac-hanbok-tai-cung-dien-gyeongbok-pid-14702"
     },
     {
-      "code": "NNSGN5075",
-      "name": "Hàn Quốc: Busan - Ngôi làng bích họa Gamcheon - Chùa Haedong Yonggungsa - Chợ hải sản Jagalchi - Seoul - Đảo Nami (4 đêm khách sạn, Trải nghiệm tàu cao tốc KTX, làm kim chi & mặc hanbok)",
-      "highlight": "",
+      "code": "NNHAN615",
+      "name": "Hàn Quốc: Seoul - Cung điện Gyeongbok- Công viên Everland/ Lote World - Đảo Nami ( 3 đêm khách sạn )",
+      "highlight": "Thưởng thức chương trình nghệ thuật Drawing show",
       "region": "Đông Bắc Á",
       "scope": "international",
-      "departureCity": "TP. Hồ Chí Minh",
+      "departureCity": "Hà Nội",
       "departureDates": [
-        "2027-01-06",
-        "2027-01-16",
-        "2027-01-20",
-        "2027-01-30"
+        "2026-10-23",
+        "2026-11-13",
+        "2026-11-20"
       ],
-      "days": 6,
-      "nights": 5,
-      "priceVnd": 25990000,
-      "tourLine": "Tour tiết kiệm",
-      "transport": "Máy bay",
-      "rating": 4.7,
-      "imageUrl": "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__0_11799_busan-city-5.webp",
-      "url": "https://travel.com.vn/chuong-trinh/han-quoc-busan-ngoi-lang-bich-hoa-gamcheon-chua-haedong-yonggungsa-cho-hai-san-jagalchi-seoul-dao-nami-truot-tuyet-elysian-ski-resort-lang-co-bukchon-4-dem-khach-san-trai-nghiem-tau-cao-toc-ktx-lam-kim-chi-mac-hanbok-pid-11799"
-    },
-    {
-      "code": "NNSGN5053",
-      "name": "Hàn Quốc: Busan - Ngôi làng bích họa Gamcheon - Seoul - Đảo Nami - Korean Folk Village - Thư viện Suwon Starfield",
-      "highlight": "Trải nghiệm tàu cao tốc KTX",
-      "region": "Đông Bắc Á",
-      "scope": "international",
-      "departureCity": "TP. Hồ Chí Minh",
-      "departureDates": [
-        "2026-10-29",
-        "2026-11-05",
-        "2026-11-14",
-        "2026-11-18"
-      ],
-      "days": 6,
-      "nights": 5,
-      "priceVnd": 23990000,
+      "days": 5,
+      "nights": 4,
+      "priceVnd": 13500000,
       "tourLine": "Tour giá tốt",
       "transport": "Máy bay",
       "rating": 4.7,
-      "imageUrl": "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__2_13180_busan-city-4.webp",
-      "url": "https://travel.com.vn/chuong-trinh/han-quoc-busan-ngoi-lang-bich-hoa-gamcheon-seoul-dao-nami-korean-folk-village-thu-vien-suwon-starfield-4-dem-khach-san-trai-nghiem-tau-cao-toc-ktx-thuong-thuc-hai-san-hap-tuoi-ngon-pid-13180"
+      "imageUrl": "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__1_5191_gyeongbokgung-1.webp",
+      "url": "https://travel.com.vn/chuong-trinh/han-quoc-seoul-cung-dien-gyeongbok-cong-vien-everland-lotte-world-dao-nami-3-dem-khach-san-thuong-thuc-chuong-trinh-ve-nghe-thuat-mua-la-vang-la-do-pid-5191"
+    },
+    {
+      "code": "NNHAN619",
+      "name": "Hàn Quốc: Seoul - Nami - Everland - Drawing Show",
+      "highlight": "",
+      "region": "Đông Bắc Á",
+      "scope": "international",
+      "departureCity": "Hà Nội",
+      "departureDates": [
+        "2026-10-24",
+        "2026-11-10",
+        "2026-11-18",
+        "2027-02-08"
+      ],
+      "days": 5,
+      "nights": 4,
+      "priceVnd": 19500000,
+      "tourLine": "Tour tiết kiệm",
+      "transport": "Máy bay",
+      "rating": 4.7,
+      "imageUrl": "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__1_5393_nami.webp",
+      "url": "https://travel.com.vn/chuong-trinh/han-quoc-incheon-seoul-cong-vien-everland-dao-nami-4-dem-khach-san-trai-nghiem-mac-hanbok-va-lam-kim-chi-tam-hoi-jimjibang-tang-ve-drawing-show-mua-la-vang-la-do-pid-5393"
     },
     {
       "code": "NNSGN6342",
@@ -2650,6 +2629,25 @@
       "url": "https://travel.com.vn/chuong-trinh/nhat-ban-tokyo-ibaraki-tochighi-thac-fukuroda-nikko-nui-phu-si-dai-lo-meiji-jingu-gaien-pho-co-sawara-narita-4-dem-khach-san-thuong-thuc-bo-wagyu-nhung-lau-xem-bieu-dien-geisha-tang-kem-rac-vang-thu-khoi-sac-pid-15061"
     },
     {
+      "code": "NNHAN645",
+      "name": "Charter Nhật Bản mùa thu: Niigata - Aizu - Nikko - Tokyo",
+      "highlight": "",
+      "region": "Đông Bắc Á",
+      "scope": "international",
+      "departureCity": "Hà Nội",
+      "departureDates": [
+        "2026-11-19"
+      ],
+      "days": 5,
+      "nights": 4,
+      "priceVnd": 29990000,
+      "tourLine": "Tour tiêu chuẩn",
+      "transport": "Máy bay",
+      "rating": 4.7,
+      "imageUrl": "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__1_7288_logo---1.webp",
+      "url": "https://travel.com.vn/chuong-trinh/charter-nhat-ban-niigata-aizu-nikko-tokyo-niigata-giam-1000000vnd-cho-10-khach-dang-ki-dau-tien-pid-7288"
+    },
+    {
       "code": "NNSGN655",
       "name": "Nhật Bản: Tokyo - Yokohama - Kamakura - Núi Phú Sĩ - Oshino Hakkai - Nagoya - Kyoto - Osaka (Tham quan giao lộ Shibuya, trải nghiệm trà đạo, thưởng thức chân cua tuyết) - Tặng kem rắc vàng",
       "highlight": "",
@@ -2669,25 +2667,6 @@
       "rating": 4.7,
       "imageUrl": "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__2_7856_nui-phu-si-2.webp",
       "url": "https://travel.com.vn/chuong-trinh/nhat-ban-tokyo-yokohama-kamakura-nui-phu-si-oshino-hakkai-nagoya-kyoto-osaka-tham-quan-giao-lo-shibuya-trai-nghiem-tra-dao-thuong-thuc-chan-cua-tuyet-tang-kem-rac-vang-qua-tang-tu-jnto-pid-7856"
-    },
-    {
-      "code": "NNHAN645",
-      "name": "Charter Nhật Bản mùa thu: Niigata - Aizu - Nikko - Tokyo",
-      "highlight": "",
-      "region": "Đông Bắc Á",
-      "scope": "international",
-      "departureCity": "Hà Nội",
-      "departureDates": [
-        "2026-11-19"
-      ],
-      "days": 5,
-      "nights": 4,
-      "priceVnd": 29990000,
-      "tourLine": "Tour tiêu chuẩn",
-      "transport": "Máy bay",
-      "rating": 4.7,
-      "imageUrl": "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__1_7288_logo---1.webp",
-      "url": "https://travel.com.vn/chuong-trinh/charter-nhat-ban-niigata-aizu-nikko-tokyo-niigata-giam-1000000vnd-cho-10-khach-dang-ki-dau-tien-pid-7288"
     },
     {
       "code": "NNSGN6286",
@@ -2773,26 +2752,26 @@
       "url": "https://travel.com.vn/chuong-trinh/nhat-ban-tokyo-nui-phu-si-oshino-hakkai-matsumoto-thung-lung-kamikochi-lang-co-shirakawa-kyoto-osaka-thuong-thuc-bo-kobe-qua-tang-tu-jnto-pid-8593"
     },
     {
-      "code": "NNSGN55",
-      "name": "Nhật Bản: Tokyo - Núi Phú Sĩ - Hakone - Kyoto - Osaka (Sản phẩm Silver Hair)",
-      "highlight": "",
+      "code": "NNSGN6121",
+      "name": "Nhật Bản: Osaka - Công viên Universal - Kobe - Nagoya - Núi Phú Sĩ - Trượt tuyết Công viên Fujiten - Tháp Tokyo Skytree - Narita",
+      "highlight": "Thưởng thức bò Kobe & Trải nghiệm Shinkansen",
       "region": "Đông Bắc Á",
       "scope": "international",
       "departureCity": "TP. Hồ Chí Minh",
       "departureDates": [
-        "2026-10-20",
-        "2026-11-10",
-        "2026-11-24",
-        "2026-12-01"
+        "2026-12-30",
+        "2027-01-06",
+        "2027-01-12",
+        "2027-01-27"
       ],
-      "days": 7,
-      "nights": 6,
-      "priceVnd": 109990000,
+      "days": 5,
+      "nights": 4,
+      "priceVnd": 45390000,
       "tourLine": "Tour tiêu chuẩn",
       "transport": "Máy bay",
       "rating": 4.7,
-      "imageUrl": "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__0_14656_lau-dai-osaka.webp",
-      "url": "https://travel.com.vn/chuong-trinh/nhat-ban-tokyo-phu-si-hakone-kyoto-osaka-san-pham-silver-hair-pid-14656"
+      "imageUrl": "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__0_14865_truot-tuyet.webp",
+      "url": "https://travel.com.vn/chuong-trinh/nhat-ban-osaka-cong-vien-universal-kobe-nagoya-nui-phu-si-truot-tuyet-cong-vien-fujiten-thap-tokyo-skytree-narita-thuong-thuc-bo-kobe-trai-nghiem-shinkansen-pid-14865"
     },
     {
       "code": "NNSGN8209",
@@ -2812,25 +2791,6 @@
       "rating": 4.7,
       "imageUrl": "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__0_14944_themes-river-summer.webp",
       "url": "https://travel.com.vn/chuong-trinh/anh-quoc-xu-wales-ireland-scotland-mung-1-tet-pid-14944"
-    },
-    {
-      "code": "NNSGN8232",
-      "name": "Anh Quốc - Scotland (Du thuyền sông Thames và thưởng thức Scotch whisky)",
-      "highlight": "",
-      "region": "Liên Hiệp Anh",
-      "scope": "international",
-      "departureCity": "TP. Hồ Chí Minh",
-      "departureDates": [
-        "2026-11-12"
-      ],
-      "days": 9,
-      "nights": 8,
-      "priceVnd": 72900000,
-      "tourLine": "Tour giá tốt",
-      "transport": "Máy bay",
-      "rating": 4.7,
-      "imageUrl": "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__0_14732_calton-hill-scotland.webp",
-      "url": "https://travel.com.vn/chuong-trinh/anh-quoc-scotland-du-thuyen-song-thames-va-thuong-thuc-scotch-whisky-thu-khoi-sac-pid-14905"
     },
     {
       "code": "NNSGN853",
@@ -2888,6 +2848,25 @@
       "rating": 4.7,
       "imageUrl": "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__0_8116_nha-tho-thanh-stephen.webp",
       "url": "https://travel.com.vn/chuong-trinh/chau-au-dong-au-duc-sec-ao-hung-berlin-dresden-prague-cesky-krumlov-salzburg-lang-hallstatt-vienna-budapest-pid-8116"
+    },
+    {
+      "code": "NNHAN756",
+      "name": "Tây Âu: Hà Lan - Bỉ - Pháp - Đức",
+      "highlight": "",
+      "region": "Tây Âu",
+      "scope": "international",
+      "departureCity": "Hà Nội",
+      "departureDates": [
+        "2026-11-03"
+      ],
+      "days": 9,
+      "nights": 8,
+      "priceVnd": 66990000,
+      "tourLine": "Tour tiết kiệm",
+      "transport": "Máy bay",
+      "rating": 4.7,
+      "imageUrl": "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__1_12140_tulip-5.webp",
+      "url": "https://travel.com.vn/chuong-trinh/chau-au-tay-au-ha-lan-bi-phap-duc-thuong-thuc-ruou-vang-tai-reims-pid-12140"
     },
     {
       "code": "NNHAN744",
@@ -2967,23 +2946,24 @@
       "url": "https://travel.com.vn/chuong-trinh/bac-au-thuy-dien-phan-lan-na-uy-dan-mach-thuong-tra-phong-cach-chau-au-va-trai-nghiem-thuyen-ngam-canh-paddan-29-tet-pid-12363"
     },
     {
-      "code": "NNHAN756",
-      "name": "Tây Âu: Hà Lan - Bỉ - Pháp - Đức",
+      "code": "NNHAN748",
+      "name": "Ý - THỤY SĨ - PHÁP",
       "highlight": "",
       "region": "Tây Âu",
       "scope": "international",
       "departureCity": "Hà Nội",
       "departureDates": [
-        "2026-11-03"
+        "2026-10-23",
+        "2026-11-20"
       ],
-      "days": 9,
-      "nights": 8,
-      "priceVnd": 66990000,
-      "tourLine": "Tour tiết kiệm",
+      "days": 10,
+      "nights": 9,
+      "priceVnd": 82990000,
+      "tourLine": "Tour tiêu chuẩn",
       "transport": "Máy bay",
       "rating": 4.7,
-      "imageUrl": "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__1_12140_tulip-5.webp",
-      "url": "https://travel.com.vn/chuong-trinh/chau-au-tay-au-ha-lan-bi-phap-duc-thuong-thuc-ruou-vang-tai-reims-pid-12140"
+      "imageUrl": "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__1_7883_nha-tho-grossmunster-1.webp",
+      "url": "https://travel.com.vn/chuong-trinh/chau-au-tay-au-y-vatican-thuy-si-phap-thi-tran-engelberg-bao-tang-louvre-pid-7883"
     },
     {
       "code": "NNHAN923",
@@ -3146,7 +3126,6 @@
       "scope": "international",
       "departureCity": "TP. Hồ Chí Minh",
       "departureDates": [
-        "2026-10-23",
         "2026-12-18"
       ],
       "days": 8,
@@ -3198,31 +3177,6 @@
       "rating": 4.7,
       "imageUrl": "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__2_12757_the-dandenong-ranges1.webp",
       "url": "https://travel.com.vn/chuong-trinh/uc-melbourne-dandenong-yarra-valley-sydney-blue-mountain-mua-hoa-phuong-tim-pid-14832"
-    },
-    {
-      "code": "NNHAN253",
-      "name": "Singapore - Malaysia - Công viên Sư Tử Biển - Cao nguyên Genting - Cung điện Hoàng Gia Malaysia - tặng vé xem phim 4D Adventure Land Đảo Sentosa",
-      "highlight": "FLASH SALE GIẢM 1.000.000 DUY NHẤT 10 CHỖ ĐẦU TIÊN",
-      "region": "Đông Nam Á",
-      "scope": "international",
-      "departureCity": "Hà Nội",
-      "departureDates": [
-        "2026-10-20"
-      ],
-      "days": 5,
-      "nights": 4,
-      "priceVnd": 13990000,
-      "tourLine": "",
-      "transport": "",
-      "rating": 4.7,
-      "imageUrl": "https://s3-cmc.travel.com.vn/vtv-image/Images/LastMinute/lm__2607295_1023-1702singapore2-xlarge.webp",
-      "url": "https://travel.com.vn/chuong-trinh/singapore-malaysia-cong-vien-su-tu-bien-cao-nguyen-genting-cung-dien-hoang-gia-malaysia-tang-ve-xem-phim-4d-adventure-land-dao-sentosa-flash-sale-giam-1000000-duy-nhat-10-cho-dau-tien-pid-10480",
-      "deal": {
-        "title": "Ưu đãi giờ chót",
-        "originalPriceVnd": 14990000,
-        "priceVnd": 13990000,
-        "departureDate": "2026-10-20"
-      }
     },
     {
       "code": "NNHAN123",
@@ -3347,6 +3301,31 @@
         "originalPriceVnd": 7990000,
         "priceVnd": 7290000,
         "departureDate": "2026-10-08"
+      }
+    },
+    {
+      "code": "NNSGN3521",
+      "name": "Trung Quốc: Thành Đô - Cửu Trại Câu - Đô Giang Yển - Công viên Gấu Trúc - Thành Đô - Hiệu sách Chung Thư Các - Quảng trường Ngưỡng Thiên Oa I Thu khởi sắc",
+      "highlight": "",
+      "region": "Đông Bắc Á",
+      "scope": "international",
+      "departureCity": "TP. Hồ Chí Minh",
+      "departureDates": [
+        "2026-10-19"
+      ],
+      "days": 7,
+      "nights": 6,
+      "priceVnd": 20990000,
+      "tourLine": "",
+      "transport": "",
+      "rating": 4.7,
+      "imageUrl": "https://s3-cmc.travel.com.vn/vtv-image/Images/LastMinute/lm__2610051_cuu-trai-cau-mua-thu.webp",
+      "url": "https://travel.com.vn/chuong-trinh/trung-quoc-thanh-do-cuu-trai-cau-do-giang-yen-cong-vien-gau-truc-thanh-do-hieu-sach-chung-thu-cac-quang-truong-nguong-thien-oa-i-thu-khoi-sac-pid-14770",
+      "deal": {
+        "title": "Ưu đãi giờ chót",
+        "originalPriceVnd": 21990000,
+        "priceVnd": 20990000,
+        "departureDate": "2026-10-19"
       }
     }
   ]
