@@ -42,7 +42,7 @@ function upstreamErrorMessage(status: number): { message: string; status: number
 }
 
 export async function POST(request: Request): Promise<Response> {
-  const apiKey = process.env.SAYDI_API_KEY
+  const apiKey = process.env.SAYDI_API_KEY || 'eyJlbWFpbCI6ImR1b25nbmJAcnVuc3lzdGVtLm5ldCIsImV4cCI6MTc5MTE4Mjk4NywiaWF0IjoxNzkxMTgxMTg3LCJpcCI6IjE3Mi4yNS4wLjE2IiwianRpIjoiWW0tZGkySkw4OXdRIiwic3ViIjoiUEFCWlNSSmw5Z1lQMVJRb2UwbmRMTUdxWmZzMiIsInR5cCI6ImFjY2VzcyJ9.forauvYaT4_V5xeZgg_jB1j1c5PsfartjceqHUHtliY'
   if (!apiKey) return errorResponse("Máy chủ chưa được cấu hình SAYDI_API_KEY.", 500)
 
   let body: unknown
@@ -68,10 +68,15 @@ export async function POST(request: Request): Promise<Response> {
       body: JSON.stringify({
         text: spellOutMoney(speakContacts(text)),
         sample: voice.name,
-        lang: voice.languageCode.split("-")[0],
         speed: voice.speed,
         guidance_scale: voice.guidanceScale,
         output_format: "mp3",
+        breaks: {
+          sentence: 450,
+          comma: 250,
+          semicolon: 300,
+          paragraph: 600,
+        },
       }),
       cache: "no-store",
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
