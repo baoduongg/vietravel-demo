@@ -55,9 +55,6 @@ function LoginForm(): React.JSX.Element {
           <p className="text-sm font-bold">{company.persona.name} · Bản demo nội bộ</p>
         </div>
         <h1 className="mt-3 text-xl font-extrabold text-foreground">Nhập mật khẩu để xem demo</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Trang này chỉ dành cho nội bộ {company.brand}, vui lòng nhập mật khẩu được cung cấp.
-        </p>
 
         <label htmlFor="password" className="mt-6 flex items-center gap-2 rounded-lg border border-input px-2.5 focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50">
           <LockIcon aria-hidden strokeWidth={1.75} className="size-4 shrink-0 text-muted-foreground" />
