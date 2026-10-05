@@ -5,6 +5,7 @@ import dynamic from "next/dynamic"
 import { ArrowRightIcon, RotateCwIcon } from "lucide-react"
 import { toast } from "sonner"
 
+import { AvatarModelSwitch } from "@/components/avatar/avatar-model-switch"
 import { ChatPanel } from "@/components/avatar/chat-panel"
 import { MicButton } from "@/components/avatar/mic-button"
 import { SiteHeader } from "@/components/avatar/site-header"
@@ -104,6 +105,10 @@ export function AvatarExperience(): React.JSX.Element {
 
             <div className="absolute top-4 left-4">
               <StatusBadge status={status} />
+            </div>
+
+            <div className="absolute top-4 right-4">
+              <AvatarModelSwitch />
             </div>
 
             {!started && (

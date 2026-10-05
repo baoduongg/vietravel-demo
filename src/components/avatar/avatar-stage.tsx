@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react"
 
-import { company } from "@/config/company"
 import { createAvatarEngine, type AvatarEngine } from "@/lib/avatar-engine"
 import { createMascotEngine } from "@/lib/mascot-engine"
 import { cn } from "@/lib/utils"
@@ -14,6 +13,7 @@ interface AvatarStageProps {
 
 export function AvatarStage({ className }: AvatarStageProps): React.JSX.Element {
   const containerRef = useRef<HTMLDivElement>(null)
+  const avatarModel = useAvatarStore((state) => state.avatarModel)
 
   useEffect(() => {
     const container = containerRef.current
@@ -31,8 +31,8 @@ export function AvatarStage({ className }: AvatarStageProps): React.JSX.Element 
     setLoadProgress(0)
 
     const createEngine = (container: HTMLElement, onProgress: (percent: number) => void): Promise<AvatarEngine> => {
-      if (company.avatarModel === "human") return createAvatarEngine(container, onProgress)
-      return createMascotEngine(container, onProgress, company.avatarModel === "mascot" ? "glb" : "procedural")
+      if (avatarModel === "human") return createAvatarEngine(container, onProgress)
+      return createMascotEngine(container, onProgress, avatarModel === "mascot" ? "glb" : "procedural")
     }
     createEngine(host, (percent: number) => {
       if (!cancelled) setLoadProgress(percent)
@@ -56,7 +56,7 @@ export function AvatarStage({ className }: AvatarStageProps): React.JSX.Element 
       setEngine(null)
       host.remove()
     }
-  }, [])
+  }, [avatarModel])
 
   return <div ref={containerRef} aria-hidden className={cn("absolute inset-0", className)} />
 }
