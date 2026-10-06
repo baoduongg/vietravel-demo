@@ -3,6 +3,7 @@ import { NextResponse } from "next/server"
 import { company } from "@/config/company"
 import { spellOutMoney } from "@/lib/vietnamese-number"
 import type { ApiError } from "@/types/chat"
+import { requestWithSaydiRefresh } from "@/lib/saydi-auth"
 
 export const runtime = "nodejs"
 
@@ -42,7 +43,8 @@ function upstreamErrorMessage(status: number): { message: string; status: number
 }
 
 export async function POST(request: Request): Promise<Response> {
-  const apiKey = process.env.SAYDI_API_KEY || 'eyJlbWFpbCI6ImR1b25nbmJAcnVuc3lzdGVtLm5ldCIsImV4cCI6MTc5MTE4Mjk4NywiaWF0IjoxNzkxMTgxMTg3LCJpcCI6IjE3Mi4yNS4wLjE2IiwianRpIjoiWW0tZGkySkw4OXdRIiwic3ViIjoiUEFCWlNSSmw5Z1lQMVJRb2UwbmRMTUdxWmZzMiIsInR5cCI6ImFjY2VzcyJ9.forauvYaT4_V5xeZgg_jB1j1c5PsfartjceqHUHtliY'
+  let apiKey = process.env.SAYDI_API_KEY
+  let refreshToken = process.env.SAYDI_REFRESH_TOKEN ?? ""
   if (!apiKey) return errorResponse("Máy chủ chưa được cấu hình SAYDI_API_KEY.", 500)
 
   let body: unknown
@@ -56,31 +58,36 @@ export async function POST(request: Request): Promise<Response> {
   if (!text) return errorResponse(`Trường text phải có từ 1 đến ${MAX_TEXT_LENGTH} ký tự.`, 400)
 
   const { voice } = company
+  const ttsRequest: RequestInit = {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+      Accept: "audio/mpeg",
+    },
+    body: JSON.stringify({
+      text: spellOutMoney(speakContacts(text)),
+      sample: voice.name,
+      speed: voice.speed,
+      guidance_scale: voice.guidanceScale,
+      output_format: "mp3",
+      breaks: {
+        sentence: 450,
+        comma: 250,
+        semicolon: 300,
+        paragraph: 600,
+      },
+    }),
+    cache: "no-store",
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+  }
+
   let upstream: Response
   try {
-    upstream = await fetch(SAYDI_TTS_URL, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-        Accept: "audio/mpeg",
-      },
-      body: JSON.stringify({
-        text: spellOutMoney(speakContacts(text)),
-        sample: voice.name,
-        speed: voice.speed,
-        guidance_scale: voice.guidanceScale,
-        output_format: "mp3",
-        breaks: {
-          sentence: 450,
-          comma: 250,
-          semicolon: 300,
-          paragraph: 600,
-        },
-      }),
-      cache: "no-store",
-      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-    })
+    const result = await requestWithSaydiRefresh(apiKey, refreshToken, SAYDI_TTS_URL, ttsRequest)
+    upstream = result.response
+    apiKey = result.accessToken
+    refreshToken = result.refreshToken
   } catch (error: unknown) {
     console.error("[api/avatar/tts]", error)
     return errorResponse("Không thể kết nối tới dịch vụ giọng nói.", 502)
