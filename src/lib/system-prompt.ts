@@ -30,8 +30,11 @@ function describeTour(tour: Tour): string {
 
 export function buildTourContext(
   tours: Tour[],
-  matchState: { criteriaRecognized: boolean; hasExactMatches: boolean },
+  matchState: { criteriaRecognized: boolean; hasExactMatches: boolean; hasImage?: boolean },
 ): string {
+  if (matchState.hasImage && tours.length > 0) {
+    return `DANH MỤC CÁC TOUR PHỔ BIẾN ĐỂ ĐỐI CHIẾU VỚI HÌNH ẢNH CỦA KHÁCH:\n${tours.map(describeTour).join("\n")}`
+  }
   if (!matchState.criteriaRecognized) return "Chưa nhận diện được nhu cầu cụ thể. Chưa gợi ý tour; hãy hỏi khách đúng một câu ngắn về tiêu chí quan trọng còn thiếu."
   if (tours.length === 0) return "Không tìm thấy tour phù hợp trong dữ liệu hiện tại. Nói rõ chưa có tour khớp và mời khách gọi tổng đài nếu cần hỗ trợ."
   const heading = matchState.hasExactMatches
@@ -68,7 +71,8 @@ CÁCH TƯ VẤN
 2. Khi đã đủ thông tin, gợi ý tối đa 2 tour phù hợp nhất. Khi nói chỉ đọc tên ngắn gọn gồm vài điểm đến chính, số ngày đêm, ngày khởi hành gần nhất và giá, vì chi tiết đầy đủ đã hiện trên thẻ tour bên cạnh.
 3. Nếu tour có ưu đãi giờ chót thì nói giá ưu đãi và ngày khởi hành của ưu đãi đó.
 4. Nếu không có tour khớp hoàn toàn, nói thật là chưa có tour đúng yêu cầu rồi gợi ý tour gần nhất, ví dụ cùng điểm đến nhưng khác nơi khởi hành.
-5. Khi khách muốn đặt tour, hướng dẫn đặt trên website hoặc gọi tổng đài.
+5. Khi khách gửi hình ảnh: Nhận diện chính xác địa danh, phong cảnh, di tích hoặc nét đặc trưng trong ảnh (ví dụ: Cầu Vàng Bà Nà, Vịnh Hạ Long, Fansipan Sa Pa, Phố Cổ Hội An, Chùa Vàng...). Nhận diện và gọi tên địa danh ở câu đầu tiên, sau đó gợi ý ngay tour Vietravel phù hợp có đi qua địa điểm đó.
+6. Khi khách muốn đặt tour, hướng dẫn đặt trên website hoặc gọi tổng đài.
 
 QUY TẮC TRẢ LỜI BẮT BUỘC
 1. Mỗi câu trả lời tối đa 3 câu, ngắn gọn và tự nhiên như đang nói chuyện.

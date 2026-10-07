@@ -35,7 +35,7 @@ function TourCard({ tour, index }: { tour: Tour; index: number }): React.JSX.Ele
   return (
     <article
       style={{ "--reveal-delay": `${index * 90}ms` } as React.CSSProperties}
-      className="group animate-reveal relative flex h-full w-[17rem] shrink-0 flex-col overflow-hidden rounded-2xl bg-white shadow-[0_10px_30px_-18px_rgba(0,70,193,0.35)] ring-1 ring-cloud transition-transform duration-500 ease-soft hover:-translate-y-1"
+      className="group animate-reveal relative flex h-full w-[17rem] shrink-0 flex-col overflow-hidden rounded-2xl bg-white shadow-[0_10px_30px_-18px_rgba(0,70,193,0.35)] ring-1 ring-cloud transition-[transform,box-shadow] duration-500 ease-soft focus-within:ring-2 focus-within:ring-ring hover:-translate-y-1 hover:shadow-[0_22px_40px_-20px_rgba(0,70,193,0.45)]"
     >
       <div className="relative h-40 overflow-hidden">
         <Image
@@ -96,7 +96,7 @@ function TourCard({ tour, index }: { tour: Tour; index: number }): React.JSX.Ele
           ) : (
             <span className="text-[0.72rem] text-muted-foreground">Giá từ:</span>
           )}
-          <span className="text-lg leading-tight font-extrabold text-ocean">{formatVnd(deal?.priceVnd ?? tour.priceVnd)}</span>
+          <span className="text-lg leading-tight font-extrabold tabular-nums text-ocean">{formatVnd(deal?.priceVnd ?? tour.priceVnd)}</span>
         </div>
         <a
           href={tour.url}

@@ -5,6 +5,7 @@ export type ChatRole = "user" | "assistant"
 export interface ChatMessage {
   role: ChatRole
   content: string
+  image?: string // Base64 data URL (e.g. data:image/jpeg;base64,...)
 }
 
 export interface ChatRequest {

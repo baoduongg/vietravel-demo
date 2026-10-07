@@ -270,15 +270,28 @@ export async function createMascotEngine(
     settle()
   }
 
+  const resumeAudio = (): void => {
+    if (audioCtx.state === "suspended") {
+      void audioCtx.resume()
+    }
+  }
+  window.addEventListener("pointerdown", resumeAudio)
+  window.addEventListener("keydown", resumeAudio)
+
   return {
     async unlock(): Promise<void> {
-      await audioCtx.resume()
+      if (audioCtx.state === "suspended") {
+        await audioCtx.resume()
+      }
     },
 
     async speak(audio: ArrayBuffer): Promise<void> {
       stop()
+      if (audioCtx.state === "suspended") {
+        await audioCtx.resume()
+      }
       const token = speechToken
-      const buffer = await audioCtx.decodeAudioData(audio)
+      const buffer = await audioCtx.decodeAudioData(audio.slice(0))
       if (token !== speechToken) return
 
       if (!hasGreeted) {
@@ -315,6 +328,8 @@ export async function createMascotEngine(
       window.removeEventListener("pointermove", handlePointerMove)
       document.documentElement.removeEventListener("pointerleave", handlePointerLeave)
       window.removeEventListener("blur", handlePointerLeave)
+      window.removeEventListener("pointerdown", resumeAudio)
+      window.removeEventListener("keydown", resumeAudio)
       resizeObserver.disconnect()
       disposeObject(rig.root)
       face.dispose()

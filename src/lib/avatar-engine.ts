@@ -99,13 +99,18 @@ export async function createAvatarEngine(
   return {
     async unlock(): Promise<void> {
       head.start()
-      await head.audioCtx.resume()
+      if (head.audioCtx.state === "suspended") {
+        await head.audioCtx.resume()
+      }
     },
 
     async speak(audio: ArrayBuffer): Promise<void> {
       stop()
+      if (head.audioCtx.state === "suspended") {
+        await head.audioCtx.resume()
+      }
       const token = speechToken
-      const buffer = await head.audioCtx.decodeAudioData(audio)
+      const buffer = await head.audioCtx.decodeAudioData(audio.slice(0))
       if (token !== speechToken) return
 
       await new Promise<void>((resolve) => {

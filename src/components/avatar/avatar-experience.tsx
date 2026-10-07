@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect } from "react"
 import dynamic from "next/dynamic"
-import { RotateCwIcon } from "lucide-react"
 import { toast } from "sonner"
 
+import { StartOverlay } from "@/components/avatar/start-overlay"
 import { AvatarModelSwitch } from "@/components/avatar/avatar-model-switch"
 import { ChatPanel } from "@/components/avatar/chat-panel"
 import { MicButton } from "@/components/avatar/mic-button"
@@ -13,6 +13,7 @@ import { StageScenery } from "@/components/avatar/stage-scenery"
 import { StatusBadge } from "@/components/avatar/status-badge"
 import { Subtitle } from "@/components/avatar/subtitle"
 import { SuggestedQuestions } from "@/components/avatar/suggested-questions"
+import { ThinkingIndicator } from "@/components/avatar/thinking-indicator"
 import { TourCards } from "@/components/avatar/tour-cards"
 import { company } from "@/config/company"
 import { useAvatarConversation } from "@/hooks/use-avatar-conversation"
@@ -65,9 +66,9 @@ export function AvatarExperience(): React.JSX.Element {
   const { listening, cancel: cancelListening, start: startListening, stop: stopListening } = speech
 
   const handleAsk = useCallback(
-    (question: string): void => {
+    (question: string, image?: string): void => {
       if (listening) cancelListening()
-      void ask(question)
+      void ask(question, image)
     },
     [ask, listening, cancelListening],
   )
@@ -85,18 +86,24 @@ export function AvatarExperience(): React.JSX.Element {
   const controlsDisabled = !started || !engineReady
   const notice = !speech.supported ? NOTICES.unsupported : speech.issue ? NOTICES[speech.issue] : null
 
-  useEffect(() => {
-    if (engineReady && !started && !loadError) start()
-  }, [engineReady, started, loadError, start])
-
   return (
     <div className="flex min-h-dvh flex-col lg:h-dvh">
       <SiteHeader />
 
+      {!started && (
+        <StartOverlay
+          assistantName={company.persona.name}
+          ready={engineReady}
+          progress={loadProgress}
+          error={loadError}
+          onStart={start}
+        />
+      )}
+
       <main className="mx-auto flex w-full max-w-[1280px] flex-1 flex-col gap-5 px-4 py-5 lg:grid lg:min-h-0 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-6 lg:px-6 lg:py-6">
         <section
           aria-label={`Trợ lý ${company.persona.name}`}
-          className="animate-reveal flex flex-col rounded-[1.75rem] bg-white p-2 ring-1 ring-cloud lg:min-h-0"
+          className="animate-reveal flex flex-col rounded-[1.75rem] bg-white p-2 ring-1 ring-cloud shadow-[0_24px_60px_-30px_rgba(0,70,193,0.4)] lg:min-h-0"
         >
           <div className="relative isolate h-[58dvh] min-h-[380px] overflow-hidden rounded-[1.375rem] bg-linear-to-b from-[#bfe3ff] via-[#e3f2ff] to-white lg:h-auto lg:min-h-0 lg:flex-1">
             <StageScenery />
@@ -105,43 +112,29 @@ export function AvatarExperience(): React.JSX.Element {
               <div className="animate-cloud-drift absolute top-[30%] -right-[15%] h-20 w-[55%] rounded-full bg-white/60 blur-2xl [animation-delay:-14s] [animation-direction:alternate-reverse]" />
             </div>
 
-            <AvatarStage />
-
-            <div className="absolute top-4 left-4">
-              <StatusBadge status={status} />
-            </div>
-
-            <div className="absolute top-4 right-4">
-              <AvatarModelSwitch />
-            </div>
-
-            {!started && (
-              <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-3 bg-linear-to-t from-white via-white/80 to-transparent px-6 pt-24 pb-8">
-                {loadError ? (
-                  <>
-                    <p role="alert" className="max-w-xs text-center text-sm text-ink">
-                      {loadError}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => window.location.reload()}
-                      className="inline-flex h-11 items-center gap-2 rounded-full border border-ocean bg-white px-5 text-sm font-bold text-ocean transition-transform duration-300 ease-soft active:scale-[0.97]"
-                    >
-                      <RotateCwIcon aria-hidden strokeWidth={1.75} className="size-4" />
-                      Tải lại trang
-                    </button>
-                  </>
-                ) : (
-                  <p aria-live="polite" className="text-xs font-semibold text-muted-foreground">
-                    {engineReady ? `${company.persona.name} đang chào Quý khách…` : `Đang chuẩn bị ${company.persona.name}… ${loadProgress}%`}
-                  </p>
-                )}
+            {status === "thinking" && (
+              <div className="absolute top-0 inset-x-0 z-20 h-1 overflow-hidden bg-cloud">
+                <div className="h-full w-2/3 bg-linear-to-r from-transparent via-sunset to-transparent animate-thinking-beam" />
               </div>
             )}
 
+            <AvatarStage />
+
+            <div className="absolute top-4 left-4 z-10">
+              <StatusBadge status={status} />
+            </div>
+
+            <div className="absolute top-4 right-4 z-10">
+              <AvatarModelSwitch />
+            </div>
+
             {started && (
               <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-white via-white/90 to-transparent px-5 pt-20 pb-6 lg:px-8">
-                <Subtitle text={subtitle} interim={speech.interimTranscript} />
+                {status === "thinking" && !subtitle ? (
+                  <ThinkingIndicator assistantName={company.persona.name} />
+                ) : (
+                  <Subtitle text={subtitle} interim={speech.interimTranscript} />
+                )}
               </div>
             )}
           </div>
@@ -150,11 +143,11 @@ export function AvatarExperience(): React.JSX.Element {
         <section
           aria-labelledby="assistant-heading"
           style={{ "--reveal-delay": "120ms" } as React.CSSProperties}
-          className="animate-reveal flex min-h-0 flex-col gap-5 rounded-[1.75rem] bg-white p-5 ring-1 ring-cloud lg:p-7"
+          className="animate-reveal flex min-h-0 flex-col gap-5 rounded-[1.75rem] bg-white p-5 ring-1 ring-cloud shadow-[0_24px_60px_-30px_rgba(0,70,193,0.3)] lg:p-7"
         >
           <div className="flex flex-col gap-5 lg:min-h-0 lg:shrink-[3] lg:overflow-y-auto">
             <div className="flex flex-col gap-1.5">
-              <h1 id="assistant-heading" className="text-2xl leading-tight font-extrabold tracking-tight text-ink lg:text-[2rem]">
+              <h1 id="assistant-heading" className="text-2xl leading-[1.15] font-extrabold tracking-[-0.025em] text-ink lg:text-[2.25rem]">
                 Hỏi {company.persona.name} về chuyến đi của bạn
               </h1>
               <p className="max-w-[60ch] text-[0.95rem] leading-relaxed text-pretty text-muted-foreground">
@@ -171,6 +164,7 @@ export function AvatarExperience(): React.JSX.Element {
             className="lg:mt-auto"
             messages={messages}
             assistantName={company.persona.name}
+            status={status}
             historyOpen={historyOpen}
             disabled={controlsDisabled}
             notice={notice}
@@ -190,3 +184,4 @@ export function AvatarExperience(): React.JSX.Element {
     </div>
   )
 }
+

@@ -72,3 +72,26 @@ assert.equal(selectRelevantTours(tours, [user("Tôi muốn đi Tokyo vào tháng
 assert.deepEqual(selectRelevantTours(tours, [user("Tìm tour Tokyo từ TP Hồ Chí Minh"), user("Xin sửa lại, tôi muốn đi Osaka khởi hành từ Hà Nội")], today).tours.map(({ code }) => code), ["JPOSA102"])
 assert.deepEqual(selectRelevantTours(tours, [user("Tìm tour khởi hành ngày 10/11/2026" )], today).tours.map(({ code }) => code), ["JPTYO101", "JPOSA102", "NDDNG103"])
 assert.deepEqual(selectRelevantTours([tour({ departureDates: ["2026-10-06"] })], [user("Tìm tour khởi hành ngày 06/10" )], today).tours.map(({ code }) => code), ["JPTYO101"])
+
+// Tests for Vibe & Emotional Search
+const vibeTours = [
+  tour({ code: "DALAT01", name: "Đà Lạt - Thiên đường săn mây", highlight: "Khí hậu se lạnh, lãng mạn cho cặp đôi", departureCity: "TP. Hồ Chí Minh", priceVnd: 3500000 }),
+  tour({ code: "PQUOC02", name: "Phú Quốc - Biển xanh nắng vàng", highlight: "Tắm biển, lặn ngắm san hô, nghỉ dưỡng resort", departureCity: "TP. Hồ Chí Minh", priceVnd: 5900000 }),
+  tour({ code: "YENTU03", name: "Hà Nội - Yên Tử - Chùa Bái Đính", highlight: "Hành hương tâm linh, cầu an thanh tịnh", departureCity: "Hà Nội", priceVnd: 4200000 }),
+]
+
+assert.deepEqual(
+  selectRelevantTours(vibeTours, [user("Tôi muốn tìm một nơi se lạnh để chữa lành và xả stress")], today).tours.map(({ code }) => code),
+  ["DALAT01", "YENTU03"]
+)
+
+assert.deepEqual(
+  selectRelevantTours(vibeTours, [user("Tour nào cho 2 người đi hưởng tuần trăng mật lãng mạn?")], today).tours.map(({ code }) => code),
+  ["DALAT01", "PQUOC02"]
+)
+
+assert.deepEqual(
+  selectRelevantTours(vibeTours, [user("Tôi muốn đi tắm biển ngắm san hô")], today).tours.map(({ code }) => code),
+  ["PQUOC02"]
+)
+

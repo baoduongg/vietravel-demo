@@ -8,10 +8,11 @@ import { company } from "@/config/company"
 import { avatarService } from "@/services/avatar.service"
 import { getErrorMessage } from "@/services/http"
 import { useAvatarStore } from "@/stores/avatar.store"
+import type { Tour } from "@/types/tour"
 
 interface UseAvatarConversationResult {
   start: () => void
-  ask: (question: string) => Promise<void>
+  ask: (question: string, image?: string) => Promise<void>
   interrupt: () => void
 }
 
@@ -31,17 +32,22 @@ export function useAvatarConversation(): UseAvatarConversationResult {
   const isCurrent = useCallback((id: number): boolean => id === requestIdRef.current, [])
 
   const speakReply = useCallback(
-    async (text: string, id: number, signal: AbortSignal): Promise<void> => {
-      const { setStatus, setSubtitle } = useAvatarStore.getState()
+    async (text: string, id: number, signal: AbortSignal, tours?: Tour[]): Promise<void> => {
+      const { setStatus, setSubtitle, addMessage, setRecommendedTours } = useAvatarStore.getState()
       try {
         const audio = await avatarService.synthesize(text, signal)
         const engine = useAvatarStore.getState().engine
         if (!isCurrent(id) || !engine) return
+
+        addMessage({ role: "assistant", content: text })
+        if (tours && tours.length > 0) setRecommendedTours(tours)
         setSubtitle(text)
         setStatus("speaking")
         await engine.speak(audio)
       } catch (error: unknown) {
         if (axios.isCancel(error) || !isCurrent(id)) return
+        addMessage({ role: "assistant", content: text })
+        if (tours && tours.length > 0) setRecommendedTours(tours)
         setSubtitle(text)
         toast.error(getErrorMessage(error, "Không phát được giọng nói, em hiển thị câu trả lời bằng chữ ạ."))
       } finally {
@@ -52,33 +58,31 @@ export function useAvatarConversation(): UseAvatarConversationResult {
   )
 
   const start = useCallback((): void => {
-    const { engine, setStarted, addMessage, setStatus } = useAvatarStore.getState()
+    const { engine, setStarted, setStatus } = useAvatarStore.getState()
     if (!engine) return
     void engine.unlock()
     setStarted(true)
     const greeting = company.persona.greeting
-    addMessage({ role: "assistant", content: greeting })
     const { id, signal } = beginRequest()
     setStatus("thinking")
     void speakReply(greeting, id, signal)
   }, [beginRequest, speakReply])
 
   const ask = useCallback(
-    async (question: string): Promise<void> => {
-      const content = question.trim()
+    async (question: string, image?: string): Promise<void> => {
+      const content = question.trim() || (image ? "Hãy phân tích hình ảnh này và gợi ý tour Vietravel phù hợp nhất cho tôi." : "")
       if (!content) return
+      void useAvatarStore.getState().engine?.unlock()
       const { id, signal } = beginRequest()
       const { addMessage, setStatus, setSubtitle } = useAvatarStore.getState()
-      addMessage({ role: "user", content })
+      addMessage({ role: "user", content, image })
       setSubtitle("")
       setStatus("thinking")
 
       try {
         const { reply, tours } = await avatarService.chat(useAvatarStore.getState().messages, signal)
         if (!isCurrent(id)) return
-        addMessage({ role: "assistant", content: reply })
-        if (tours.length > 0) useAvatarStore.getState().setRecommendedTours(tours)
-        await speakReply(reply, id, signal)
+        await speakReply(reply, id, signal, tours)
       } catch (error: unknown) {
         if (axios.isCancel(error) || !isCurrent(id)) return
         setStatus("idle")

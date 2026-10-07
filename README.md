@@ -18,9 +18,10 @@ Mở http://localhost:3000 bằng Chrome hoặc Edge, bật loa rồi bấm “T
 
 | Biến môi trường | Ý nghĩa |
 | --- | --- |
-| `ANTHROPIC_API_KEY` | Khóa Claude cho phần hội thoại |
-| `ANTHROPIC_MODEL` | Model Claude, mặc định `claude-opus-5-5` |
-| `SAYDI_API_KEY` | Khóa Saydi TTS cho giọng nói tiếng Việt |
+| `GEMINI_API_KEY` | Khóa Gemini cho phần hội thoại |
+| `GEMINI_MODEL` | Model Gemini cho hội thoại |
+| `VIENEU_API_KEY` | Khóa VieNeu TTS cho giọng nói tiếng Việt |
+| `DEMO_PASSWORD` | Mật khẩu vào trang demo |
 
 ## Chọn nhân vật
 

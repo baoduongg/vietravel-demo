@@ -16,8 +16,6 @@ export interface Persona {
 export interface VoiceConfig {
   languageCode: string
   name: string
-  speed: number
-  guidanceScale: number
 }
 
 /**
@@ -85,9 +83,7 @@ export const company: CompanyConfig = {
   },
   voice: {
     languageCode: "vi-VN",
-    name: "vi-ngoc-huyen-2-0",
-    speed: 1,
-    guidanceScale: 2.8,
+    name: "Ngọc Lan",
   },
   services: [
     "Tour trọn gói trong nước và nước ngoài",
@@ -129,9 +125,9 @@ export const company: CompanyConfig = {
   ],
   suggestedQuestions: [
     "Tháng này đi Đà Nẵng Hội An 3 ngày hết bao nhiêu?",
-    "Có tour Nhật Bản ngắm mùa thu không em?",
+    "Tìm nơi se lạnh, bình yên để xả stress và chữa lành",
+    "Tour nào lãng mạn cho cặp đôi đi trăng mật?",
     "Tour nước ngoài nào dưới 10 triệu?",
     "Đang có ưu đãi giờ chót nào không?",
-    "Thanh toán bằng những hình thức nào?",
   ],
 }

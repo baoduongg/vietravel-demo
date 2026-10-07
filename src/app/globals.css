@@ -86,8 +86,26 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    background-image:
+      radial-gradient(60rem 30rem at 85% -10%, color-mix(in oklab, var(--cloud) 70%, transparent), transparent 70%),
+      radial-gradient(40rem 24rem at -5% 30%, color-mix(in oklab, var(--cloud) 40%, transparent), transparent 70%);
+    background-attachment: fixed;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--sunset) 30%, transparent);
   }
 }
 
@@ -119,6 +137,25 @@
   }
 }
 
+@keyframes thinking-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(3, 145, 255, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(3, 145, 255, 0);
+  }
+}
+
+@keyframes thinking-beam {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
 @utility animate-cloud-drift {
   animation: cloud-drift 38s ease-in-out infinite alternate;
 }
@@ -131,10 +168,20 @@
   animation: listening-pulse 1.3s ease-out infinite;
 }
 
+@utility animate-thinking-pulse {
+  animation: thinking-pulse 1.6s ease-in-out infinite;
+}
+
+@utility animate-thinking-beam {
+  animation: thinking-beam 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-cloud-drift,
   .animate-speaking-glow,
-  .animate-listening-pulse {
+  .animate-listening-pulse,
+  .animate-thinking-pulse,
+  .animate-thinking-beam {
     animation: none;
   }
 }

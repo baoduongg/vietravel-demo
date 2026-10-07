@@ -4,7 +4,7 @@ import { company } from "@/config/company"
 
 export function SiteHeader(): React.JSX.Element {
   return (
-    <header className="sticky top-0 z-20 border-b border-black/5 bg-white">
+    <header className="sticky top-0 z-20 border-b border-ocean/10 bg-white/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/70">
       <div className="mx-auto flex h-16 w-full max-w-[1280px] items-center gap-4 px-4 lg:px-6">
         <a href={`https://${company.website}`} target="_blank" rel="noreferrer" className="shrink-0">
           {/* eslint-disable-next-line @next/next/no-img-element -- logo nhỏ, giữ nguyên tỉ lệ gốc */}

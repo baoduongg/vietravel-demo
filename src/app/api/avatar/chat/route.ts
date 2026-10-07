@@ -1,28 +1,29 @@
 import { NextResponse } from "next/server"
 
 import { company, MAX_RECOMMENDED_TOURS, TOUR_TAG } from "@/config/company"
-import { findToursByCode, getUpcomingTours, inferToursFromReply, scrapedAt, todayIso } from "@/data/tours"
+import { findToursByCode, getUpcomingTours, inferToursFromReply, todayIso } from "@/data/tours"
 import { selectRelevantTours } from "@/lib/tour-matching"
+import { searchToursHybrid } from "@/lib/vector-rag/vector-store"
 import { buildSystemPrompt, buildTourContext } from "@/lib/system-prompt"
 import type { ApiError, ChatMessage, ChatResponse } from "@/types/chat"
 
 export const runtime = "nodejs"
 
 const GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta/models"
-const GEMINI_CACHE_URL = "https://generativelanguage.googleapis.com/v1beta/cachedContents"
 const DEFAULT_MODEL = "gemini-3.5-flash-lite"
 const REQUEST_TIMEOUT_MS = 30000
 const MAX_RETRIES = 2
 const MAX_TURNS = 10
 const MAX_SENTENCES = 3
 const MAX_MESSAGE_LENGTH = 1000
-const SYSTEM_CACHE_TTL_SECONDS = 3600
 /** Ranh giới câu, trừ dấu chấm sau chữ viết tắt như "TP." trong "TP. Hồ Chí Minh". */
 const SENTENCE_BREAK = /(?<=[.!?…])(?<!(?:^|\s)(?:TP|Tp|Q|P|TX|TT)\.)\s+/
 
+type GeminiPart = { text: string } | { inlineData: { mimeType: string; data: string } }
+
 interface GeminiContent {
   role: "user" | "model"
-  parts: { text: string }[]
+  parts: GeminiPart[]
 }
 
 interface GeminiResponse {
@@ -38,10 +39,18 @@ class GeminiHttpError extends Error {
   }
 }
 
+function parseDataUrl(dataUrl: string): { mimeType: string; data: string } | null {
+  const match = dataUrl.match(/^data:([^;]+);base64,(.+)$/)
+  if (!match) return null
+  return { mimeType: match[1], data: match[2] }
+}
+
 function isChatMessage(value: unknown): value is ChatMessage {
   if (typeof value !== "object" || value === null) return false
-  const { role, content } = value as Record<string, unknown>
-  return (role === "user" || role === "assistant") && typeof content === "string" && content.trim().length > 0
+  const { role, content, image } = value as Record<string, unknown>
+  const hasContent = typeof content === "string" && content.trim().length > 0
+  const hasImage = typeof image === "string" && image.startsWith("data:image/")
+  return (role === "user" || role === "assistant") && (hasContent || hasImage)
 }
 
 function parseMessages(body: unknown): ChatMessage[] | null {
@@ -50,17 +59,30 @@ function parseMessages(body: unknown): ChatMessage[] | null {
   if (!Array.isArray(messages) || messages.length === 0 || !messages.every(isChatMessage)) return null
   return messages.map((message) => ({
     role: message.role,
-    content: message.content.trim().slice(0, MAX_MESSAGE_LENGTH),
+    content: (message.content ?? "").trim().slice(0, MAX_MESSAGE_LENGTH),
+    image: typeof message.image === "string" && message.image.startsWith("data:image/") ? message.image : undefined,
   }))
 }
 
 function toGeminiContents(messages: ChatMessage[], dynamicTourContext: string): GeminiContent[] {
   const recent = messages.slice(-MAX_TURNS * 2)
   const firstUserIndex = recent.findIndex((message) => message.role === "user")
-  const contents = recent.slice(Math.max(firstUserIndex, 0)).map((message) => ({
-    role: message.role === "assistant" ? "model" as const : "user" as const,
-    parts: [{ text: message.content }],
-  }))
+  const contents = recent.slice(Math.max(firstUserIndex, 0)).map((message) => {
+    const parts: GeminiPart[] = []
+    if (message.image) {
+      const parsed = parseDataUrl(message.image)
+      if (parsed) {
+        parts.push({ inlineData: parsed })
+      }
+    }
+    if (message.content) {
+      parts.push({ text: message.content })
+    }
+    return {
+      role: message.role === "assistant" ? ("model" as const) : ("user" as const),
+      parts,
+    }
+  })
   const latestUserMessage = contents.pop()
   return [
     ...contents,
@@ -102,43 +124,6 @@ async function callGemini(apiKey: string, model: string, body: Record<string, un
     await response.body?.cancel()
     await new Promise((resolve) => setTimeout(resolve, delay))
   }
-}
-
-interface SystemCacheEntry {
-  key: string
-  name: string
-  expiresAt: number
-}
-
-let systemCache: SystemCacheEntry | null = null
-
-/** System prompt (155 tour + FAQ) đổi nhiều nhất 1 lần/ngày, nên cache qua Gemini cachedContents thay vì gửi lại full mỗi lượt chat. */
-async function getCachedSystemInstruction(apiKey: string, model: string, today: string): Promise<string | null> {
-  const key = `${model}:${today}:${scrapedAt}`
-  if (systemCache && systemCache.key === key && systemCache.expiresAt > Date.now()) {
-    return systemCache.name
-  }
-  const response = await fetch(GEMINI_CACHE_URL, {
-    method: "POST",
-    headers: { "x-goog-api-key": apiKey, "content-type": "application/json" },
-    body: JSON.stringify({
-      model: `models/${model}`,
-      systemInstruction: { parts: [{ text: buildSystemPrompt(today) }] },
-      ttl: `${SYSTEM_CACHE_TTL_SECONDS}s`,
-    }),
-    cache: "no-store",
-  })
-  if (!response.ok) {
-    console.error("[api/avatar/chat] cache create failed", response.status, await response.text())
-    return null
-  }
-  const data = (await response.json()) as { name: string }
-  systemCache = { key, name: data.name, expiresAt: Date.now() + (SYSTEM_CACHE_TTL_SECONDS - 60) * 1000 }
-  return data.name
-}
-
-function isCacheMissError(error: unknown): boolean {
-  return error instanceof GeminiHttpError && error.status === 404 && error.body.includes("cachedContent")
 }
 
 function hotlineReply(): string {
@@ -199,32 +184,46 @@ export async function POST(request: Request): Promise<NextResponse<ChatResponse 
   const today = todayIso()
 
   try {
-    const match = selectRelevantTours(getUpcomingTours(today), messages.slice(-MAX_TURNS * 2), today)
-    const dynamicTourContext = buildTourContext(match.tours, match)
+    const latestMessage = messages.at(-1)
+    const hasImage = Boolean(latestMessage?.image)
+
+    const upcoming = getUpcomingTours(today)
+    let match = selectRelevantTours(upcoming, messages.slice(-MAX_TURNS * 2), today)
+
+    if (!match.criteriaRecognized || match.tours.length === 0) {
+      const userText = messages
+        .filter((m) => m.role === "user")
+        .map((m) => m.content)
+        .join(" ")
+      if (userText.trim()) {
+        const hybridResult = await searchToursHybrid({
+          query: userText,
+          tours: upcoming,
+          apiKey,
+        })
+        if (hybridResult.tours.length > 0) {
+          match = hybridResult
+        }
+      }
+    }
+
+    if (hasImage && match.tours.length === 0) {
+      match = {
+        criteriaRecognized: true,
+        hasExactMatches: true,
+        tours: upcoming.slice(0, 30),
+      }
+    }
+
+    const dynamicTourContext = buildTourContext(match.tours, { ...match, hasImage })
     const contents = toGeminiContents(messages, dynamicTourContext)
     const generationConfig = { maxOutputTokens: 500, thinkingConfig: { thinkingBudget: 0 } }
-    const cacheName = await getCachedSystemInstruction(apiKey, model, today)
 
-    const response = await (async () => {
-      if (!cacheName) {
-        return callGemini(apiKey, model, {
-          contents,
-          systemInstruction: { parts: [{ text: buildSystemPrompt(today) }] },
-          generationConfig,
-        })
-      }
-      try {
-        return await callGemini(apiKey, model, { contents, cachedContent: cacheName, generationConfig })
-      } catch (error) {
-        if (!isCacheMissError(error)) throw error
-        systemCache = null
-        return callGemini(apiKey, model, {
-          contents,
-          systemInstruction: { parts: [{ text: buildSystemPrompt(today) }] },
-          generationConfig,
-        })
-      }
-    })()
+    const response = await callGemini(apiKey, model, {
+      contents,
+      systemInstruction: { parts: [{ text: buildSystemPrompt(today) }] },
+      generationConfig,
+    })
 
     const candidate = response.candidates?.[0]
     if (candidate?.finishReason === "SAFETY" || candidate?.finishReason === "RECITATION") {
@@ -232,8 +231,8 @@ export async function POST(request: Request): Promise<NextResponse<ChatResponse 
     }
 
     const text = (candidate?.content?.parts ?? [])
-      .map((part) => part.text)
-      .filter((value): value is string => typeof value === "string")
+      .map((part) => ("text" in part ? part.text : ""))
+      .filter((value): value is string => typeof value === "string" && value.length > 0)
       .join(" ")
     const { speech, codes } = splitTourTag(text)
     const reply = toSpokenText(speech)
