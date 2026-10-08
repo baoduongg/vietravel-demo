@@ -28,7 +28,7 @@ export default function HomePage(): React.JSX.Element {
         </Section>
         <MomentsStrip guide={phuQuoc} />
         <Section id="tour-noi-bat" title="Tour Phú Quốc đang mở bán" intro="Giá và ngày khởi hành lấy từ travel.com.vn.">
-          <TourList tours={tours} limit={3} hotline={company.hotline} />
+          <TourList tours={tours} limit={3} hotline={company.hotline} planDestination={{ slug: phuQuoc.slug, name: phuQuoc.name }} />
         </Section>
         <Section id="vi-sao" title="Vì sao đi cùng Vietravel">
           <div className="grid gap-4 md:grid-cols-5">

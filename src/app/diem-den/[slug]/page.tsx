@@ -57,7 +57,7 @@ export default async function DestinationPage({ params }: PageProps): Promise<Re
         <CostChecklist guide={guide} minTourPriceVnd={tours[0]?.priceVnd ?? null} />
         <Reviews guide={guide} />
         <Section id="tour" title={`Tour ${guide.name} đang mở bán`} intro="Giá và ngày khởi hành lấy từ travel.com.vn. Bấm Xem và đặt để chuyển sang trang tour của Vietravel.">
-          <TourList tours={tours} hotline={company.hotline} />
+          <TourList tours={tours} hotline={company.hotline} planDestination={{ slug: guide.slug, name: guide.name }} />
         </Section>
         <Faq guide={guide} />
         <FinalCta guide={guide} />

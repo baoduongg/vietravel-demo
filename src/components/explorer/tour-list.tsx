@@ -3,6 +3,8 @@ import { ClockIcon, PhoneIcon, StarIcon, TagIcon } from "lucide-react"
 
 import { CARD_CLASS } from "@/components/explorer/section"
 import { CtaLink } from "@/components/explorer/cta-link"
+import { AddToPlanButton } from "@/components/journey/add-to-plan-button"
+import { tourServiceId } from "@/lib/journey/ids"
 import { formatRating, formatShortDate, formatVnd } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import type { Tour } from "@/types/tour"
@@ -11,9 +13,11 @@ interface TourListProps {
   tours: Tour[]
   hotline: string
   limit?: number
+  /** Có giá trị thì mỗi thẻ có nút "Thêm vào kế hoạch". */
+  planDestination?: { slug: string; name: string }
 }
 
-function TourItem({ tour }: { tour: Tour }): React.JSX.Element {
+function TourItem({ tour, plan }: { tour: Tour; plan?: { slug: string; name: string } }): React.JSX.Element {
   const price = tour.deal?.priceVnd ?? tour.priceVnd
   const dates = (tour.deal ? [tour.deal.departureDate] : tour.departureDates).slice(0, 3).map(formatShortDate)
   const rating = formatRating(tour.rating)
@@ -29,6 +33,15 @@ function TourItem({ tour }: { tour: Tour }): React.JSX.Element {
         className="-z-20 object-cover transition-transform duration-1000 ease-soft group-hover:scale-105"
       />
       <span aria-hidden className="absolute inset-0 -z-10 bg-linear-to-t from-shade via-shade/75 via-45% to-transparent" />
+      {plan && (
+        <AddToPlanButton
+          destinationSlug={plan.slug}
+          destinationName={plan.name}
+          serviceId={tourServiceId(tour.code)}
+          label="Thêm vào kế hoạch"
+          className="absolute top-4 left-4 h-9 px-3 text-xs"
+        />
+      )}
       {tour.deal && (
         <span className="absolute top-4 right-4 rounded-full bg-primary px-3 py-1 text-xs font-bold text-white">
           -{Math.round((1 - tour.deal.priceVnd / tour.deal.originalPriceVnd) * 100)}%
@@ -72,7 +85,7 @@ function TourItem({ tour }: { tour: Tour }): React.JSX.Element {
   )
 }
 
-export function TourList({ tours, hotline, limit }: TourListProps): React.JSX.Element {
+export function TourList({ tours, hotline, limit, planDestination }: TourListProps): React.JSX.Element {
   const shown = limit ? tours.slice(0, limit) : tours
 
   if (shown.length === 0) {
@@ -94,7 +107,7 @@ export function TourList({ tours, hotline, limit }: TourListProps): React.JSX.El
   return (
     <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {shown.map((tour) => (
-        <TourItem key={tour.code} tour={tour} />
+        <TourItem key={tour.code} tour={tour} plan={planDestination} />
       ))}
     </ul>
   )

@@ -1,6 +1,7 @@
 import { CtaLink } from "@/components/explorer/cta-link"
 import { PlaceGrid } from "@/components/explorer/place-grid"
 import { Section } from "@/components/explorer/section"
+import { AddToPlanButton } from "@/components/journey/add-to-plan-button"
 import type { DestinationGuide } from "@/types/destination"
 
 export function StayBlock({ guide }: { guide: DestinationGuide }): React.JSX.Element {
@@ -17,8 +18,9 @@ export function StayBlock({ guide }: { guide: DestinationGuide }): React.JSX.Ele
       <div className="mt-12">
         <PlaceGrid items={guide.stays} variant="rail" />
       </div>
-      <div className="mt-6">
+      <div className="mt-6 flex flex-wrap items-center gap-3">
         <CtaLink href={guide.links.hotels}>Xem khách sạn {guide.name} tại Vietravel</CtaLink>
+        <AddToPlanButton destinationSlug={guide.slug} destinationName={guide.name} pickerKind="hotel" label="Chọn khách sạn cho kế hoạch" className="h-12" />
       </div>
     </Section>
   )

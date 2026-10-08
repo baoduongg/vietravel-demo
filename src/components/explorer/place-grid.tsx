@@ -4,10 +4,15 @@ import { useState } from "react"
 import Image from "next/image"
 import { LightbulbIcon } from "lucide-react"
 
+import { AddToPlanButton } from "@/components/journey/add-to-plan-button"
 import { AUDIENCE_LABEL, type Audience, type Place } from "@/types/destination"
+import { activityServiceId } from "@/lib/journey/ids"
 import { cn } from "@/lib/utils"
 
 type Filter = Audience | "all"
+
+/** Có giá trị thì mỗi thẻ có nút "Thêm vào kế hoạch" (chỉ dùng cho hoạt động, không cho loại hình lưu trú). */
+type PlanDestination = { slug: string; name: string }
 
 const OPTIONS: { value: Filter; label: string }[] = [
   { value: "all", label: "Tất cả" },
@@ -17,7 +22,7 @@ const OPTIONS: { value: Filter; label: string }[] = [
 /** Tỉ lệ ảnh xoay vòng để dạng mosaic có nhịp cao thấp. */
 const MOSAIC_RATIO = ["aspect-[4/5]", "aspect-[4/3]", "aspect-square"]
 
-function PlaceCard({ place, ratio }: { place: Place; ratio: string }): React.JSX.Element {
+function PlaceCard({ place, ratio, plan }: { place: Place; ratio: string; plan?: PlanDestination }): React.JSX.Element {
   return (
     // Không có ảnh thì đặt nội dung trong thẻ trắng để khối vẫn có hình khối.
     <div className={cn(!place.imageUrl && "h-full glass-card p-5")}>
@@ -51,13 +56,16 @@ function PlaceCard({ place, ratio }: { place: Place; ratio: string }): React.JSX
           </p>
         )}
         <p className="pt-1 text-xs text-muted-foreground">Phù hợp: {place.audiences.map((audience) => AUDIENCE_LABEL[audience]).join(", ")}</p>
+        {plan && (
+          <AddToPlanButton destinationSlug={plan.slug} destinationName={plan.name} serviceId={activityServiceId(place.name)} className="mt-3 self-start" />
+        )}
       </div>
     </div>
   )
 }
 
 /** rail: cuộn ngang từng thẻ; mosaic: nhiều cột xếp so le, không bao giờ có ô trống dù lọc còn ít thẻ. */
-export function PlaceGrid({ items, variant }: { items: Place[]; variant: "rail" | "mosaic" }): React.JSX.Element {
+export function PlaceGrid({ items, variant, planDestination }: { items: Place[]; variant: "rail" | "mosaic"; planDestination?: PlanDestination }): React.JSX.Element {
   const [filter, setFilter] = useState<Filter>("all")
   const visible = filter === "all" ? items : items.filter((item) => item.audiences.includes(filter))
 
@@ -83,7 +91,7 @@ export function PlaceGrid({ items, variant }: { items: Place[]; variant: "rail" 
         <ul className="-mx-4 mt-8 flex snap-x snap-mandatory scroll-px-4 gap-5 overflow-x-auto px-4 pb-4 [scrollbar-width:none] lg:-mx-6 lg:scroll-px-6 lg:px-6">
           {visible.map((place) => (
             <li key={place.name} className="w-[17rem] shrink-0 snap-start sm:w-[20rem]">
-              <PlaceCard place={place} ratio="aspect-[4/5]" />
+              <PlaceCard place={place} ratio="aspect-[4/5]" plan={planDestination} />
             </li>
           ))}
         </ul>
@@ -91,7 +99,7 @@ export function PlaceGrid({ items, variant }: { items: Place[]; variant: "rail" 
         <ul className="mt-8 gap-x-5 sm:columns-2 lg:columns-3">
           {visible.map((place, index) => (
             <li key={place.name} className="mb-10 break-inside-avoid">
-              <PlaceCard place={place} ratio={MOSAIC_RATIO[index % MOSAIC_RATIO.length]} />
+              <PlaceCard place={place} ratio={MOSAIC_RATIO[index % MOSAIC_RATIO.length]} plan={planDestination} />
             </li>
           ))}
         </ul>
