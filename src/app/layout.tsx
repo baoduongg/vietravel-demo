@@ -12,8 +12,8 @@ const jakarta = Plus_Jakarta_Sans({
 })
 
 export const metadata: Metadata = {
-  title: `${company.persona.name} · Trợ lý du lịch ${company.brand}`,
-  description: `Trò chuyện bằng giọng nói với ${company.persona.name}, ${company.persona.role} ảo của ${company.brand}.`,
+  title: `${company.brand} Explorer · Cảm hứng du lịch`,
+  description: `Khám phá điểm đến, thời tiết, lưu trú, ăn chơi và đặt tour cùng ${company.brand}.`,
 }
 
 export const viewport: Viewport = {
