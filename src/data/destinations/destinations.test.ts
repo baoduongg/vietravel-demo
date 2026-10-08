@@ -37,6 +37,14 @@ for (const place of [...phuQuoc.stays, ...phuQuoc.activities]) {
 }
 for (const review of phuQuoc.reviews) assert.ok(review.rating >= 1 && review.rating <= 5)
 
+// Nội dung dễ sai thực tế (reviewer cuối): không khẳng định tháng 10 mưa nhiều nhất/giá thấp nhất,
+// và không khuyên tự ký gửi nước mắm (hãng bay có quy định riêng).
+assert.ok(!/nhiều nhất/i.test(phuQuoc.months[9].rain + phuQuoc.months[9].advice), "T10 không được ghi 'nhiều nhất'")
+assert.ok(!/thấp nhất/i.test(phuQuoc.months[9].advice), "T10 không được ghi 'thấp nhất'")
+const fishSauce = phuQuoc.faqs.find((faq) => /nước mắm/i.test(faq.question))
+assert.ok(fishSauce, "phải có FAQ nước mắm")
+assert.ok(!/ký gửi/i.test(fishSauce.answer) && /hãng bay/i.test(fishSauce.answer), "FAQ nước mắm phải dẫn về quy định hãng bay")
+
 // Tour: có tour sắp đi; hết lịch thì mảng rỗng (UI hiện CTA hotline); sắp xếp giá tăng.
 const tours = toursForDestination(phuQuoc, today)
 assert.ok(tours.length > 0, "phải có tour Phú Quốc sắp khởi hành")
