@@ -43,3 +43,6 @@ next-env.d.ts
 
 # large video files
 *.mov
+
+# dữ liệu kế hoạch chuyến đi (FileJourneyStore)
+/.data/
