@@ -5,8 +5,9 @@ export const INPUT_CLASS =
 export const PRIMARY_BUTTON =
   "btn-primary inline-flex h-11 items-center justify-center gap-2 rounded-full px-5 text-sm font-semibold whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
 
+/** Dùng token theme thay cho btn-glass (chữ trắng cố định) để đọc được ở cả giao diện sáng; trên ảnh tối thì bọc .on-dark. */
 export const GHOST_BUTTON =
-  "btn-glass inline-flex h-10 items-center justify-center gap-2 rounded-full px-4 text-sm font-semibold whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
+  "inline-flex h-10 items-center justify-center gap-2 rounded-full bg-tint/5 px-4 text-sm font-semibold whitespace-nowrap text-title ring-1 ring-tint/15 backdrop-blur-md transition-colors outline-none hover:bg-tint/10 focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
 
 export const ICON_BUTTON =
   "grid size-9 place-items-center rounded-full text-body outline-none hover:bg-tint/[0.08] focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-40"

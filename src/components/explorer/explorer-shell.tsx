@@ -2,7 +2,13 @@ import { ExplorerFooter } from "@/components/explorer/explorer-footer"
 import { ExplorerHeader } from "@/components/explorer/explorer-header"
 import { TripiFab } from "@/components/explorer/tripi-fab"
 
-export function ExplorerShell({ children }: { children: React.ReactNode }): React.JSX.Element {
+interface ExplorerShellProps {
+  children: React.ReactNode
+  /** Tắt nút nổi "Hỏi Tripi" ở trang có thanh dính đáy riêng (trang kế hoạch). */
+  showTripi?: boolean
+}
+
+export function ExplorerShell({ children, showTripi = true }: ExplorerShellProps): React.JSX.Element {
   return (
     <div className="explorer grain relative min-h-dvh">
       <div aria-hidden className="scroll-progress fixed inset-x-0 top-0 z-50 h-[3px] origin-left bg-linear-to-r from-amber-300 via-coral to-fuchsia-500" />
@@ -10,7 +16,7 @@ export function ExplorerShell({ children }: { children: React.ReactNode }): Reac
       {/* Kéo nội dung lên dưới thanh điều hướng nổi để ảnh hero tràn mép trên. */}
       <main className="-mt-[4.25rem]">{children}</main>
       <ExplorerFooter />
-      <TripiFab />
+      {showTripi && <TripiFab />}
     </div>
   )
 }
