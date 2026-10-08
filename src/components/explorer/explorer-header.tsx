@@ -7,6 +7,7 @@ import { company } from "@/config/company"
 const NAV = [
   { href: "/#diem-den", label: "Điểm đến" },
   { href: "/diem-den/phu-quoc#tour", label: "Tour và ưu đãi" },
+  { href: "/hanh-trinh", label: "Kế hoạch của tôi" },
   { href: "/tripi", label: "Hỏi Tripi" },
 ]
 
