@@ -25,8 +25,13 @@ for (const service of all) {
   assert.ok(!service.bookUrl.includes("khach-san-phu-quoc") && !service.bookUrl.includes("ve-may-bay"), `${service.id}: link đang lỗi`)
   assert.ok(Number.isInteger(service.priceVnd) && service.priceVnd >= 0, `${service.id}: giá không hợp lệ`)
   assert.equal(service.mock, service.kind !== "tour", `${service.id}: cờ mock sai`)
-  // Chỉ tour có ảnh (ảnh của Vietravel); ảnh CC khác bắt buộc ghi công nên không dùng ở đây.
-  assert.equal(service.imageUrl === undefined, service.kind !== "tour", `${service.id}: ảnh sai quy ước`)
+  // Mọi dịch vụ có ảnh, trừ hoạt động chưa có ảnh đúng địa điểm (giao diện dùng ô minh họa).
+  // Ảnh không phải của Vietravel (S3) là ảnh CC: bắt buộc ghi công.
+  if (service.kind !== "activity") assert.ok(service.imageUrl, `${service.id}: thiếu ảnh`)
+  if (!service.imageUrl) continue
+  const vietravelImage = service.imageUrl.startsWith("https://s3-cmc.travel.com.vn/")
+  assert.ok(vietravelImage || service.imageUrl.startsWith("/images/"), `${service.id}: ảnh ngoài host cho phép`)
+  if (!vietravelImage) assert.ok(service.credit?.author && service.credit.license && service.credit.url, `${service.id}: ảnh CC thiếu ghi công`)
   assert.equal(service.destinationSlug, "phu-quoc")
 }
 
@@ -34,6 +39,10 @@ for (const service of all) {
 for (const place of phuQuoc.activities) {
   assert.ok(Object.hasOwn(phuQuocActivityPrices, place.name), `thiếu giá cho "${place.name}"`)
 }
+
+// Hoạt động có ảnh đúng địa điểm trong thư viện cẩm nang thì phải dùng ảnh đó.
+const withPhoto = getServices("phu-quoc", "activity", today).filter((service) => service.imageUrl).map((service) => service.name)
+assert.deepEqual(withPhoto.sort(), ["Bãi Sao", "Cáp treo vượt biển và Hòn Thơm", "Chợ đêm Phú Quốc", "Thị trấn Hoàng Hôn và Kiss Bridge"].sort())
 
 // Tra cứu.
 assert.equal(getService("phu-quoc", activityServiceId("Vinpearl Safari"), today)?.name, "Vinpearl Safari")

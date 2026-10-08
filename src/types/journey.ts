@@ -1,3 +1,5 @@
+import type { PhotoCredit } from "@/types/destination"
+
 export type ServiceKind = "hotel" | "flight" | "vehicle" | "activity" | "tour"
 export type PriceUnit = "per_person" | "per_room_night" | "per_day" | "per_booking"
 export type JourneyRole = "edit" | "view"
@@ -44,8 +46,9 @@ export interface ServiceItem {
   name: string
   tag: string
   blurb: string
-  /** Chỉ tour có ảnh (ảnh S3 của Vietravel). */
+  /** Ảnh S3 của Vietravel (tour) hoặc ảnh CC trong /images (bắt buộc kèm credit). */
   imageUrl?: string
+  credit?: PhotoCredit
   priceVnd: number
   priceUnit: PriceUnit
   /** Sắp tăng dần theo underAge. Thiếu thì trẻ em trả như người lớn. */
@@ -57,7 +60,7 @@ export interface ServiceItem {
 
 export type ServiceSnapshot = Pick<
   ServiceItem,
-  "name" | "kind" | "tag" | "priceVnd" | "priceUnit" | "childRates" | "imageUrl" | "bookUrl" | "mock"
+  "name" | "kind" | "tag" | "priceVnd" | "priceUnit" | "childRates" | "imageUrl" | "credit" | "bookUrl" | "mock"
 >
 
 export interface Travelers {
@@ -115,7 +118,8 @@ export type PublicJourney = Omit<Journey, "editToken"> & { editToken?: string }
 export type JourneyOp =
   | { type: "join"; name: string }
   | { type: "updateInfo"; title?: string; startDate?: string | null; nights?: number; travelers?: Travelers }
-  | { type: "addItem"; serviceId: string }
+  /** day bỏ trống hoặc null: vào "Đang cân nhắc". */
+  | { type: "addItem"; serviceId: string; day?: number | null }
   | { type: "removeItem"; itemId: string }
   | { type: "moveItem"; itemId: string; day: number | null; order?: number }
   | { type: "setQuantity"; itemId: string; quantity: number | null }

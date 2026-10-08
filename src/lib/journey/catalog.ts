@@ -1,5 +1,5 @@
 import { getGuide } from "@/data/destinations"
-import { ACTIVITY_CHILD, phuQuocActivityPrices, phuQuocServices } from "@/data/services/phu-quoc"
+import { ACTIVITY_CHILD, phuQuocActivityPhotos, phuQuocActivityPrices, phuQuocServices } from "@/data/services/phu-quoc"
 import { toursForDestination } from "@/lib/destination-tours"
 import { activityServiceId, tourServiceId } from "@/lib/journey/ids"
 import type { DestinationGuide } from "@/types/destination"
@@ -14,9 +14,11 @@ const TOUR_CHILD: ChildRate[] = [
 // Khi có API Hub: thay hai bảng mock này và giữ nguyên kiểu ServiceItem.
 const MOCK_SERVICES = new Map<string, ServiceItem[]>([["phu-quoc", phuQuocServices]])
 const ACTIVITY_PRICES = new Map<string, Record<string, number>>([["phu-quoc", phuQuocActivityPrices]])
+const ACTIVITY_PHOTOS = new Map([["phu-quoc", phuQuocActivityPhotos]])
 
 function activityServices(guide: DestinationGuide): ServiceItem[] {
   const prices = ACTIVITY_PRICES.get(guide.slug) ?? {}
+  const photos = ACTIVITY_PHOTOS.get(guide.slug) ?? {}
   return guide.activities.map((place) => ({
     id: activityServiceId(place.name),
     kind: "activity",
@@ -24,6 +26,8 @@ function activityServices(guide: DestinationGuide): ServiceItem[] {
     name: place.name,
     tag: place.tag,
     blurb: place.blurb,
+    imageUrl: photos[place.name]?.imageUrl,
+    credit: photos[place.name]?.credit,
     priceVnd: prices[place.name] ?? 0,
     priceUnit: "per_person",
     childRates: ACTIVITY_CHILD,

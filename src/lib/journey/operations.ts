@@ -100,8 +100,10 @@ export function parseOp(value: unknown): JourneyOp {
       if (value.travelers !== undefined) op.travelers = parseTravelers(value.travelers)
       return op
     }
-    case "addItem":
-      return { type: "addItem", serviceId: text(value.serviceId, 100, "Mã dịch vụ") }
+    case "addItem": {
+      const day = value.day === undefined || value.day === null ? null : int(value.day, 1, LIMITS.maxNights + 1, "Ngày")
+      return { type: "addItem", serviceId: text(value.serviceId, 100, "Mã dịch vụ"), day }
+    }
     case "removeItem":
       return { type: "removeItem", itemId: itemId() }
     case "moveItem": {
@@ -153,17 +155,18 @@ function moveItem(journey: PublicJourney, item: JourneyItem, day: number | null,
   }
 }
 
-function addItem(journey: PublicJourney, serviceId: string, memberId: string, deps: OpDeps): void {
+function addItem(journey: PublicJourney, serviceId: string, day: number | null, memberId: string, deps: OpDeps): void {
   if (journey.items.length >= LIMITS.maxItems) bad(`Kế hoạch đã đủ ${LIMITS.maxItems} mục.`)
+  if (day !== null && day > journey.nights + 1) bad("Ngày này nằm ngoài chuyến đi.")
   const service = deps.lookup(serviceId)
   if (!service || service.destinationSlug !== journey.destinationSlug) bad("Dịch vụ không có trong danh mục.")
-  const { name, kind, tag, priceVnd, priceUnit, childRates, imageUrl, bookUrl, mock } = service
+  const { name, kind, tag, priceVnd, priceUnit, childRates, imageUrl, credit, bookUrl, mock } = service
   journey.items.push({
     id: deps.newId(),
     serviceId,
-    snapshot: { name, kind, tag, priceVnd, priceUnit, childRates, imageUrl, bookUrl, mock },
-    day: null,
-    order: groupOf(journey, null).length,
+    snapshot: { name, kind, tag, priceVnd, priceUnit, childRates, imageUrl, credit, bookUrl, mock },
+    day,
+    order: groupOf(journey, day).length,
     quantity: null,
     addedBy: memberId,
     votes: {},
@@ -204,7 +207,7 @@ export function applyOp<T extends PublicJourney>(journey: T, rawOp: unknown, act
       updateInfo(next, op)
       break
     case "addItem":
-      addItem(next, op.serviceId, memberId, deps)
+      addItem(next, op.serviceId, op.day ?? null, memberId, deps)
       break
     case "removeItem": {
       const item = findItem(next, op.itemId)

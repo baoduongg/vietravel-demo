@@ -8,7 +8,10 @@ const hotel: ServiceItem = {
   id: "hotel-x", kind: "hotel", destinationSlug: "phu-quoc", name: "Resort X", tag: "Cao cấp", blurb: "",
   priceVnd: 2000000, priceUnit: "per_room_night", bookUrl: "https://travel.com.vn/du-lich-phu-quoc", mock: true,
 }
-const flight: ServiceItem = { ...hotel, id: "flight-x", kind: "flight", name: "Vé bay X", priceUnit: "per_person" }
+const flight: ServiceItem = {
+  ...hotel, id: "flight-x", kind: "flight", name: "Vé bay X", priceUnit: "per_person",
+  imageUrl: "/images/phu-quoc/san-bay-phu-quoc.webp", credit: { author: "Tác giả", license: "CC BY-SA 4.0", url: "https://commons.wikimedia.org/" },
+}
 const otherPlace: ServiceItem = { ...hotel, id: "hotel-dn", destinationSlug: "da-nang" }
 let counter = 0
 const deps: OpDeps = {
@@ -124,6 +127,18 @@ assert.equal(j.title, "Đi ngắn")
 assert.equal(find(j, flightItem).day, null)
 assert.equal(find(j, hotelItem).day, 1)
 expectError(() => applyOp(j, { type: "updateInfo", nights: -1 }, edit, deps), 400)
+
+// addItem có day: thêm thẳng vào ngày đó, ở cuối ngày; ngày ngoài chuyến bị từ chối.
+j = applyOp(j, { type: "addItem", serviceId: "hotel-x", day: 1 }, edit, deps)
+const direct = j.items[j.items.length - 1]
+assert.equal(direct.day, 1)
+assert.deepEqual(dayOrder(j, 1), [hotelItem.id, direct.id])
+expectError(() => applyOp(j, { type: "addItem", serviceId: "hotel-x", day: 3 }, edit, deps), 400) // còn 1 đêm → 2 ngày
+j = applyOp(j, { type: "removeItem", itemId: direct.id }, edit, deps)
+
+// Snapshot giữ ghi công ảnh.
+const credited = applyOp(j, { type: "addItem", serviceId: "flight-x" }, edit, deps)
+assert.deepEqual(credited.items[credited.items.length - 1].snapshot.credit, flight.credit)
 
 // removeItem.
 j = applyOp(j, { type: "removeItem", itemId: hotelItem.id }, edit, deps)

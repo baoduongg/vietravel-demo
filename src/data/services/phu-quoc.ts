@@ -1,4 +1,5 @@
 import { phuQuoc } from "@/data/destinations/phu-quoc"
+import type { GalleryPhoto, PhotoCredit } from "@/types/destination"
 import type { ChildRate, ServiceItem } from "@/types/journey"
 
 /** Trẻ < 2 tuổi 10%, < 12 tuổi 75%: mức phổ biến của hãng bay nội địa (mock). */
@@ -13,27 +14,57 @@ export const ACTIVITY_CHILD: ChildRate[] = [
   { underAge: 12, rate: 0.75 },
 ]
 
-function mock(item: Omit<ServiceItem, "destinationSlug" | "bookUrl" | "mock">): ServiceItem {
-  return { ...item, destinationSlug: phuQuoc.slug, bookUrl: phuQuoc.links.tours, mock: true }
+type Photo = { imageUrl: string; credit: PhotoCredit }
+
+/** Ảnh minh họa lấy từ loại hình lưu trú cùng kiểu trong cẩm nang (ảnh CC, giữ ghi công). */
+function stayPhoto(stayName: string): Photo {
+  const stay = phuQuoc.stays.find((place) => place.name === stayName)
+  if (!stay?.imageUrl || !stay.credit) throw new Error(`Thiếu ảnh lưu trú "${stayName}"`)
+  return { imageUrl: stay.imageUrl, credit: stay.credit }
+}
+
+function galleryPhoto(photo: GalleryPhoto): Photo {
+  return { imageUrl: photo.src, credit: photo.credit }
+}
+
+const AIRPORT = galleryPhoto(phuQuoc.airport.photo)
+const ON_ISLAND = galleryPhoto(phuQuoc.onIslandPhoto)
+
+function mock(item: Omit<ServiceItem, "destinationSlug" | "bookUrl" | "mock" | "imageUrl" | "credit">, photo: Photo): ServiceItem {
+  return { ...item, ...photo, destinationSlug: phuQuoc.slug, bookUrl: phuQuoc.links.tours, mock: true }
 }
 
 /** Dữ liệu mẫu cho bản demo: tên khách sạn tự đặt, giá tham khảo. Thay bằng API Hub khi có. */
 export const phuQuocServices: ServiceItem[] = [
-  mock({ id: "hotel-pq-01", kind: "hotel", name: "Homestay Gió Biển", tag: "Tiết kiệm · Ông Lang", blurb: "Phòng gọn gàng, đi bộ 3 phút ra biển, hợp nhóm bạn trẻ.", priceVnd: 650000, priceUnit: "per_room_night" }),
-  mock({ id: "hotel-pq-02", kind: "hotel", name: "Khách sạn Phố Đêm", tag: "Tầm trung · Dương Đông", blurb: "Gần chợ đêm và quán ăn, thuê xe máy ngay tại sảnh.", priceVnd: 1100000, priceUnit: "per_room_night" }),
-  mock({ id: "hotel-pq-03", kind: "hotel", name: "Khách sạn Nhà Mình", tag: "Tầm trung · phòng liên thông", blurb: "Phòng liên thông cho gia đình, bữa sáng có thực đơn trẻ em.", priceVnd: 1450000, priceUnit: "per_room_night" }),
-  mock({ id: "hotel-pq-04", kind: "hotel", name: "Resort Hoàng Hôn", tag: "Cao cấp · Bãi Trường", blurb: "Bãi biển riêng, hồ bơi lớn, phòng hướng biển ngắm hoàng hôn.", priceVnd: 2900000, priceUnit: "per_room_night" }),
-  mock({ id: "hotel-pq-05", kind: "hotel", name: "Resort Rừng Biển", tag: "Cao cấp · Bắc đảo", blurb: "Gần VinWonders và Safari, có câu lạc bộ trẻ em và hồ bơi nông.", priceVnd: 3400000, priceUnit: "per_room_night" }),
-  mock({ id: "hotel-pq-06", kind: "hotel", name: "Villa Hồ Bơi Riêng", tag: "Sang trọng · Nam đảo", blurb: "Villa riêng tư có hồ bơi, bữa sáng phục vụ tại villa.", priceVnd: 6800000, priceUnit: "per_room_night" }),
-  mock({ id: "flight-sgn-pqc", kind: "flight", name: "Vé khứ hồi TP.HCM ⇄ Phú Quốc", tag: "Khứ hồi · khoảng 1 giờ bay", blurb: "Giá tham khảo hạng phổ thông, đã gồm 7kg hành lý xách tay.", priceVnd: 2200000, priceUnit: "per_person", childRates: FLIGHT_CHILD }),
-  mock({ id: "flight-han-pqc", kind: "flight", name: "Vé khứ hồi Hà Nội ⇄ Phú Quốc", tag: "Khứ hồi · khoảng 2 giờ 10 phút bay", blurb: "Giá tham khảo hạng phổ thông, đã gồm 7kg hành lý xách tay.", priceVnd: 3600000, priceUnit: "per_person", childRates: FLIGHT_CHILD }),
-  mock({ id: "flight-dad-pqc", kind: "flight", name: "Vé khứ hồi Đà Nẵng ⇄ Phú Quốc", tag: "Khứ hồi · khoảng 1 giờ 45 phút bay", blurb: "Giá tham khảo hạng phổ thông, đã gồm 7kg hành lý xách tay.", priceVnd: 3100000, priceUnit: "per_person", childRates: FLIGHT_CHILD }),
-  mock({ id: "flight-vca-pqc", kind: "flight", name: "Vé khứ hồi Cần Thơ ⇄ Phú Quốc", tag: "Khứ hồi · khoảng 50 phút bay", blurb: "Giá tham khảo hạng phổ thông, đã gồm 7kg hành lý xách tay.", priceVnd: 1700000, priceUnit: "per_person", childRates: FLIGHT_CHILD }),
-  mock({ id: "vehicle-pq-01", kind: "vehicle", name: "Thuê xe máy tay ga", tag: "Tự lái · giao tại khách sạn", blurb: "Kèm 2 mũ bảo hiểm. Cần bằng lái xe máy.", priceVnd: 150000, priceUnit: "per_day" }),
-  mock({ id: "vehicle-pq-02", kind: "vehicle", name: "Ô tô 4 chỗ có tài xế", tag: "Có tài xế · 10 giờ/ngày", blurb: "Đi Nam đảo, Bắc đảo theo lịch trình của Quý khách.", priceVnd: 1200000, priceUnit: "per_day" }),
-  mock({ id: "vehicle-pq-03", kind: "vehicle", name: "Ô tô 7 chỗ có tài xế", tag: "Có tài xế · 10 giờ/ngày", blurb: "Rộng cho gia đình có trẻ nhỏ, có thể yêu cầu ghế trẻ em.", priceVnd: 1500000, priceUnit: "per_day" }),
-  mock({ id: "vehicle-pq-04", kind: "vehicle", name: "Đưa đón sân bay 2 chiều", tag: "Xe 7 chỗ · sân bay ⇄ khách sạn", blurb: "Tài xế đón tại cửa ra, hỗ trợ hành lý.", priceVnd: 500000, priceUnit: "per_booking" }),
+  mock({ id: "hotel-pq-01", kind: "hotel", name: "Homestay Gió Biển", tag: "Tiết kiệm · Ông Lang", blurb: "Phòng gọn gàng, đi bộ 3 phút ra biển, hợp nhóm bạn trẻ.", priceVnd: 650000, priceUnit: "per_room_night" }, stayPhoto("Khách sạn, homestay gần biển")),
+  mock({ id: "hotel-pq-02", kind: "hotel", name: "Khách sạn Phố Đêm", tag: "Tầm trung · Dương Đông", blurb: "Gần chợ đêm và quán ăn, thuê xe máy ngay tại sảnh.", priceVnd: 1100000, priceUnit: "per_room_night" }, stayPhoto("Khách sạn trung tâm Dương Đông")),
+  mock({ id: "hotel-pq-03", kind: "hotel", name: "Khách sạn Nhà Mình", tag: "Tầm trung · phòng liên thông", blurb: "Phòng liên thông cho gia đình, bữa sáng có thực đơn trẻ em.", priceVnd: 1450000, priceUnit: "per_room_night" }, stayPhoto("Khách sạn gia đình, phòng liên thông")),
+  mock({ id: "hotel-pq-04", kind: "hotel", name: "Resort Hoàng Hôn", tag: "Cao cấp · Bãi Trường", blurb: "Bãi biển riêng, hồ bơi lớn, phòng hướng biển ngắm hoàng hôn.", priceVnd: 2900000, priceUnit: "per_room_night" }, stayPhoto("Resort ven biển Bãi Trường")),
+  mock({ id: "hotel-pq-05", kind: "hotel", name: "Resort Rừng Biển", tag: "Cao cấp · Bắc đảo", blurb: "Gần VinWonders và Safari, có câu lạc bộ trẻ em và hồ bơi nông.", priceVnd: 3400000, priceUnit: "per_room_night" }, stayPhoto("Resort liền kề khu vui chơi")),
+  mock({ id: "hotel-pq-06", kind: "hotel", name: "Villa Hồ Bơi Riêng", tag: "Sang trọng · Nam đảo", blurb: "Villa riêng tư có hồ bơi, bữa sáng phục vụ tại villa.", priceVnd: 6800000, priceUnit: "per_room_night" }, stayPhoto("Villa hồ bơi riêng")),
+  mock({ id: "flight-sgn-pqc", kind: "flight", name: "Vé khứ hồi TP.HCM ⇄ Phú Quốc", tag: "Khứ hồi · khoảng 1 giờ bay", blurb: "Giá tham khảo hạng phổ thông, đã gồm 7kg hành lý xách tay.", priceVnd: 2200000, priceUnit: "per_person", childRates: FLIGHT_CHILD }, AIRPORT),
+  mock({ id: "flight-han-pqc", kind: "flight", name: "Vé khứ hồi Hà Nội ⇄ Phú Quốc", tag: "Khứ hồi · khoảng 2 giờ 10 phút bay", blurb: "Giá tham khảo hạng phổ thông, đã gồm 7kg hành lý xách tay.", priceVnd: 3600000, priceUnit: "per_person", childRates: FLIGHT_CHILD }, AIRPORT),
+  mock({ id: "flight-dad-pqc", kind: "flight", name: "Vé khứ hồi Đà Nẵng ⇄ Phú Quốc", tag: "Khứ hồi · khoảng 1 giờ 45 phút bay", blurb: "Giá tham khảo hạng phổ thông, đã gồm 7kg hành lý xách tay.", priceVnd: 3100000, priceUnit: "per_person", childRates: FLIGHT_CHILD }, AIRPORT),
+  mock({ id: "flight-vca-pqc", kind: "flight", name: "Vé khứ hồi Cần Thơ ⇄ Phú Quốc", tag: "Khứ hồi · khoảng 50 phút bay", blurb: "Giá tham khảo hạng phổ thông, đã gồm 7kg hành lý xách tay.", priceVnd: 1700000, priceUnit: "per_person", childRates: FLIGHT_CHILD }, AIRPORT),
+  mock({ id: "vehicle-pq-01", kind: "vehicle", name: "Thuê xe máy tay ga", tag: "Tự lái · giao tại khách sạn", blurb: "Kèm 2 mũ bảo hiểm. Cần bằng lái xe máy.", priceVnd: 150000, priceUnit: "per_day" }, ON_ISLAND),
+  mock({ id: "vehicle-pq-02", kind: "vehicle", name: "Ô tô 4 chỗ có tài xế", tag: "Có tài xế · 10 giờ/ngày", blurb: "Đi Nam đảo, Bắc đảo theo lịch trình của Quý khách.", priceVnd: 1200000, priceUnit: "per_day" }, ON_ISLAND),
+  mock({ id: "vehicle-pq-03", kind: "vehicle", name: "Ô tô 7 chỗ có tài xế", tag: "Có tài xế · 10 giờ/ngày", blurb: "Rộng cho gia đình có trẻ nhỏ, có thể yêu cầu ghế trẻ em.", priceVnd: 1500000, priceUnit: "per_day" }, ON_ISLAND),
+  mock({ id: "vehicle-pq-04", kind: "vehicle", name: "Đưa đón sân bay 2 chiều", tag: "Xe 7 chỗ · sân bay ⇄ khách sạn", blurb: "Tài xế đón tại cửa ra, hỗ trợ hành lý.", priceVnd: 500000, priceUnit: "per_booking" }, ON_ISLAND),
 ]
+
+function photoBySrc(src: string): Photo {
+  const photo = [...phuQuoc.gallery, phuQuoc.foodPhoto].find((item) => item.src === src)
+  if (!photo) throw new Error(`Thiếu ảnh ${src} trong thư viện cẩm nang`)
+  return galleryPhoto(photo)
+}
+
+/** Ảnh đúng địa điểm cho hoạt động, lấy từ thư viện cẩm nang. Hoạt động chưa có ảnh khớp thì để trống (giao diện dùng ô minh họa). */
+export const phuQuocActivityPhotos: Record<string, Photo> = {
+  "Cáp treo vượt biển và Hòn Thơm": photoBySrc("/images/phu-quoc/cap-treo-an-thoi.webp"),
+  "Thị trấn Hoàng Hôn và Kiss Bridge": photoBySrc("/images/phu-quoc/kiss-bridge.webp"),
+  "Bãi Sao": photoBySrc("/images/phu-quoc/bai-sao.webp"),
+  "Chợ đêm Phú Quốc": photoBySrc("/images/phu-quoc/cho-dem-hai-san.webp"),
+}
 
 /** Giá vé mock cho từng mục trong phuQuoc.activities, khóa là tên mục. 0 = vào cửa miễn phí. */
 export const phuQuocActivityPrices: Record<string, number> = {
