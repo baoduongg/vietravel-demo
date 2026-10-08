@@ -1,4 +1,5 @@
 import { StarIcon } from "lucide-react"
+import { motion } from "motion/react"
 
 import { cn } from "@/lib/utils"
 
@@ -16,23 +17,32 @@ export function SuggestedQuestions({
   className,
 }: SuggestedQuestionsProps): React.JSX.Element {
   return (
-    <div className={cn("flex flex-col gap-2.5", className)}>
-      <p className="text-xs font-bold tracking-wide text-muted-foreground">Hỏi nhanh</p>
-      <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] lg:mx-0 lg:px-0 lg:[mask-image:linear-gradient(to_right,black_88%,transparent)]">
+    <div className={cn("flex min-w-0", className)}>
+      <motion.ul
+        initial="hidden"
+        animate="show"
+        variants={{ hidden: {}, show: { transition: { staggerChildren: 0.06 } } }}
+        className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]"
+      >
         {questions.map((question) => (
-          <li key={question} className="shrink-0">
+          <motion.li
+            key={question}
+            variants={{ hidden: { opacity: 0, x: 18 }, show: { opacity: 1, x: 0 } }}
+            transition={{ type: "spring", stiffness: 240, damping: 24 }}
+            className="shrink-0"
+          >
             <button
               type="button"
               disabled={disabled}
               onClick={() => onSelect(question)}
-              className="inline-flex items-center gap-1.5 rounded-full whitespace-nowrap bg-cloud px-3.5 py-2 text-left hover:-translate-y-px text-[0.82rem] font-semibold text-ocean transition-transform duration-300 ease-soft outline-none hover:bg-[#cbe6ff] focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.97] disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-full bg-white ring-1 ring-ocean/10 px-3.5 py-1.5 text-left whitespace-nowrap text-[0.78rem] font-semibold text-ocean transition-colors duration-300 outline-none hover:bg-[#cbe6ff] focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
             >
-              <StarIcon aria-hidden strokeWidth={1.75} className="size-3.5 shrink-0" />
+              <StarIcon aria-hidden strokeWidth={1.5} className="size-3.5 shrink-0" />
               {question}
             </button>
-          </li>
+          </motion.li>
         ))}
-      </ul>
+      </motion.ul>
     </div>
   )
 }

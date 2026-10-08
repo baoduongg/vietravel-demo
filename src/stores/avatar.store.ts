@@ -3,6 +3,7 @@ import { create } from "zustand"
 import type { AvatarModel } from "@/config/company"
 import { company } from "@/config/company"
 import type { AvatarEngine } from "@/lib/avatar-engine"
+import { DEFAULT_SCENE, sceneForTour, type SceneTheme } from "@/lib/scene"
 import type { ChatMessage } from "@/types/chat"
 import type { Tour } from "@/types/tour"
 
@@ -19,6 +20,7 @@ interface AvatarState {
   loadError: string | null
   historyOpen: boolean
   recommendedTours: Tour[]
+  scene: SceneTheme
   setAvatarModel: (avatarModel: AvatarModel) => void
   setStatus: (status: AvatarStatus) => void
   addMessage: (message: ChatMessage) => void
@@ -29,6 +31,7 @@ interface AvatarState {
   setLoadError: (loadError: string | null) => void
   toggleHistory: () => void
   setRecommendedTours: (recommendedTours: Tour[]) => void
+  setScene: (scene: SceneTheme) => void
 }
 
 export const useAvatarStore = create<AvatarState>()((set) => ({
@@ -40,8 +43,9 @@ export const useAvatarStore = create<AvatarState>()((set) => ({
   engine: null,
   loadProgress: 0,
   loadError: null,
-  historyOpen: true,
+  historyOpen: false,
   recommendedTours: [],
+  scene: DEFAULT_SCENE,
   // Đổi model giữa lúc đang trò chuyện phải dựng lại engine, nên reset luôn trạng thái hội thoại.
   setAvatarModel: (avatarModel) =>
     set({ avatarModel, started: false, messages: [], subtitle: "", status: "idle" }),
@@ -53,5 +57,11 @@ export const useAvatarStore = create<AvatarState>()((set) => ({
   setLoadProgress: (loadProgress) => set({ loadProgress }),
   setLoadError: (loadError) => set({ loadError }),
   toggleHistory: () => set((state) => ({ historyOpen: !state.historyOpen })),
-  setRecommendedTours: (recommendedTours) => set({ recommendedTours }),
+  // Cảnh nền theo tour đầu tiên: đó là tour Tripi vừa nhắc tới trước tiên.
+  setRecommendedTours: (recommendedTours) =>
+    set((state) => ({
+      recommendedTours,
+      scene: recommendedTours[0] ? sceneForTour(recommendedTours[0]) : state.scene,
+    })),
+  setScene: (scene) => set({ scene }),
 }))

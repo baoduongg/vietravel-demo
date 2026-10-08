@@ -37,12 +37,19 @@ const DOUBLE_SIDED_PARTS = /^(hat-|brim-stitch|crown-stitch)/
 const ARM_DOWN_ANGLE = 0.6
 const MITTEN_REST_SCALE = 1.02
 const MITTEN_WAVE_SCALE = 1.26
+/** Mức giơ tay trái khi chỉ về thẻ tour, so với giơ hết cỡ khi ăn mừng. */
+const POINT_RAISE = 0.55
 const ROBOT_WIDTH = 2.2
 
 function findGroup(scene: THREE.Object3D, name: string): THREE.Object3D {
   const node = scene.getObjectByName(name)
   if (!node) throw new Error(`File GLB thiếu phần "${name}".`)
   return node
+}
+
+/** Đối xứng qua mặt phẳng dọc giữa thân: phép xoay của tay trái thành của tay phải và ngược lại. */
+function mirrorX(q: THREE.Quaternion): THREE.Quaternion {
+  return new THREE.Quaternion(q.x, -q.y, -q.z, q.w)
 }
 
 function rotationZ(angle: number): THREE.Quaternion {
@@ -99,8 +106,12 @@ export async function loadTripiGlb(
   const rightRest = rotationZ(ARM_DOWN_ANGLE)
   const leftRest = rotationZ(-ARM_DOWN_ANGLE)
   const mittenWave = rightMitten.quaternion.clone()
-  const leftMitten = findGroup(model, "mitten-l").quaternion
-  const mittenRest = new THREE.Quaternion(leftMitten.x, -leftMitten.y, -leftMitten.z, leftMitten.w)
+  const leftMittenNode = findGroup(model, "mitten-l")
+  const leftMitten = leftMittenNode.quaternion
+  const mittenRest = mirrorX(leftMitten)
+  const leftMittenRest = leftMitten.clone()
+  const leftWave = mirrorX(rightWave)
+  const leftMittenWave = mirrorX(mittenWave)
   const torsoRest = torso.quaternion.clone()
   const headRest = head.quaternion.clone()
   const swing = new THREE.Quaternion()
@@ -108,19 +119,38 @@ export async function loadTripiGlb(
 
   const box = new THREE.Box3().setFromObject(model)
 
-  const applyPose = ({ time, lift, sway, headPitch, headYaw, headRoll, wave, waveSwing, armsOpen }: MascotPose): void => {
+  const applyPose = ({
+    time,
+    lift,
+    sway,
+    headPitch,
+    headYaw,
+    headRoll,
+    wave,
+    waveSwing,
+    armsOpen,
+    cheer,
+    pointLeft,
+  }: MascotPose): void => {
     const idle = Math.sin(time * 1.8) * 0.03
     root.position.y = lift
     torso.quaternion.copy(torsoRest).multiply(swing.setFromEuler(euler.set(0, 0, sway)))
     head.quaternion.copy(headRest).multiply(swing.setFromEuler(euler.set(headPitch, headYaw, headRoll)))
 
-    rightArm.quaternion.slerpQuaternions(rightRest, rightWave, wave)
-    rightArm.quaternion.multiply(rotationZ(THREE.MathUtils.lerp(-armsOpen - idle, waveSwing, wave)))
-    rightMitten.quaternion.slerpQuaternions(mittenRest, mittenWave, wave)
-    rightMitten.scale.setScalar(THREE.MathUtils.lerp(MITTEN_REST_SCALE, MITTEN_WAVE_SCALE, wave))
+    // Ăn mừng dùng lại tư thế giơ tay của lúc vẫy, nhân đôi sang tay còn lại.
+    const rightRaise = Math.max(wave, cheer)
+    rightArm.quaternion.slerpQuaternions(rightRest, rightWave, rightRaise)
+    rightArm.quaternion.multiply(rotationZ(THREE.MathUtils.lerp(-armsOpen - idle, waveSwing, rightRaise)))
+    rightMitten.quaternion.slerpQuaternions(mittenRest, mittenWave, rightRaise)
+    rightMitten.scale.setScalar(THREE.MathUtils.lerp(MITTEN_REST_SCALE, MITTEN_WAVE_SCALE, rightRaise))
 
+    // Chỉ tay chỉ giơ lưng chừng để cánh tay hướng ra ngoài thay vì vẫy.
+    const leftRaise = Math.max(cheer, pointLeft * POINT_RAISE)
     const leftIdle = Math.sin(time * 1.8 + 1) * 0.03
-    leftArm.quaternion.copy(leftRest).multiply(rotationZ(armsOpen + leftIdle))
+    leftArm.quaternion.slerpQuaternions(leftRest, leftWave, leftRaise)
+    leftArm.quaternion.multiply(rotationZ(THREE.MathUtils.lerp(armsOpen + leftIdle, -waveSwing, cheer)))
+    leftMittenNode.quaternion.slerpQuaternions(leftMittenRest, leftMittenWave, leftRaise)
+    leftMittenNode.scale.setScalar(THREE.MathUtils.lerp(MITTEN_REST_SCALE, MITTEN_WAVE_SCALE, leftRaise))
   }
 
   return { root, topY: box.max.y, width: ROBOT_WIDTH, applyPose }

@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from "react"
-import { ChevronDownIcon, ImageIcon, MessageCircleIcon, SendHorizontalIcon, SparklesIcon, XIcon } from "lucide-react"
+import { HistoryIcon, ImageIcon, SendHorizontalIcon, XIcon } from "lucide-react"
+import { motion } from "motion/react"
 import { toast } from "sonner"
 
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -90,200 +91,158 @@ export function ChatPanel({
   }
 
   return (
-    <div className={cn("flex min-h-[8rem] flex-col overflow-hidden rounded-2xl bg-white ring-1 ring-cloud", className)}>
-      <button
-        type="button"
-        onClick={onToggleHistory}
-        aria-expanded={historyOpen}
-        aria-controls="chat-history"
-        className="flex w-full shrink-0 items-center justify-between px-4 py-3 text-sm font-bold text-ink outline-none transition-colors duration-300 ease-soft hover:bg-secondary focus-visible:bg-secondary"
-      >
-        <span>
-          Lịch sử trò chuyện <span className="font-semibold text-muted-foreground">({messages.length})</span>
-        </span>
-        <ChevronDownIcon
-          aria-hidden
-          strokeWidth={1.75}
-          className={cn("size-4 transition-transform duration-300 ease-soft", historyOpen && "rotate-180")}
-        />
-      </button>
+    <div className={cn("relative rounded-[1.75rem] bg-ocean/[0.04] p-1.5 ring-1 ring-ocean/10", className)}>
+      <div className="flex flex-col rounded-[calc(1.75rem-0.375rem)] bg-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.9)]">
+        {historyOpen && (
+          <ScrollArea
+            id="chat-history"
+            ref={historyRef}
+            className="absolute inset-x-0 bottom-full z-30 mb-2 h-[min(20rem,45dvh)] overflow-hidden rounded-[1.75rem] bg-white/95 shadow-[0_30px_60px_-24px_rgba(0,70,193,0.45)] ring-1 ring-ocean/10 animate-in fade-in slide-in-from-bottom-2 duration-200"
+          >
+            {messages.length === 0 ? (
+              <p className="px-4 py-6 text-center text-sm text-muted-foreground">
+                Chưa có tin nhắn nào. Hãy chọn câu hỏi nhanh, nhập câu hỏi hoặc gửi ảnh địa danh bên dưới.
+              </p>
+            ) : (
+              <ol className="flex flex-col gap-3 p-4">
+                {messages.map((message, index) => (
+                  <motion.li
+                    key={`${index}-${message.role}`}
+                    initial={{ opacity: 0, y: 12, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ type: "spring", stiffness: 260, damping: 22 }}
+                    className={cn(
+                      "flex max-w-[85%] flex-col gap-2 rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed",
+                      message.role === "user"
+                        ? "self-end rounded-br-md bg-ocean text-white"
+                        : "self-start rounded-bl-md bg-white text-ink ring-1 ring-cloud",
+                    )}
+                  >
+                    <span className="sr-only">{message.role === "user" ? "Quý khách: " : `${assistantName}: `}</span>
+                    {message.image && (
+                      <div className="relative overflow-hidden rounded-xl border border-white/20 bg-black/10">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={message.image}
+                          alt="Hình ảnh gửi kèm"
+                          className="max-h-48 w-auto rounded-lg object-cover"
+                        />
+                      </div>
+                    )}
+                    {message.content && <span>{message.content}</span>}
+                  </motion.li>
+                ))}
+              </ol>
+            )}
+          </ScrollArea>
+        )}
 
-      {historyOpen && (
-        <ScrollArea
-          id="chat-history"
-          ref={historyRef}
-          className="h-64 min-h-0 border-t border-cloud bg-[#fafbfc] lg:h-[min(22rem,40dvh)] lg:shrink"
-        >
-          {messages.length === 0 ? (
-            <p className="px-4 py-6 text-center text-sm text-muted-foreground">
-              Chưa có tin nhắn nào. Hãy chọn câu hỏi nhanh, nhập câu hỏi hoặc gửi ảnh địa danh bên dưới.
-            </p>
-          ) : (
-            <ol className="flex flex-col gap-3 p-4">
-              {messages.map((message, index) => (
-                <li
-                  key={`${index}-${message.role}`}
-                  className={cn(
-                    "flex max-w-[85%] flex-col gap-2 rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed",
-                    message.role === "user"
-                      ? "self-end rounded-br-md bg-ocean text-white"
-                      : "self-start rounded-bl-md bg-white text-ink ring-1 ring-cloud",
-                  )}
-                >
-                  <span className="sr-only">{message.role === "user" ? "Quý khách: " : `${assistantName}: `}</span>
-                  {message.image && (
-                    <div className="relative overflow-hidden rounded-xl border border-white/20 bg-black/10">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={message.image}
-                        alt="Hình ảnh gửi kèm"
-                        className="max-h-48 w-auto rounded-lg object-cover"
-                      />
-                    </div>
-                  )}
-                  {message.content && <span>{message.content}</span>}
-                </li>
-              ))}
-
-              {status === "thinking" && (
-                <li
-                  role="status"
-                  aria-live="polite"
-                  className="animate-in fade-in slide-in-from-bottom-2 flex max-w-[85%] items-center gap-2.5 self-start rounded-2xl rounded-bl-md border border-cloud bg-secondary px-3.5 py-2.5 text-sm text-ink shadow-xs"
-                >
-                  <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-sunset text-white">
-                    <SparklesIcon className="size-3.5 animate-spin motion-reduce:animate-none" />
-                  </div>
-                  <div className="flex items-center gap-1.5 font-medium text-ocean">
-                    <span className="font-bold text-ocean">{assistantName}</span>
-                    <span>đang suy nghĩ</span>
-                    <span className="flex items-center gap-1 pl-1">
-                      <span className="size-1.5 rounded-full bg-sunset animate-bounce [animation-delay:-0.3s]" />
-                      <span className="size-1.5 rounded-full bg-sunset animate-bounce [animation-delay:-0.15s]" />
-                      <span className="size-1.5 rounded-full bg-sunset animate-bounce" />
-                    </span>
-                  </div>
-                </li>
-              )}
-            </ol>
-          )}
-        </ScrollArea>
-      )}
-
-      {selectedImage && (
-        <div className="flex items-center gap-2.5 border-t border-cloud bg-secondary px-4 py-2 text-xs">
-          <div className="relative size-12 shrink-0 overflow-hidden rounded-lg border border-cloud">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={selectedImage} alt="Xem trước" className="size-full object-cover" />
+        {selectedImage && (
+          <div className="flex items-center gap-2.5 border-b border-cloud bg-secondary px-4 py-2 text-xs">
+            <div className="relative size-12 shrink-0 overflow-hidden rounded-lg border border-cloud">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={selectedImage} alt="Xem trước" className="size-full object-cover" />
+            </div>
+            <div className="flex min-w-0 flex-1 flex-col">
+              <span className="font-bold text-ocean">Đã chọn hình ảnh</span>
+              <span className="truncate text-muted-foreground">Tripi sẽ nhận diện cảnh đẹp & địa danh trong ảnh</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSelectedImage(null)}
+              className="flex size-7 items-center justify-center rounded-full bg-white text-ocean shadow-sm transition-transform hover:scale-105 active:scale-95"
+              aria-label="Xoá ảnh"
+            >
+              <XIcon className="size-4" />
+            </button>
           </div>
-          <div className="flex min-w-0 flex-1 flex-col">
-            <span className="font-bold text-ocean">Đã chọn hình ảnh</span>
-            <span className="truncate text-muted-foreground">Tripi sẽ nhận diện cảnh đẹp & địa danh trong ảnh</span>
-          </div>
+        )}
+
+        {notice && (
+          <p
+            role="alert"
+            className="mx-3 mt-3 shrink-0 rounded-xl bg-cloud px-3.5 py-2.5 text-[0.82rem] leading-relaxed text-ink"
+          >
+            {notice}
+          </p>
+        )}
+
+        <form onSubmit={handleSubmit} onPaste={handlePaste} className="flex shrink-0 items-center gap-2 p-2.5">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/jpg"
+            className="hidden"
+            onChange={handleFileChange}
+          />
+
           <button
             type="button"
-            onClick={() => setSelectedImage(null)}
-            className="flex size-7 items-center justify-center rounded-full bg-white text-ocean shadow-sm transition-transform hover:scale-105 active:scale-95"
-            aria-label="Xoá ảnh"
+            onClick={onToggleHistory}
+            aria-expanded={historyOpen}
+            aria-controls="chat-history"
+            title={`Lịch sử trò chuyện (${messages.length})`}
+            className={cn(
+              "flex size-11 shrink-0 items-center justify-center rounded-full border border-cloud bg-muted text-muted-foreground transition-colors duration-300 ease-soft hover:border-ocean hover:text-ocean",
+              historyOpen && "border-ocean bg-ocean/10 text-ocean",
+            )}
           >
-            <XIcon className="size-4" />
+            <HistoryIcon aria-hidden strokeWidth={1.5} className="size-5" />
+            <span className="sr-only">Lịch sử trò chuyện ({messages.length})</span>
           </button>
-        </div>
-      )}
 
-      {notice && (
-        <p role="alert" className="mx-3 mt-3 shrink-0 rounded-xl bg-cloud px-3.5 py-2.5 text-[0.82rem] leading-relaxed text-ink">
-          {notice}
-        </p>
-      )}
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={disabled || isProcessingImage}
+            title="Tải ảnh cảnh đẹp để tìm tour tương tự"
+            className={cn(
+              "flex size-11 shrink-0 items-center justify-center rounded-full border border-cloud bg-muted text-muted-foreground transition-all duration-300 ease-soft hover:border-ocean hover:bg-ocean/10 hover:text-ocean active:scale-[0.95] disabled:cursor-not-allowed disabled:opacity-50",
+              selectedImage && "border-sunset bg-accent text-ocean",
+            )}
+          >
+            <ImageIcon aria-hidden strokeWidth={1.5} className="size-5" />
+            <span className="sr-only">Tải ảnh</span>
+          </button>
 
-      <form
-        onSubmit={handleSubmit}
-        onPaste={handlePaste}
-        className="flex shrink-0 items-center gap-2 border-t border-cloud p-3"
-      >
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/png,image/jpeg,image/webp,image/jpg"
-          className="hidden"
-          onChange={handleFileChange}
-        />
-
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={disabled || isProcessingImage}
-          title="Tải ảnh cảnh đẹp để tìm tour tương tự"
-          className={cn(
-            "flex size-14 shrink-0 items-center justify-center rounded-full border border-cloud bg-muted text-muted-foreground transition-all duration-300 ease-soft hover:border-ocean hover:bg-ocean/10 hover:text-ocean active:scale-[0.95] disabled:cursor-not-allowed disabled:opacity-50",
-            selectedImage && "border-sunset bg-accent text-ocean",
-          )}
-        >
-          <ImageIcon aria-hidden strokeWidth={1.75} className="size-5" />
-          <span className="sr-only">Tải ảnh</span>
-        </button>
-
-        <label
-          htmlFor={inputId}
-          className={cn(
-            "flex h-14 min-w-0 flex-1 cursor-text items-center gap-3 rounded-full bg-muted px-4 transition-all duration-300 ease-soft focus-within:bg-white focus-within:ring-2 focus-within:ring-ring/60",
-            status === "thinking" && "bg-secondary ring-1 ring-cloud",
-          )}
-        >
-          <MessageCircleIcon
-            aria-hidden
-            strokeWidth={1.75}
-            className={cn("size-5 shrink-0 text-muted-foreground", status === "thinking" && "text-sunset animate-pulse")}
-          />
-          <span className="flex min-w-0 flex-1 flex-col">
-            <span className="text-[0.72rem] font-semibold text-muted-foreground">
-              {status === "thinking"
-                ? `${assistantName} đang trả lời...`
-                : selectedImage
-                  ? "Thêm ghi chú cho ảnh (tuỳ chọn)"
-                  : `Câu hỏi cho ${assistantName}`}
-            </span>
+          <label
+            htmlFor={inputId}
+            className={cn(
+              "flex h-11 min-w-0 flex-1 cursor-text items-center rounded-full bg-muted px-4 transition-all duration-300 ease-soft focus-within:bg-white focus-within:ring-2 focus-within:ring-ring/60",
+              status === "thinking" && "animate-thinking-pulse bg-secondary",
+            )}
+          >
             <input
               id={inputId}
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
               disabled={disabled}
+              aria-label={`Câu hỏi cho ${assistantName}`}
               placeholder={
                 status === "thinking"
-                  ? `${assistantName} đang xử lý và chuẩn bị câu trả lời...`
+                  ? `${assistantName} đang trả lời...`
                   : selectedImage
-                    ? "Ví dụ: Tìm tour có cảnh này khởi hành từ Hà Nội..."
+                    ? "Thêm ghi chú cho ảnh (tuỳ chọn)"
                     : "Ví dụ: tour Đà Lạt 3 ngày tháng 11, hoặc dán ảnh vào đây"
               }
               maxLength={500}
-              className="w-full min-w-0 bg-transparent text-[0.95rem] font-bold text-ocean outline-none placeholder:font-medium placeholder:text-[#8a8f98] disabled:cursor-not-allowed"
+              className="w-full min-w-0 bg-transparent text-[0.92rem] font-semibold text-ocean outline-none placeholder:font-medium placeholder:text-[#8a8f98] disabled:cursor-not-allowed"
             />
-          </span>
-        </label>
+          </label>
 
-        <button
-          type="submit"
-          disabled={disabled || (draft.trim().length === 0 && !selectedImage) || isProcessingImage}
-          className={cn(
-            "inline-flex h-14 shrink-0 items-center gap-2 rounded-xl bg-ocean px-5 text-[0.95rem] font-bold text-white transition-all duration-300 ease-soft outline-none hover:bg-[#003a9f] focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.97] disabled:opacity-50",
-            status === "thinking" && "bg-linear-to-r from-ocean to-sunset text-white opacity-90 shadow-sm",
-          )}
-        >
-          {status === "thinking" ? (
-            <>
-              <SparklesIcon aria-hidden className="size-5 animate-spin motion-reduce:animate-none" />
-              <span className="hidden sm:inline">Đang nghĩ</span>
-            </>
-          ) : (
-            <>
-              <SendHorizontalIcon aria-hidden strokeWidth={1.75} className="size-5" />
-              <span className="hidden sm:inline">Gửi</span>
-              <span className="sr-only sm:hidden">Gửi câu hỏi</span>
-            </>
-          )}
-        </button>
-      </form>
+          <button
+            type="submit"
+            disabled={disabled || (draft.trim().length === 0 && !selectedImage) || isProcessingImage}
+            className="group/send inline-flex h-11 shrink-0 items-center gap-2 rounded-full bg-ocean py-1.5 pr-1.5 pl-5 text-[0.92rem] font-semibold text-white outline-none transition-all duration-500 ease-soft hover:bg-[#003a9f] focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.97] disabled:opacity-50"
+          >
+            <span className="hidden sm:inline">Gửi</span>
+            <span className="sr-only sm:hidden">Gửi câu hỏi</span>
+            <span className="flex size-8 items-center justify-center rounded-full bg-white/15 transition-transform duration-500 ease-soft group-hover/send:translate-x-0.5 group-hover/send:-translate-y-px group-hover/send:scale-105">
+              <SendHorizontalIcon aria-hidden strokeWidth={1.5} className="size-4" />
+            </span>
+          </button>
+        </form>
+      </div>
     </div>
   )
 }

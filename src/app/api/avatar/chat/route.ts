@@ -126,6 +126,27 @@ async function callGemini(apiKey: string, model: string, body: Record<string, un
   }
 }
 
+/** Tên địa danh chính trong ảnh (vài từ); rỗng nếu không nhận ra. */
+async function detectPlace(apiKey: string, model: string, image: string): Promise<string> {
+  const inlineData = parseDataUrl(image)
+  if (!inlineData) return ""
+  try {
+    const response = await callGemini(apiKey, model, {
+      contents: [
+        {
+          role: "user",
+          parts: [{ inlineData }, { text: "Ảnh chụp địa danh/điểm đến du lịch nào? Chỉ trả lời tên địa danh và quốc gia hoặc tỉnh, tối đa 8 từ. Không nhận ra thì trả lời: không rõ" }],
+        },
+      ],
+      generationConfig: { maxOutputTokens: 30, thinkingConfig: { thinkingBudget: 0 } },
+    })
+    const text = (response.candidates?.[0]?.content?.parts ?? []).map((part) => ("text" in part ? part.text : "")).join(" ").trim()
+    return /không rõ/i.test(text) ? "" : text
+  } catch {
+    return ""
+  }
+}
+
 function hotlineReply(): string {
   return `Dạ em chưa trả lời được câu này, Quý khách vui lòng gọi tổng đài ${company.hotline} để được hỗ trợ ạ.`
 }
@@ -188,30 +209,22 @@ export async function POST(request: Request): Promise<NextResponse<ChatResponse 
     const hasImage = Boolean(latestMessage?.image)
 
     const upcoming = getUpcomingTours(today)
-    let match = selectRelevantTours(upcoming, messages.slice(-MAX_TURNS * 2), today)
+    // Ảnh: nhận diện địa danh bằng một lượt gọi ngắn, rồi lọc tour theo tên đó như chat chữ.
+    let matchMessages = messages.slice(-MAX_TURNS * 2)
+    if (hasImage) {
+      const place = await detectPlace(apiKey, model, latestMessage!.image!)
+      if (place) matchMessages = [...matchMessages, { role: "user", content: place }]
+    }
 
+    let match = selectRelevantTours(upcoming, matchMessages, today)
     if (!match.criteriaRecognized || match.tours.length === 0) {
-      const userText = messages
+      const userText = matchMessages
         .filter((m) => m.role === "user")
         .map((m) => m.content)
         .join(" ")
       if (userText.trim()) {
-        const hybridResult = await searchToursHybrid({
-          query: userText,
-          tours: upcoming,
-          apiKey,
-        })
-        if (hybridResult.tours.length > 0) {
-          match = hybridResult
-        }
-      }
-    }
-
-    if (hasImage && match.tours.length === 0) {
-      match = {
-        criteriaRecognized: true,
-        hasExactMatches: true,
-        tours: upcoming.slice(0, 30),
+        const hybridResult = await searchToursHybrid({ query: userText, tours: upcoming, apiKey })
+        if (hybridResult.tours.length > 0) match = hybridResult
       }
     }
 

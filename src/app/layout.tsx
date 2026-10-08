@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from "next"
-import { Mulish } from "next/font/google"
+import { Plus_Jakarta_Sans } from "next/font/google"
 
 import { Toaster } from "@/components/ui/sonner"
 import { company } from "@/config/company"
 import "./globals.css"
 
-const mulish = Mulish({
+const jakarta = Plus_Jakarta_Sans({
   variable: "--font-sans",
   subsets: ["latin", "vietnamese"],
   weight: ["400", "500", "600", "700", "800"],
@@ -23,7 +23,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>): React.JSX.Element {
   return (
     <html lang="vi">
-      <body className={`${mulish.variable}`}>
+      <body className={`${jakarta.variable}`}>
         {children}
         <Toaster position="top-center" richColors={false} />
       </body>

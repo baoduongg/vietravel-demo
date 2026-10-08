@@ -50,6 +50,8 @@ export interface FaceState {
   /** Hướng nhìn, mỗi trục trong khoảng -1 đến 1. */
   gazeX: number
   gazeY: number
+  /** 0 đến 1, cười tít mắt hình vòm khi ăn mừng. */
+  happy?: number
 }
 
 export interface TripiFace {
@@ -198,13 +200,19 @@ export function createTripiFace(layout: FaceLayout = PROCEDURAL_FACE_LAYOUT): Tr
 
     drawEyebrow(leftX, eyeY - eyeR, -1, wink * 12)
     drawEyebrow(rightX, eyeY - eyeR, 1, -wink * 10)
-    drawOpenEye(leftX, eyeY, eyeOpen, lookX, lookY)
-    if (wink > 0.5) drawClosedEye(rightX, eyeY)
-    else drawOpenEye(rightX, eyeY, eyeOpen * (1 - wink * 2), lookX, lookY)
+    const happy = finite(state.happy ?? 0, 0) > 0.5
+    if (happy) {
+      drawClosedEye(leftX, eyeY)
+      drawClosedEye(rightX, eyeY)
+    } else {
+      drawOpenEye(leftX, eyeY, eyeOpen, lookX, lookY)
+      if (wink > 0.5) drawClosedEye(rightX, eyeY)
+      else drawOpenEye(rightX, eyeY, eyeOpen * (1 - wink * 2), lookX, lookY)
+    }
 
     drawCheekMarks(leftX + layout.cheekLeft[0], eyeY + layout.cheekLeft[1])
     drawCheekMarks(rightX + layout.cheekRight[0], eyeY + layout.cheekRight[1] - wink * 30 * s)
-    drawMouth(cx, cy + layout.mouthY, IDLE_MOUTH + mouthOpen * (1 - IDLE_MOUTH))
+    drawMouth(cx, cy + layout.mouthY, IDLE_MOUTH + Math.max(mouthOpen, happy ? 0.6 : 0) * (1 - IDLE_MOUTH))
     ctx.shadowBlur = 0
 
     texture.needsUpdate = true

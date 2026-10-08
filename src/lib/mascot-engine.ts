@@ -1,7 +1,8 @@
 import * as THREE from "three"
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js"
 
-import type { AvatarEngine } from "@/lib/avatar-engine"
+import type { AvatarEngine, MascotMood, MascotReaction } from "@/lib/avatar-engine"
+import { createConfetti } from "@/lib/mascot/confetti"
 import { disposeObject, type MascotRig } from "@/lib/mascot/rig"
 import { createTripiFace, PROCEDURAL_FACE_LAYOUT } from "@/lib/mascot/tripi-face"
 import { GLB_FACE_LAYOUT, loadTripiGlb } from "@/lib/mascot/tripi-glb"
@@ -10,20 +11,23 @@ import { buildTripi } from "@/lib/mascot/tripi-model"
 /** "glb": Tripi từ file 3D; "procedural": Tripi dựng bằng code. */
 export type MascotSource = "glb" | "procedural"
 
-type GestureKind = "wave" | "nod" | "open-arms"
+type GestureKind = "wave" | "nod" | "open-arms" | MascotReaction
 
 interface Gesture {
   kind: GestureKind
   start: number
   duration: number
+  /** Pháo giấy chỉ bắn một lần trong mỗi lần ăn mừng. */
+  fired?: boolean
 }
 
 const CAMERA_FOV = 30
 const FRAME_BOTTOM_Y = 0
-const FRAME_MARGIN = 1.15
+/** Chừa rộng quanh Tripi để cảnh nền và pháo giấy còn chỗ hiện ra. */
+const FRAME_MARGIN = 1.55
 /** Đẩy robot xuống dưới tâm khung để chừa chỗ cho phần vòm và nhãn trạng thái phía trên. */
 const FRAME_TOP_PADDING = 0.3
-const GESTURE_DURATION: Record<GestureKind, number> = { wave: 2.6, nod: 0.9, "open-arms": 1.6 }
+const GESTURE_DURATION: Record<GestureKind, number> = { wave: 2.6, nod: 0.9, "open-arms": 1.6, celebrate: 2.6, point: 2.2 }
 const SPEECH_GESTURE_CHANCE = 0.6
 const MOUTH_GAIN = 9
 const MOUTH_NOISE_FLOOR = 0.012
@@ -35,6 +39,41 @@ const POINTER_IDLE_MS = 4000
 const EYE_HEIGHT_RATIO = 0.72
 const GAZE_FOLLOW_SPEED = 0.12
 const GAZE_WANDER_SPEED = 0.06
+/** Đang nghĩ thì Tripi ngước nhìn lên phía trên bên trái, như đang cân nhắc. */
+const THINKING_GAZE = new THREE.Vector2(-0.55, -0.6)
+/** Khi chỉ tay về thẻ tour (bên phải màn hình), mắt và đầu quay sang phải. */
+const POINT_GAZE_X = 0.75
+const POINT_YAW = 0.28
+const SHADOW_RADIUS = 1.25
+const CELEBRATE_JUMPS = 3
+const CELEBRATE_JUMP_HEIGHT = 0.14
+
+/** Bóng mờ dưới chân để Tripi đứng trên sân khấu thay vì lơ lửng. */
+function createGroundShadow(): { mesh: THREE.Mesh; dispose: () => void } {
+  const canvas = document.createElement("canvas")
+  canvas.width = canvas.height = 128
+  const ctx = canvas.getContext("2d")
+  if (ctx) {
+    const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 64)
+    gradient.addColorStop(0, "rgba(0, 40, 120, 0.38)")
+    gradient.addColorStop(1, "rgba(0, 40, 120, 0)")
+    ctx.fillStyle = gradient
+    ctx.fillRect(0, 0, 128, 128)
+  }
+  const texture = new THREE.CanvasTexture(canvas)
+  const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, depthWrite: false })
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(SHADOW_RADIUS * 2, SHADOW_RADIUS * 2), material)
+  mesh.rotation.x = -Math.PI / 2
+  mesh.position.y = 0.01
+  return {
+    mesh,
+    dispose: () => {
+      mesh.geometry.dispose()
+      material.dispose()
+      texture.dispose()
+    },
+  }
+}
 
 function easeInOut(value: number): number {
   const clamped = THREE.MathUtils.clamp(value, 0, 1)
@@ -105,6 +144,9 @@ export async function createMascotEngine(
     throw error
   }
   scene.add(rig.root)
+  const shadow = createGroundShadow()
+  const confetti = createConfetti()
+  scene.add(shadow.mesh, confetti.object)
 
   const camera = new THREE.PerspectiveCamera(CAMERA_FOV, 1, 0.1, 50)
   const resize = (): void => {
@@ -126,6 +168,7 @@ export async function createMascotEngine(
   let speechToken = 0
   let finishCurrent: (() => void) | null = null
   let hasGreeted = false
+  let mood: MascotMood = "idle"
   let gesture: Gesture | null = null
   let mouth = 0
   let gaze = new THREE.Vector2()
@@ -161,6 +204,7 @@ export async function createMascotEngine(
       THREE.MathUtils.clamp((pointer.y - eyeY) / (window.innerHeight * 0.45), -1, 1),
     )
   }
+  let lastFrameTime = 0
   let nextBlinkAt = 2
   let blinkStart = -1
   let frameId = 0
@@ -183,6 +227,9 @@ export async function createMascotEngine(
   const animate = (): void => {
     frameId = requestAnimationFrame(animate)
     const time = clock.getElapsedTime()
+    // getElapsedTime đã tự gọi getDelta nên tính khoảng cách giữa hai khung hình từ mốc trước.
+    const deltaSeconds = Math.min(time - lastFrameTime, 0.05)
+    lastFrameTime = time
 
     const level = readVoiceLevel()
     mouth += (level - mouth) * (level > mouth ? MOUTH_ATTACK : MOUTH_RELEASE)
@@ -197,7 +244,9 @@ export async function createMascotEngine(
     // Đang nói thì nhìn thẳng vào khách; không nói thì nhìn theo chuột, chuột đứng yên lâu thì liếc ngẫu nhiên.
     const now = performance.now()
     const followPointer = !source && now >= eyeContactUntil && now - pointer.movedAt < POINTER_IDLE_MS
-    if (source || now < eyeContactUntil) {
+    if (mood === "thinking" && !source) {
+      gazeTarget = THINKING_GAZE.clone()
+    } else if (source || now < eyeContactUntil || mood === "listening") {
       gazeTarget.set(0, 0)
     } else if (followPointer) {
       gazeTarget = pointerGaze()
@@ -211,12 +260,26 @@ export async function createMascotEngine(
     if (!Number.isFinite(gaze.x) || !Number.isFinite(gaze.y)) gaze.set(0, 0)
 
     let wink = 0
+    let happy = 0
+    let cheer = 0
+    let pointLeft = 0
+    let pointYaw = 0
 
     let wave = 0
     let waveSwing = 0
     let armsOpen = 0
     let headPitch = mouth * 0.06 + Math.sin(time * 1.1) * 0.02 + gaze.y * 0.12
     let bodyLift = 0
+    let headRoll = Math.sin(time * 1.3) * 0.035 - gaze.x * 0.03
+
+    // Nghe khách nói thì nghiêng đầu về phía trước một chút, đang nghĩ thì nghiêng sang một bên.
+    if (mood === "listening") {
+      headRoll += 0.1
+      headPitch -= 0.04
+    } else if (mood === "thinking" && !source) {
+      headRoll -= 0.12
+      headPitch -= 0.06
+    }
 
     if (gesture) {
       const progress = (time - gesture.start) / gesture.duration
@@ -230,24 +293,53 @@ export async function createMascotEngine(
         bodyLift = raise * 0.03
       } else if (gesture.kind === "nod") {
         headPitch += Math.sin(progress * Math.PI * 2) * 0.14
+      } else if (gesture.kind === "celebrate") {
+        cheer = envelope(progress, 0.15, 0.25)
+        happy = envelope(progress, 0.1, 0.2)
+        waveSwing = Math.sin(time * 12) * 0.25
+        // Nhún nhảy vài nhịp trong lúc giơ hai tay.
+        bodyLift = Math.abs(Math.sin(progress * Math.PI * CELEBRATE_JUMPS)) * CELEBRATE_JUMP_HEIGHT * cheer
+        headPitch -= 0.08 * cheer
+        if (!gesture.fired) {
+          gesture.fired = true
+          confetti.burst(new THREE.Vector3(0, rig.topY * 0.85, 0.2))
+        }
+      } else if (gesture.kind === "point") {
+        pointLeft = envelope(progress, 0.25, 0.3)
+        pointYaw = pointLeft
+        headPitch += Math.sin(progress * Math.PI) * 0.05
       } else {
         armsOpen = envelope(progress, 0.3, 0.35) * 0.55
       }
     }
 
-    face.draw({ eyeOpen, wink, mouthOpen: mouth, gazeX: gaze.x, gazeY: gaze.y })
+    face.draw({
+      eyeOpen,
+      wink,
+      mouthOpen: mouth,
+      gazeX: gaze.x + pointYaw * POINT_GAZE_X,
+      gazeY: gaze.y,
+      happy,
+    })
 
     rig.applyPose({
       time,
       lift: Math.sin(time * 2) * 0.025 + bodyLift,
       sway: Math.sin(time * 0.9) * 0.015,
       headPitch,
-      headYaw: gaze.x * 0.22,
-      headRoll: Math.sin(time * 1.3) * 0.035 - gaze.x * 0.03,
+      headYaw: gaze.x * 0.22 + pointYaw * POINT_YAW,
+      headRoll,
       wave,
       waveSwing,
       armsOpen,
+      cheer,
+      pointLeft,
     })
+
+    // Bóng co lại khi Tripi nhảy lên.
+    const grounded = 1 / (1 + (rig.root.position.y > 0 ? rig.root.position.y * 3 : 0))
+    shadow.mesh.scale.setScalar(grounded)
+    confetti.update(deltaSeconds)
 
     renderer.render(scene, camera)
   }
@@ -297,7 +389,7 @@ export async function createMascotEngine(
       if (!hasGreeted) {
         hasGreeted = true
         startGesture("wave")
-      } else if (Math.random() < SPEECH_GESTURE_CHANCE) {
+      } else if (!gesture && Math.random() < SPEECH_GESTURE_CHANCE) {
         startGesture(Math.random() < 0.5 ? "nod" : "open-arms")
       }
 
@@ -322,6 +414,14 @@ export async function createMascotEngine(
       eyeContactUntil = performance.now() + durationMs
     },
 
+    setMood(next: MascotMood): void {
+      mood = next
+    },
+
+    react(reaction: MascotReaction): void {
+      startGesture(reaction)
+    },
+
     dispose(): void {
       stop()
       cancelAnimationFrame(frameId)
@@ -332,6 +432,8 @@ export async function createMascotEngine(
       window.removeEventListener("keydown", resumeAudio)
       resizeObserver.disconnect()
       disposeObject(rig.root)
+      shadow.dispose()
+      confetti.dispose()
       face.dispose()
       environment.dispose()
       pmrem.dispose()

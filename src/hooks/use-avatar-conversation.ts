@@ -16,6 +16,14 @@ interface UseAvatarConversationResult {
   interrupt: () => void
 }
 
+/** Hiện thẻ tour kèm phản ứng của mascot: ăn mừng nếu có ưu đãi, không thì chỉ tay về phía thẻ. */
+function showTours(tours: Tour[] | undefined): void {
+  if (!tours || tours.length === 0) return
+  const { setRecommendedTours, engine } = useAvatarStore.getState()
+  setRecommendedTours(tours)
+  engine?.react?.(tours.some((tour) => tour.deal) ? "celebrate" : "point")
+}
+
 export function useAvatarConversation(): UseAvatarConversationResult {
   const requestIdRef = useRef<number>(0)
   const abortRef = useRef<AbortController | null>(null)
@@ -32,22 +40,25 @@ export function useAvatarConversation(): UseAvatarConversationResult {
   const isCurrent = useCallback((id: number): boolean => id === requestIdRef.current, [])
 
   const speakReply = useCallback(
-    async (text: string, id: number, signal: AbortSignal, tours?: Tour[]): Promise<void> => {
-      const { setStatus, setSubtitle, addMessage, setRecommendedTours } = useAvatarStore.getState()
+    async (text: string, id: number, signal: AbortSignal, tours?: Tour[], prerecorded = false): Promise<void> => {
+      const { setStatus, setSubtitle, addMessage } = useAvatarStore.getState()
       try {
-        const audio = await avatarService.synthesize(text, signal)
+        // Lời chào dùng file tạo sẵn; lỗi tải thì rơi về TTS như câu trả lời thường.
+        const audio = prerecorded
+          ? await avatarService.greeting(signal).catch(() => avatarService.synthesize(text, signal))
+          : await avatarService.synthesize(text, signal)
         const engine = useAvatarStore.getState().engine
         if (!isCurrent(id) || !engine) return
 
         addMessage({ role: "assistant", content: text })
-        if (tours && tours.length > 0) setRecommendedTours(tours)
+        showTours(tours)
         setSubtitle(text)
         setStatus("speaking")
         await engine.speak(audio)
       } catch (error: unknown) {
         if (axios.isCancel(error) || !isCurrent(id)) return
         addMessage({ role: "assistant", content: text })
-        if (tours && tours.length > 0) setRecommendedTours(tours)
+        showTours(tours)
         setSubtitle(text)
         toast.error(getErrorMessage(error, "Không phát được giọng nói, em hiển thị câu trả lời bằng chữ ạ."))
       } finally {
@@ -65,7 +76,7 @@ export function useAvatarConversation(): UseAvatarConversationResult {
     const greeting = company.persona.greeting
     const { id, signal } = beginRequest()
     setStatus("thinking")
-    void speakReply(greeting, id, signal)
+    void speakReply(greeting, id, signal, undefined, true)
   }, [beginRequest, speakReply])
 
   const ask = useCallback(

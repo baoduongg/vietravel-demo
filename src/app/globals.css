@@ -59,7 +59,7 @@
   --cloud: #d9eeff;
   --sunset: #0391ff;
   --sale: #ed1d24;
-  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-soft: cubic-bezier(0.32, 0.72, 0, 1);
 
   --background: var(--sky);
   --foreground: var(--ink);
@@ -82,6 +82,17 @@
   --radius: 0.875rem;
 }
 
+/* Màu nhuộm nền theo cảnh; đăng ký kiểu <color> để đổi cảnh thì màu chuyển mượt. */
+@property --scene-tint {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #d9eeff;
+}
+
+html {
+  transition: --scene-tint 1.4s var(--ease-out-soft);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -92,8 +103,8 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
     background-image:
-      radial-gradient(60rem 30rem at 85% -10%, color-mix(in oklab, var(--cloud) 70%, transparent), transparent 70%),
-      radial-gradient(40rem 24rem at -5% 30%, color-mix(in oklab, var(--cloud) 40%, transparent), transparent 70%);
+      radial-gradient(60rem 30rem at 85% -10%, color-mix(in oklab, var(--scene-tint) 70%, transparent), transparent 70%),
+      radial-gradient(40rem 24rem at -5% 30%, color-mix(in oklab, var(--scene-tint) 55%, transparent), transparent 70%);
     background-attachment: fixed;
   }
   h1,
@@ -156,6 +167,61 @@
   }
 }
 
+@keyframes shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(-4px);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+@keyframes lantern-sway {
+  0%,
+  100% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@utility animate-float {
+  animation: float 5s ease-in-out infinite;
+}
+
+@utility animate-lantern {
+  animation: lantern-sway 3.2s ease-in-out infinite;
+}
+
+@utility animate-twinkle {
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+@utility animate-shimmer {
+  animation: shimmer 1.6s var(--ease-out-soft) infinite;
+}
+
 @utility animate-cloud-drift {
   animation: cloud-drift 38s ease-in-out infinite alternate;
 }
@@ -178,10 +244,14 @@
 
 @media (prefers-reduced-motion: reduce) {
   .animate-cloud-drift,
+  .animate-float,
+  .animate-lantern,
+  .animate-twinkle,
   .animate-speaking-glow,
   .animate-listening-pulse,
   .animate-thinking-pulse,
-  .animate-thinking-beam {
+  .animate-thinking-beam,
+  .animate-shimmer {
     animation: none;
   }
 }

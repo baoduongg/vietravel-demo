@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect } from "react"
 import dynamic from "next/dynamic"
+import { AnimatePresence, MotionConfig } from "motion/react"
 import { toast } from "sonner"
 
 import { StartOverlay } from "@/components/avatar/start-overlay"
@@ -18,16 +19,15 @@ import { TourCards } from "@/components/avatar/tour-cards"
 import { company } from "@/config/company"
 import { useAvatarConversation } from "@/hooks/use-avatar-conversation"
 import { useSpeechRecognition, type SpeechRecognitionIssue } from "@/hooks/use-speech-recognition"
+import { SCENE_TINT } from "@/lib/scene"
 import { useAvatarStore } from "@/stores/avatar.store"
 
-const AvatarStage = dynamic(
-  () => import("@/components/avatar/avatar-stage").then((module) => module.AvatarStage),
-  { ssr: false },
-)
+const AvatarStage = dynamic(() => import("@/components/avatar/avatar-stage").then((module) => module.AvatarStage), {
+  ssr: false,
+})
 
 const NOTICES: Record<Exclude<SpeechRecognitionIssue, null>, string> = {
-  unsupported:
-    `Trình duyệt này chưa hỗ trợ nhận dạng giọng nói, Quý khách vui lòng gõ câu hỏi vào ô trên. Dùng Chrome hoặc Edge để nói trực tiếp với ${company.persona.name}.`,
+  unsupported: `Trình duyệt này chưa hỗ trợ nhận dạng giọng nói, Quý khách vui lòng gõ câu hỏi vào ô trên. Dùng Chrome hoặc Edge để nói trực tiếp với ${company.persona.name}.`,
   "permission-denied":
     "Micro đang bị chặn. Bấm biểu tượng ổ khóa cạnh thanh địa chỉ để cho phép micro, hoặc gõ câu hỏi vào ô trên.",
   "no-microphone": "Không tìm thấy micro trên thiết bị này. Quý khách có thể gõ câu hỏi vào ô trên.",
@@ -44,6 +44,8 @@ export function AvatarExperience(): React.JSX.Element {
   const historyOpen = useAvatarStore((state) => state.historyOpen)
   const toggleHistory = useAvatarStore((state) => state.toggleHistory)
   const recommendedTours = useAvatarStore((state) => state.recommendedTours)
+  const scene = useAvatarStore((state) => state.scene)
+  const setScene = useAvatarStore((state) => state.setScene)
 
   const { start, ask, interrupt } = useAvatarConversation()
 
@@ -62,6 +64,18 @@ export function AvatarExperience(): React.JSX.Element {
     if (speech.listening) setStatus("listening")
     else if (current === "listening") setStatus("idle")
   }, [speech.listening])
+
+  // Nhuộm nền trang theo cảnh đang chọn; CSS lo phần chuyển màu mượt.
+  useEffect(() => {
+    document.documentElement.style.setProperty("--scene-tint", SCENE_TINT[scene])
+  }, [scene])
+
+  // Mascot đổi dáng chờ theo trạng thái: nghiêng đầu nghe khách, ngước lên suy nghĩ.
+  useEffect(() => {
+    if (!engineReady) return
+    const mood = status === "listening" ? "listening" : status === "thinking" ? "thinking" : "idle"
+    useAvatarStore.getState().engine?.setMood?.(mood)
+  }, [status, engineReady])
 
   const { listening, cancel: cancelListening, start: startListening, stop: stopListening } = speech
 
@@ -86,102 +100,142 @@ export function AvatarExperience(): React.JSX.Element {
   const controlsDisabled = !started || !engineReady
   const notice = !speech.supported ? NOTICES.unsupported : speech.issue ? NOTICES[speech.issue] : null
 
+  const thinking = status === "thinking"
+
   return (
-    <div className="flex min-h-dvh flex-col lg:h-dvh">
-      <SiteHeader />
+    <MotionConfig reducedMotion="user">
+      <div className="flex h-dvh flex-col overflow-hidden">
+        <SiteHeader />
 
-      {!started && (
-        <StartOverlay
-          assistantName={company.persona.name}
-          ready={engineReady}
-          progress={loadProgress}
-          error={loadError}
-          onStart={start}
-        />
-      )}
-
-      <main className="mx-auto flex w-full max-w-[1280px] flex-1 flex-col gap-5 px-4 py-5 lg:grid lg:min-h-0 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-6 lg:px-6 lg:py-6">
-        <section
-          aria-label={`Trợ lý ${company.persona.name}`}
-          className="animate-reveal flex flex-col rounded-[1.75rem] bg-white p-2 ring-1 ring-cloud shadow-[0_24px_60px_-30px_rgba(0,70,193,0.4)] lg:min-h-0"
-        >
-          <div className="relative isolate h-[58dvh] min-h-[380px] overflow-hidden rounded-[1.375rem] bg-linear-to-b from-[#bfe3ff] via-[#e3f2ff] to-white lg:h-auto lg:min-h-0 lg:flex-1">
-            <StageScenery />
-            <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-              <div className="animate-cloud-drift absolute top-[12%] -left-[10%] h-24 w-[70%] rounded-full bg-white/80 blur-2xl" />
-              <div className="animate-cloud-drift absolute top-[30%] -right-[15%] h-20 w-[55%] rounded-full bg-white/60 blur-2xl [animation-delay:-14s] [animation-direction:alternate-reverse]" />
-            </div>
-
-            {status === "thinking" && (
-              <div className="absolute top-0 inset-x-0 z-20 h-1 overflow-hidden bg-cloud">
-                <div className="h-full w-2/3 bg-linear-to-r from-transparent via-sunset to-transparent animate-thinking-beam" />
-              </div>
-            )}
-
-            <AvatarStage />
-
-            <div className="absolute top-4 left-4 z-10">
-              <StatusBadge status={status} />
-            </div>
-
-            <div className="absolute top-4 right-4 z-10">
-              <AvatarModelSwitch />
-            </div>
-
-            {started && (
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-white via-white/90 to-transparent px-5 pt-20 pb-6 lg:px-8">
-                {status === "thinking" && !subtitle ? (
-                  <ThinkingIndicator assistantName={company.persona.name} />
-                ) : (
-                  <Subtitle text={subtitle} interim={speech.interimTranscript} />
-                )}
-              </div>
-            )}
-          </div>
-        </section>
-
-        <section
-          aria-labelledby="assistant-heading"
-          style={{ "--reveal-delay": "120ms" } as React.CSSProperties}
-          className="animate-reveal flex min-h-0 flex-col gap-5 rounded-[1.75rem] bg-white p-5 ring-1 ring-cloud shadow-[0_24px_60px_-30px_rgba(0,70,193,0.3)] lg:p-7"
-        >
-          <div className="flex flex-col gap-5 lg:min-h-0 lg:shrink-[3] lg:overflow-y-auto">
-            <div className="flex flex-col gap-1.5">
-              <h1 id="assistant-heading" className="text-2xl leading-[1.15] font-extrabold tracking-[-0.025em] text-ink lg:text-[2.25rem]">
-                Hỏi {company.persona.name} về chuyến đi của bạn
-              </h1>
-              <p className="max-w-[60ch] text-[0.95rem] leading-relaxed text-pretty text-muted-foreground">
-                Nói điểm đến, thời gian và ngân sách, {company.persona.name} tìm ngay tour {company.brand} đang mở bán.
-              </p>
-            </div>
-
-            <SuggestedQuestions questions={company.suggestedQuestions} disabled={controlsDisabled} onSelect={handleAsk} />
-
-            <TourCards tours={recommendedTours} assistantName={company.persona.name} />
-          </div>
-
-          <ChatPanel
-            className="lg:mt-auto"
-            messages={messages}
-            assistantName={company.persona.name}
-            status={status}
-            historyOpen={historyOpen}
-            disabled={controlsDisabled}
-            notice={notice}
-            onToggleHistory={toggleHistory}
-            onSubmit={handleAsk}
-            micButton={
-              <MicButton
-                listening={speech.listening}
-                supported={speech.supported}
-                disabled={controlsDisabled}
-                onToggle={handleMicToggle}
+        <main className="mx-auto grid min-h-0 w-full max-w-[1480px] flex-1 grid-cols-[minmax(0,1fr)] grid-rows-[minmax(0,38fr)_minmax(0,62fr)] gap-3 p-3 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:grid-rows-1 lg:gap-6 lg:px-5 lg:pt-4 lg:pb-5">
+          <section
+            aria-label={`Trợ lý ${company.persona.name}`}
+            className="animate-reveal min-h-0 rounded-[2rem] bg-ocean/[0.04] p-1.5 ring-1 ring-ocean/10"
+          >
+            <div className="relative isolate h-full overflow-hidden rounded-[calc(2rem-0.375rem)] bg-linear-to-b from-[#bfe3ff] via-[#e3f2ff] to-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.8),0_40px_80px_-40px_rgba(0,70,193,0.55)]">
+              <StageScenery scene={scene} />
+              {/* Quầng sáng sau lưng mascot, nhuộm theo cảnh để Tripi luôn nổi bật trên nền */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-x-[10%] top-[18%] bottom-[8%] -z-10 rounded-full bg-[radial-gradient(closest-side,white,transparent)] opacity-70 blur-xl"
               />
-            }
-          />
-        </section>
-      </main>
-    </div>
+              <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+                <div className="animate-cloud-drift absolute top-[12%] -left-[10%] h-24 w-[70%] rounded-full bg-white/80 blur-2xl" />
+                <div className="animate-cloud-drift absolute top-[30%] -right-[15%] h-20 w-[55%] rounded-full bg-white/60 blur-2xl [animation-delay:-14s] [animation-direction:alternate-reverse]" />
+              </div>
+
+              {/* {thinking && (
+                <>
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 z-10 animate-pulse rounded-[inherit] ring-2 ring-inset ring-sunset/40"
+                  />
+                  <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 z-10 w-1/2 overflow-hidden">
+                    <div className="animate-shimmer h-full w-full bg-linear-to-r from-transparent via-white/40 to-transparent" />
+                  </div>
+                </>
+              )} */}
+
+              <AvatarStage />
+
+              <div className="absolute top-3 left-3 z-10">
+                <StatusBadge status={status} />
+              </div>
+              <div className="absolute top-3 right-3 z-10">
+                <AvatarModelSwitch />
+              </div>
+
+
+              {started && (
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-white via-white/90 to-transparent px-4 pt-14 pb-4 lg:px-6">
+                  {thinking && !subtitle ? (
+                    <ThinkingIndicator assistantName={company.persona.name} />
+                  ) : (
+                    <Subtitle text={subtitle} interim={speech.interimTranscript} />
+                  )}
+                </div>
+              )}
+            </div>
+          </section>
+
+          <section
+            aria-labelledby="assistant-heading"
+            style={{ "--reveal-delay": "120ms" } as React.CSSProperties}
+            className="animate-reveal flex min-h-0 flex-col gap-3"
+          >
+            <div className="hidden shrink-0 lg:block">
+              <p className="inline-flex rounded-full bg-sunset/10 px-3 py-1 text-[10px] font-semibold tracking-[0.2em] text-ocean uppercase">
+                Lên kế hoạch chuyến đi
+              </p>
+              <h1
+                id="assistant-heading"
+                className="mt-2 text-[2.25rem] leading-[1.05] font-extrabold tracking-[-0.04em] text-ink"
+              >
+                Bạn muốn <span className="text-ocean">đi đâu</span> trong chuyến tới?
+              </h1>
+            </div>
+            <h1 id="assistant-heading-sm" className="sr-only lg:hidden">
+              Lên kế hoạch chuyến đi
+            </h1>
+
+            {/* Panel chào phủ lên các ảnh điểm đến để khách thấy ngay mascot và nút bắt đầu cùng lúc */}
+            <div className="relative flex min-h-0 flex-1 flex-col">
+              <TourCards
+                tours={recommendedTours}
+                thinking={thinking}
+                assistantName={company.persona.name}
+                destinations={company.destinations}
+                controlsDisabled={controlsDisabled}
+                onSelectDestination={handleAsk}
+                onPreviewScene={setScene}
+                className="min-h-0 flex-1"
+              />
+              <AnimatePresence>
+                {!started && (
+                  <StartOverlay
+                    key="start"
+                    assistantName={company.persona.name}
+                    ready={engineReady}
+                    progress={loadProgress}
+                    error={loadError}
+                    onStart={start}
+                  />
+                )}
+              </AnimatePresence>
+            </div>
+
+            <div className="flex shrink-0 flex-col gap-2">
+              {/* Khi chưa có tour, các ô điểm đến đã đóng vai gợi ý nên chỉ hiện chip sau lần tư vấn đầu */}
+              {(recommendedTours.length > 0 || thinking) && (
+                <SuggestedQuestions
+                  questions={company.suggestedQuestions}
+                  disabled={controlsDisabled}
+                  onSelect={handleAsk}
+                />
+              )}
+              <ChatPanel
+                messages={messages}
+                assistantName={company.persona.name}
+                status={status}
+                historyOpen={historyOpen}
+                disabled={controlsDisabled}
+                notice={notice}
+                onToggleHistory={toggleHistory}
+                onSubmit={handleAsk}
+                micButton={
+                  <MicButton
+                    listening={speech.listening}
+                    supported={speech.supported}
+                    disabled={controlsDisabled}
+                    onToggle={handleMicToggle}
+                  />
+                }
+                className=""
+              />
+            </div>
+          </section>
+        </main>
+      </div>
+    </MotionConfig>
   )
 }
-

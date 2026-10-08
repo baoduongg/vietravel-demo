@@ -17,6 +17,10 @@ export interface MascotPose {
   waveSwing: number
   /** Góc dang thêm của hai tay ra ngoài (radian). */
   armsOpen: number
+  /** 0 đến 1, hai tay giơ cao ăn mừng. */
+  cheer: number
+  /** 0 đến 1, tay trái đưa ra chỉ về phía thẻ tour bên phải. */
+  pointLeft: number
 }
 
 export interface MascotRig {

@@ -225,14 +225,35 @@ export function buildTripi(faceTexture: THREE.Texture): MascotRig {
   leftArm.position.set(0.58, 1.12, 0)
   body.add(rightArm, leftArm)
 
-  const applyPose = ({ time, lift, sway, headPitch, headYaw, headRoll, wave, waveSwing, armsOpen }: MascotPose): void => {
+  const applyPose = ({
+    time,
+    lift,
+    sway,
+    headPitch,
+    headYaw,
+    headRoll,
+    wave,
+    waveSwing,
+    armsOpen,
+    cheer,
+    pointLeft,
+  }: MascotPose): void => {
     const restRight = -ARM_REST_ANGLE - Math.sin(time * 1.8) * 0.03 - armsOpen
     const restLeft = ARM_REST_ANGLE + Math.sin(time * 1.8 + 1) * 0.03 + armsOpen
     root.position.y = lift
     body.rotation.z = sway
     head.rotation.set(headPitch, headYaw, headRoll)
-    rightArm.rotation.set(Math.sin(time * 1.8) * 0.04, 0, THREE.MathUtils.lerp(restRight, -WAVE_RAISE_ANGLE + waveSwing, wave))
-    leftArm.rotation.set(Math.sin(time * 1.8 + 1) * 0.04, 0, restLeft)
+    rightArm.rotation.set(
+      Math.sin(time * 1.8) * 0.04,
+      0,
+      THREE.MathUtils.lerp(restRight, -WAVE_RAISE_ANGLE + waveSwing, Math.max(wave, cheer)),
+    )
+    const leftRaise = Math.max(cheer, pointLeft * 0.55)
+    leftArm.rotation.set(
+      Math.sin(time * 1.8 + 1) * 0.04,
+      0,
+      THREE.MathUtils.lerp(restLeft, WAVE_RAISE_ANGLE - waveSwing * cheer, leftRaise),
+    )
   }
 
   return { root, topY: 1.36 + HAT_BASE_Y + 0.5, width: ROBOT_WIDTH, applyPose }

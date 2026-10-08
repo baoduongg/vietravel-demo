@@ -31,4 +31,11 @@ export const avatarService = {
       .catch(readBlobError)
     return data.arrayBuffer()
   },
+
+  /** Lời chào cố định, tạo sẵn bằng scripts/generate-greeting.ts. */
+  async greeting(signal?: AbortSignal): Promise<ArrayBuffer> {
+    const response = await fetch("/audio/greeting.mp3", { signal })
+    if (!response.ok) throw new Error(`Không tải được lời chào (${response.status})`)
+    return response.arrayBuffer()
+  },
 }

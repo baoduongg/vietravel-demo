@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { SparklesIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -10,46 +9,54 @@ interface ThinkingIndicatorProps {
   className?: string
 }
 
-const THINKING_MESSAGES = [
-  "đang tìm kiếm thông tin tour...",
-  "đang tra cứu lịch trình & giá vé...",
-  "đang tổng hợp thông tin & chuẩn bị giọng nói...",
-  "đang hoàn thiện gợi ý tốt nhất cho bạn...",
+export const THINKING_STEPS = [
+  "Đang tìm tour phù hợp",
+  "Đang tra lịch trình & giá",
+  "Đang chuẩn bị giọng nói",
+  "Sắp xong rồi",
 ]
 
+/** Thẻ nổi trên sân khấu: tên trợ lý, bước hiện tại và thanh tiến trình theo bước. */
 export function ThinkingIndicator({ assistantName, className }: ThinkingIndicatorProps): React.JSX.Element {
-  const [messageIndex, setMessageIndex] = useState<number>(0)
+  const [step, setStep] = useState<number>(0)
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setMessageIndex((prev) => (prev + 1) % THINKING_MESSAGES.length)
-    }, 2500)
+    const interval = setInterval(() => setStep((prev) => Math.min(prev + 1, THINKING_STEPS.length - 1)), 2500)
     return () => clearInterval(interval)
   }, [])
 
   return (
     <div
+      role="status"
+      aria-live="polite"
       className={cn(
-        "animate-in fade-in zoom-in-95 flex flex-col items-center gap-2 duration-300",
+        "animate-in fade-in slide-in-from-bottom-2 mx-auto flex w-full max-w-sm flex-col gap-2 rounded-[1.5rem] bg-white/70 p-1.5 ring-1 ring-ocean/10 duration-500",
         className,
       )}
     >
-      <div className="flex items-center gap-2.5 rounded-full border border-cloud bg-white/95 px-4 py-2 shadow-[0_10px_30px_-12px_rgba(0,70,193,0.35)] backdrop-blur-md">
-        <div className="flex size-6 items-center justify-center rounded-full bg-linear-to-br from-sunset to-ocean text-white shadow-xs">
-          <SparklesIcon className="size-3.5 animate-spin motion-reduce:animate-none" />
-        </div>
-
-        <div className="flex items-center gap-1.5 text-xs font-bold text-ink sm:text-sm">
-          <span className="text-ocean font-extrabold">{assistantName}</span>
-          <span className="text-ocean font-semibold transition-all duration-300">
-            {THINKING_MESSAGES[messageIndex]}
+      <div className="flex flex-col gap-2 rounded-[calc(1.5rem-0.375rem)] bg-white px-4 py-3 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_14px_30px_-18px_rgba(0,70,193,0.4)]">
+        <p className="flex items-center gap-2 text-[10px] font-semibold tracking-[0.2em] text-ocean uppercase">
+          <span className="flex gap-1" aria-hidden>
+            <span className="size-1.5 animate-bounce rounded-full bg-sunset [animation-delay:-0.3s]" />
+            <span className="size-1.5 animate-bounce rounded-full bg-sunset [animation-delay:-0.15s]" />
+            <span className="size-1.5 animate-bounce rounded-full bg-sunset" />
           </span>
-        </div>
-
-        <div className="flex items-center gap-1 pl-1">
-          <span className="size-1.5 rounded-full bg-sunset animate-bounce [animation-delay:-0.3s]" />
-          <span className="size-1.5 rounded-full bg-sunset animate-bounce [animation-delay:-0.15s]" />
-          <span className="size-1.5 rounded-full bg-sunset animate-bounce" />
+          {assistantName} đang suy nghĩ
+        </p>
+        <p key={step} className="animate-in fade-in slide-in-from-bottom-1 text-base font-bold text-ink duration-500">
+          {THINKING_STEPS[step]}
+        </p>
+        <div className="flex gap-1" aria-hidden>
+          {THINKING_STEPS.map((label, index) => (
+            <span
+              key={label}
+              className={cn(
+                "h-1 flex-1 rounded-full bg-cloud transition-colors duration-500",
+                index < step && "bg-ocean",
+                index === step && "bg-sunset animate-pulse",
+              )}
+            />
+          ))}
         </div>
       </div>
     </div>

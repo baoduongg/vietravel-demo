@@ -1,3 +1,5 @@
+import type { SceneTheme } from "@/lib/scene"
+
 export interface FaqItem {
   question: string
   answer: string
@@ -25,6 +27,15 @@ export interface VoiceConfig {
  */
 export type AvatarModel = "mascot" | "mascot-procedural" | "human"
 
+export interface Destination {
+  label: string
+  caption: string
+  /** Câu hỏi gửi cho Tripi khi khách bấm vào ô điểm đến. */
+  question: string
+  imageUrl: string
+  scene: SceneTheme
+}
+
 export interface CompanyConfig {
   brand: string
   avatarModel: AvatarModel
@@ -50,6 +61,7 @@ export interface CompanyConfig {
   promotions: string[]
   faqs: FaqItem[]
   suggestedQuestions: string[]
+  destinations: Destination[]
 }
 
 export const TOUR_TAG = "TOURS:"
@@ -129,5 +141,49 @@ export const company: CompanyConfig = {
     "Tour nào lãng mạn cho cặp đôi đi trăng mật?",
     "Tour nước ngoài nào dưới 10 triệu?",
     "Đang có ưu đãi giờ chót nào không?",
+  ],
+  destinations: [
+    {
+      label: "Hạ Long & Ninh Bình",
+      caption: "Kỳ quan thiên nhiên",
+      question: "Gợi ý cho tôi tour Vịnh Hạ Long và Ninh Bình",
+      imageUrl: "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__0_11106_ha-long-bay.webp",
+      scene: "bay",
+    },
+    {
+      label: "Sa Pa & Tây Bắc",
+      caption: "Săn mây, ruộng bậc thang",
+      question: "Tôi muốn đi Sa Pa hoặc Tây Bắc săn mây, có tour nào không?",
+      imageUrl: "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__2_3966_view-of-sapa-town.webp",
+      scene: "mountain",
+    },
+    {
+      label: "Phú Quốc & biển đảo",
+      caption: "Nghỉ dưỡng, hoàng hôn",
+      question: "Tour biển đảo nào đẹp để nghỉ dưỡng, ví dụ Phú Quốc?",
+      imageUrl: "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__0_6221_bai-sao-1.webp",
+      scene: "beach",
+    },
+    {
+      label: "Đà Nẵng & Hội An",
+      caption: "Di sản, phố đèn lồng",
+      question: "Tháng này đi Đà Nẵng Hội An 3 ngày hết bao nhiêu?",
+      imageUrl: "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__2_12156_cau-rong-ban-dem.webp",
+      scene: "heritage",
+    },
+    {
+      label: "Nhật Bản & Hàn Quốc",
+      caption: "Hoa anh đào, lá đỏ",
+      question: "Tour Nhật Bản nào đang có lịch khởi hành gần nhất?",
+      imageUrl: "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__0_4288_lau-dai-matsumoto-2.webp",
+      scene: "world",
+    },
+    {
+      label: "Châu Âu",
+      caption: "Hành trình trời Âu",
+      question: "Tour Châu Âu nào đẹp, đi khoảng hai tuần?",
+      imageUrl: "https://s3-cmc.travel.com.vn/vtv-image/Images/Destination/tf__2_14622_zermatt-winter.webp",
+      scene: "world",
+    },
   ],
 }

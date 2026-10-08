@@ -1,44 +1,29 @@
-import { ArrowUpRightIcon, PhoneIcon, SparklesIcon } from "lucide-react"
+import { PhoneIcon, SparklesIcon } from "lucide-react"
 
 import { company } from "@/config/company"
 
 export function SiteHeader(): React.JSX.Element {
   return (
-    <header className="sticky top-0 z-20 border-b border-ocean/10 bg-white/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/70">
-      <div className="mx-auto flex h-16 w-full max-w-[1280px] items-center gap-4 px-4 lg:px-6">
+    <header className="z-20 shrink-0 px-3 pt-3 lg:px-5">
+      <div className="mx-auto flex h-12 w-full max-w-[1480px] items-center gap-3 rounded-full bg-white/70 py-1 pr-1.5 pl-5 shadow-[0_18px_40px_-24px_rgba(0,70,193,0.45)] ring-1 ring-ocean/10 backdrop-blur-xl">
         <a href={`https://${company.website}`} target="_blank" rel="noreferrer" className="shrink-0">
           {/* eslint-disable-next-line @next/next/no-img-element -- logo nhỏ, giữ nguyên tỉ lệ gốc */}
-          <img src={company.logoUrl} alt={company.brand} className="h-8 w-auto lg:h-9" />
+          <img src={company.logoUrl} alt={company.brand} className="h-6 w-auto" />
         </a>
-
-        <span aria-hidden className="hidden h-6 w-px bg-black/10 sm:block" />
-
-        <p className="hidden items-center gap-1.5 text-[0.95rem] font-bold text-ocean sm:flex">
+        <span aria-hidden className="hidden h-4 w-px bg-ocean/15 sm:block" />
+        <p className="hidden items-center gap-1.5 text-[10px] font-semibold tracking-[0.2em] text-ocean uppercase sm:flex">
           AI Trợ lý du lịch
-          <SparklesIcon aria-hidden strokeWidth={1.75} className="size-4 text-sunset" />
+          <SparklesIcon aria-hidden strokeWidth={1.5} className="size-3.5 text-sunset" />
         </p>
-
-        <div className="ml-auto flex items-center gap-2">
-          <a
-            href={`tel:${company.hotline.replace(/\s/g, "")}`}
-            className="inline-flex h-10 items-center gap-2 rounded-full bg-cloud px-4 text-sm font-bold text-ocean transition-transform duration-300 ease-soft outline-none hover:bg-[#cbe6ff] focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.98]"
-          >
-            <PhoneIcon aria-hidden strokeWidth={1.75} className="size-4" />
-            <span className="hidden sm:inline">{company.hotline}</span>
-            <span className="sm:hidden">Gọi</span>
-          </a>
-          <a
-            href={`https://${company.website}`}
-            target="_blank"
-            rel="noreferrer"
-            className="group hidden h-10 items-center gap-2 rounded-full border border-ocean pr-1 pl-4 text-sm font-bold text-ocean transition-transform duration-300 ease-soft outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.98] md:inline-flex"
-          >
-            {company.website}
-            <span className="flex size-8 items-center justify-center rounded-full bg-ocean text-white transition-transform duration-300 ease-soft group-hover:translate-x-0.5 group-hover:-translate-y-px">
-              <ArrowUpRightIcon aria-hidden strokeWidth={1.75} className="size-4" />
-            </span>
-          </a>
-        </div>
+        <a
+          href={`tel:${company.hotline.replace(/\s/g, "")}`}
+          className="group ml-auto inline-flex h-9 items-center gap-2 rounded-full bg-ocean pr-1 pl-4 text-sm font-semibold text-white outline-none transition-transform duration-500 ease-soft focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.98]"
+        >
+          {company.hotline}
+          <span className="flex size-7 items-center justify-center rounded-full bg-white/15 transition-transform duration-500 ease-soft group-hover:scale-105 group-hover:translate-x-0.5 group-hover:-translate-y-px">
+            <PhoneIcon aria-hidden strokeWidth={1.5} className="size-3.5" />
+          </span>
+        </a>
       </div>
     </header>
   )

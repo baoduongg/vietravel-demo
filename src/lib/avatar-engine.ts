@@ -7,11 +7,19 @@ const HEADAUDIO_MODEL_URL = "/headaudio/model-en-mixed.bin"
 const LIPSYNC_DELAY_SECONDS = 0.1
 const GESTURE_PAUSE_MS = 150
 
+/** Trạng thái nền của mascot trong lúc chờ: khách đang nói hoặc Tripi đang nghĩ. */
+export type MascotMood = "idle" | "listening" | "thinking"
+/** Phản ứng một lần: ăn mừng khi có ưu đãi, chỉ tay về thẻ tour khi vừa gợi ý. */
+export type MascotReaction = "celebrate" | "point"
+
 export interface AvatarEngine {
   unlock: () => Promise<void>
   speak: (audio: ArrayBuffer) => Promise<void>
   stop: () => void
   lookAtUser: (durationMs: number) => void
+  /** Chỉ mascot 3D mới có; avatar người bỏ qua. */
+  setMood?: (mood: MascotMood) => void
+  react?: (reaction: MascotReaction) => void
   dispose: () => void
 }
 

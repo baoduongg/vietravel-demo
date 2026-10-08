@@ -1,5 +1,7 @@
 import { AudioLinesIcon, EarIcon, PlaneIcon, SparklesIcon, type LucideIcon } from "lucide-react"
 
+import { AnimatePresence, motion } from "motion/react"
+
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import type { AvatarStatus } from "@/stores/avatar.store"
@@ -49,8 +51,19 @@ export function StatusBadge({ status, className }: StatusBadgeProps): React.JSX.
       aria-live="polite"
       className={cn("h-8 gap-1.5 px-3.5 text-[0.8rem] font-bold transition-all duration-300", tone, className)}
     >
-      <Icon className={cn("size-3.5!", iconClassName)} aria-hidden />
-      <span>{label}</span>
+      <AnimatePresence mode="popLayout" initial={false}>
+        <motion.span
+          key={status}
+          className="flex items-center gap-1.5"
+          initial={{ opacity: 0, y: 8, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -8, scale: 0.9 }}
+          transition={{ type: "spring", stiffness: 380, damping: 26 }}
+        >
+          <Icon className={cn("size-3.5!", iconClassName)} aria-hidden />
+          {label}
+        </motion.span>
+      </AnimatePresence>
       {status === "thinking" && (
         <span className="flex items-center gap-0.5 ml-0.5">
           <span className="size-1 rounded-full bg-white animate-bounce [animation-delay:-0.3s]" />
