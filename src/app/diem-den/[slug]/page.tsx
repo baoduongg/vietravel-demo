@@ -8,6 +8,7 @@ import { EatBlock } from "@/components/explorer/eat-block"
 import { ExplorerShell } from "@/components/explorer/explorer-shell"
 import { Faq } from "@/components/explorer/faq"
 import { FinalCta } from "@/components/explorer/final-cta"
+import { MediaBlock } from "@/components/explorer/media-block"
 import { GettingThere } from "@/components/explorer/getting-there"
 import { Itinerary } from "@/components/explorer/itinerary"
 import { PlayBlock } from "@/components/explorer/play-block"
@@ -44,8 +45,9 @@ export default async function DestinationPage({ params }: PageProps): Promise<Re
   return (
     <ExplorerShell>
       <DestinationHero guide={guide} />
-      <AnchorNav />
+      {/* <AnchorNav /> */}
       <div className="mx-auto max-w-6xl px-4 lg:px-6">
+        <MediaBlock guide={guide} />
         <WeatherBlock guide={guide} />
         <GettingThere guide={guide} />
         <StayBlock guide={guide} />
@@ -54,7 +56,7 @@ export default async function DestinationPage({ params }: PageProps): Promise<Re
         <Itinerary guide={guide} />
         <CostChecklist guide={guide} minTourPriceVnd={tours[0]?.priceVnd ?? null} />
         <Reviews guide={guide} />
-        <Section id="tour" eyebrow="Đặt tour" title={`Tour ${guide.name} đang mở bán`} intro="Giá và ngày khởi hành lấy từ travel.com.vn. Bấm Xem và đặt để chuyển sang trang tour của Vietravel.">
+        <Section id="tour" title={`Tour ${guide.name} đang mở bán`} intro="Giá và ngày khởi hành lấy từ travel.com.vn. Bấm Xem và đặt để chuyển sang trang tour của Vietravel.">
           <TourList tours={tours} hotline={company.hotline} />
         </Section>
         <Faq guide={guide} />

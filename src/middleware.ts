@@ -34,5 +34,6 @@ export default async function middleware(request: NextRequest): Promise<NextResp
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  // /images/: ảnh tĩnh công khai trong public; bộ tối ưu next/image tải chúng không kèm cookie đăng nhập.
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|images/).*)"],
 }

@@ -1,0 +1,11 @@
+Decisions
+- Explorer được triển khai trên hoặc tích hợp vào travel.com.vn, nhằm bổ sung lớp thông tin và cảm hứng du lịch.
+- Giai đoạn đầu Explorer chủ yếu hiển thị thông tin và chuyển khách sang các hệ thống/hub hiện có để đặt dịch vụ.
+- Các dịch vụ chưa có hub vẫn được nhập thông tin cơ bản trên Explorer và gắn liên kết liên hệ hoặc đặt hàng của đối tác.
+- Phạm vi tổng thể được chia thành các phần/giai đoạn: dữ liệu điểm đến, kết nối hub dịch vụ, thành viên và đối tác.
+- Phần thành viên bao gồm tạo hành trình, lưu điểm đến, chia sẻ hành trình và review trải nghiệm.
+- Phần đối tác bao gồm đăng ký, xác minh, kiểm duyệt và tự cập nhật dịch vụ sau khi được cấp quyền.
+- Không triển khai Explorer như một mạng xã hội đầy đủ ở giai đoạn hiện tại để tránh phát sinh yêu cầu giấy phép và phạm vi phức tạp.
+- Chatbot không nằm trong phạm vi dự án Explorer hiện tại.
+- AI được sử dụng rộng rãi để tạo và thu thập dữ liệu, nhưng nội dung vẫn phải qua bước kiểm tra và phê duyệt.
+- Ưu tiên trước mắt là chốt scope và nội dung chức năng; các chi tiết kỹ thuật sẽ làm rõ sau với anh Khánh và đội liên quan.

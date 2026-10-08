@@ -1,0 +1,13 @@
+- Dự án “Việt Travel Explorer” nhằm mở rộng định vị Vietravel từ chỉ bán tour sang cung cấp và gợi ý nhiều dịch vụ du lịch lẻ.
+- Explorer tập trung vào thông tin điểm đến, cảm hứng du lịch, kế hoạch hành trình, review trải nghiệm và kết nối sang hệ thống booking hiện có.
+- Nội dung điểm đến gồm thời tiết thời gian thực, di chuyển, lưu trú, ăn uống, vui chơi, mua sắm, hỗ trợ và các thông tin địa phương liên quan.
+- Mỗi nhóm dịch vụ được thiết kế như một block; dịch vụ đã có hub sẽ gọi API/AI từ hub tương ứng, dịch vụ chưa có hub sẽ hiển thị thông tin và liên kết sang đối tác.
+- Explorer không trực tiếp xử lý booking trong giai đoạn đầu; nút đặt hàng sẽ chuyển khách sang các hệ thống thương mại điện tử/travel hiện có.
+- Đối tác có thể đăng ký, xác nhận quyền sở hữu dịch vụ, cập nhật thông tin; Vietravel chịu trách nhiệm kiểm duyệt và xác minh.
+- AI được dùng để thu thập, tạo và chuẩn hóa dữ liệu điểm đến; nhân viên chủ yếu kiểm tra và phê duyệt.
+- Hệ thống cần đáp ứng SEO, AEO và GEO để được Google, công cụ tìm kiếm và các nền tảng AI nhận diện, đề xuất.
+- Tính năng thành viên gồm lưu điểm đến, tạo và chia sẻ hành trình, đánh dấu “tôi đã ở đây” và đăng review/video trải nghiệm.
+- Explorer chưa được định vị là mạng xã hội; chỉ hỗ trợ review theo điểm đến và chia sẻ trong nhóm bạn bè.
+- Chatbot là một đề bài riêng, không thuộc phạm vi Explorer hiện tại.
+- UI có thể phát triển độc lập nhưng cần lưu ý khả năng tích hợp vào travel.com.vn theo mô hình microservice frontend.
+- Phạm vi cần được chia thành các giai đoạn để GMO ước tính giải pháp, thời gian và chi phí; ưu tiên ra nội dung và từ khóa sớm để hỗ trợ KPI traffic.

@@ -1,0 +1,12 @@
+Topics
+- Mục tiêu kinh doanh và định vị Vietravel
+- Kiến trúc và các module của Việt Travel Explorer
+- Dữ liệu và nội dung điểm đến
+- AI, API thời tiết và tự động hóa nội dung
+- Kết nối e-commerce hub và booking
+- Nền tảng đối tác và quy trình xác minh
+- Thành viên, hành trình và review trải nghiệm
+- SEO, AEO và GEO
+- Tích hợp microservice frontend vào travel.com.vn
+- Phân chia scope, giai đoạn, tiến độ và báo giá
+- KPI traffic và ưu tiên từ khóa dịch vụ lẻ

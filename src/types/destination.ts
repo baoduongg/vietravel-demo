@@ -16,6 +16,29 @@ export interface DestinationSummary {
   active: boolean
 }
 
+/** Ghi công ảnh theo giấy phép Creative Commons (Wikimedia Commons). */
+export interface PhotoCredit {
+  author: string
+  license: string
+  /** Trang gốc của ảnh, nơi xem đầy đủ giấy phép. */
+  url: string
+}
+
+/** Ảnh trong thư viện của trang điểm đến. */
+export interface GalleryPhoto {
+  src: string
+  alt: string
+  caption: string
+  credit: PhotoCredit
+}
+
+/** Video YouTube nhúng; chỉ lưu id, người xem bấm mới tải trình phát. */
+export interface VideoItem {
+  id: string
+  title: string
+  channel: string
+}
+
 /** Một địa điểm vui chơi hoặc loại hình lưu trú, lọc được theo nhóm đi cùng. */
 export interface Place {
   name: string
@@ -24,6 +47,8 @@ export interface Place {
   blurb: string
   audiences: Audience[]
   imageUrl?: string
+  /** Bắt buộc khi ảnh không thuộc Vietravel. */
+  credit?: PhotoCredit
   tip?: string
 }
 
@@ -31,6 +56,13 @@ export interface Dish {
   name: string
   blurb: string
   where: string
+  /** Giá tham khảo, ghi rõ đơn vị tính. */
+  price: string
+  /** Nên ăn vào lúc nào. */
+  bestTime: string
+  imageUrl?: string
+  /** Bắt buộc khi có ảnh. */
+  credit?: PhotoCredit
 }
 
 export interface Route {
@@ -91,9 +123,18 @@ export interface DestinationGuide {
   months: MonthInfo[]
   routes: Route[]
   onIsland: { name: string; note: string }[]
+  /** Ảnh sân bay kèm vài thông tin nhanh và lưu ý khi di chuyển. */
+  airport: { photo: GalleryPhoto; facts: { label: string; value: string }[] }
+  travelTips: string[]
+  onIslandPhoto: GalleryPhoto
   areas: Area[]
+  videos: VideoItem[]
+  gallery: GalleryPhoto[]
   stays: Place[]
   dishes: Dish[]
+  /** Ảnh lớn đầu khối ẩm thực và vài mẹo ăn uống. */
+  foodPhoto: GalleryPhoto
+  eatTips: string[]
   activities: Place[]
   itinerary: ItineraryDay[]
   costs: CostRow[]

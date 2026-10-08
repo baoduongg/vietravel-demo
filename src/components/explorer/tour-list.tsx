@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { PhoneIcon, StarIcon } from "lucide-react"
+import { ClockIcon, PhoneIcon, StarIcon, TagIcon } from "lucide-react"
 
 import { CARD_CLASS } from "@/components/explorer/section"
 import { CtaLink } from "@/components/explorer/cta-link"
@@ -18,41 +18,52 @@ function TourItem({ tour }: { tour: Tour }): React.JSX.Element {
   const dates = (tour.deal ? [tour.deal.departureDate] : tour.departureDates).slice(0, 3).map(formatShortDate)
   const rating = formatRating(tour.rating)
 
+  // Thẻ dọc 4:5: ảnh phủ gần hết thẻ, nội dung nằm trên lớp phủ tối ở chân ảnh.
   return (
-    <li className="flex flex-col overflow-hidden rounded-3xl bg-white ring-1 ring-ocean/10 shadow-[0_20px_40px_-30px_rgba(0,70,193,0.45)]">
-      <div className="relative aspect-[16/10] overflow-hidden">
-        <Image src={tour.imageUrl} alt={tour.name} fill sizes="(min-width:1024px) 360px, (min-width:640px) 50vw, 100vw" className="object-cover" />
-        {tour.deal && (
-          <span className="absolute top-3 right-3 rounded-full bg-sale px-2.5 py-0.5 text-xs font-extrabold text-white">
-            -{Math.round((1 - tour.deal.priceVnd / tour.deal.originalPriceVnd) * 100)}%
-          </span>
-        )}
-        <span className="absolute top-3 left-3 rounded-full bg-white px-2.5 py-0.5 text-xs font-extrabold text-ocean">
-          {tour.days} ngày {tour.nights} đêm
+    <li className="on-dark group lift relative isolate flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-[18px] ring-1 ring-tint/10 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)]">
+      <Image
+        src={tour.imageUrl}
+        alt={tour.name}
+        fill
+        sizes="(min-width:1024px) 360px, (min-width:640px) 50vw, 100vw"
+        className="-z-20 object-cover transition-transform duration-1000 ease-soft group-hover:scale-105"
+      />
+      <span aria-hidden className="absolute inset-0 -z-10 bg-linear-to-t from-shade via-shade/75 via-45% to-transparent" />
+      {tour.deal && (
+        <span className="absolute top-4 right-4 rounded-full bg-primary px-3 py-1 text-xs font-bold text-white">
+          -{Math.round((1 - tour.deal.priceVnd / tour.deal.originalPriceVnd) * 100)}%
         </span>
-      </div>
-      <div className="flex flex-1 flex-col gap-3 p-5">
-        <h3 className="line-clamp-2 text-base font-extrabold">{tour.name}</h3>
-        <p className="text-sm text-muted-foreground">
-          Khởi hành từ {tour.departureCity} · {tour.transport}
+      )}
+      <div className="flex flex-col gap-3 p-5">
+        <ul className="flex flex-wrap gap-2 text-xs font-semibold text-title">
+          <li className="inline-flex items-center gap-1.5 rounded-full bg-tint/10 px-2.5 py-1 backdrop-blur-md">
+            <ClockIcon aria-hidden strokeWidth={1.5} className="size-3.5 text-gold" />
+            {tour.days}N{tour.nights}Đ
+          </li>
           {rating && (
-            <span className="ml-2 inline-flex items-center gap-1 font-semibold text-ink">
-              <StarIcon aria-hidden className="size-3.5 fill-amber-400 text-amber-400" />
+            <li className="inline-flex items-center gap-1.5 rounded-full bg-tint/10 px-2.5 py-1 backdrop-blur-md">
+              <StarIcon aria-hidden className="size-3.5 fill-glow text-glow" />
               {rating}
-            </span>
+            </li>
           )}
+          <li className="inline-flex items-center gap-1.5 rounded-full bg-tint/10 px-2.5 py-1 backdrop-blur-md">
+            <TagIcon aria-hidden strokeWidth={1.5} className="size-3.5 text-gold" />
+            {tour.transport}
+          </li>
+        </ul>
+        <h3 className="font-voyage line-clamp-2 text-xl leading-snug font-semibold tracking-wide text-title uppercase">{tour.name}</h3>
+        <p className="text-xs text-body">
+          Từ {tour.departureCity} · Ngày đi: <span className="font-semibold text-title">{dates.join(" · ")}</span>
         </p>
-        <p className="text-sm">
-          <span className="text-muted-foreground">Ngày đi: </span>
-          <span className="font-semibold">{dates.join(" · ")}</span>
-        </p>
-        <div className="mt-auto flex items-end justify-between gap-3 pt-2">
+        <div className="flex items-end justify-between gap-3 border-t border-tint/10 pt-3">
           <p>
-            <span className="block text-xs text-muted-foreground">Giá từ</span>
-            <span className="text-xl font-extrabold text-sale">{formatVnd(price)}</span>
-            {tour.deal && <span className="ml-2 text-sm text-muted-foreground line-through">{formatVnd(tour.deal.originalPriceVnd)}</span>}
+            <span className="block text-xs text-body">
+              Giá từ{tour.deal && <span className="ml-2 line-through">{formatVnd(tour.deal.originalPriceVnd)}</span>}
+            </span>
+            <span className="font-sans text-xl font-bold tracking-tight whitespace-nowrap text-champagne">{formatVnd(price)}</span>
+            <span className="text-xs whitespace-nowrap text-body"> / khách</span>
           </p>
-          <CtaLink href={tour.url} className="h-10 px-4">
+          <CtaLink href={tour.url} variant="outline" className="h-11">
             Xem và đặt
           </CtaLink>
         </div>
@@ -71,7 +82,7 @@ export function TourList({ tours, hotline, limit }: TourListProps): React.JSX.El
         <p className="text-sm text-muted-foreground">Tư vấn viên Vietravel sẽ giúp Quý khách chọn lịch trình phù hợp.</p>
         <a
           href={`tel:${hotline.replace(/\s/g, "")}`}
-          className="inline-flex h-11 items-center gap-2 rounded-full bg-ocean px-5 text-sm font-semibold text-white"
+          className="inline-flex h-11 items-center gap-2 btn-primary rounded-full px-5 text-sm font-semibold"
         >
           <PhoneIcon aria-hidden strokeWidth={1.5} className="size-4" />
           Gọi {hotline}
@@ -81,7 +92,7 @@ export function TourList({ tours, hotline, limit }: TourListProps): React.JSX.El
   }
 
   return (
-    <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {shown.map((tour) => (
         <TourItem key={tour.code} tour={tour} />
       ))}

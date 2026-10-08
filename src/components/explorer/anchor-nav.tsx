@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
 
 const ITEMS = [
+  { id: "hinh-anh", label: "Hình ảnh" },
   { id: "thoi-tiet", label: "Thời tiết" },
   { id: "di-chuyen", label: "Di chuyển" },
   { id: "luu-tru", label: "Lưu trú" },
@@ -36,14 +37,14 @@ export function AnchorNav(): React.JSX.Element {
 
   return (
     <nav aria-label="Mục trong trang" className="sticky top-[76px] z-20 mt-6 px-3 lg:px-5">
-      <ul className="mx-auto flex max-w-6xl gap-1 overflow-x-auto rounded-full bg-white/85 p-1.5 shadow-[0_12px_30px_-20px_rgba(0,70,193,0.45)] ring-1 ring-ocean/10 backdrop-blur-xl [scrollbar-width:none]">
+      <ul className="mx-auto flex max-w-6xl gap-1 overflow-x-auto rounded-full bg-void/75 p-1.5 shadow-[0_20px_44px_-24px_rgba(0,0,0,0.4)] ring-1 ring-tint/10 backdrop-blur-xl [scrollbar-width:none]">
         {ITEMS.map((item) => (
           <li key={item.id} className="shrink-0">
             <a
               href={`#${item.id}`}
               className={cn(
-                "inline-flex h-8 items-center rounded-full px-3.5 text-sm font-semibold transition-colors",
-                active === item.id ? "bg-ocean text-white" : "text-ink/75 hover:bg-cloud/60",
+                "inline-flex h-9 items-center rounded-full px-4 text-sm font-semibold transition-colors duration-500 ease-soft",
+                active === item.id ? "bg-champagne text-void" : "text-body hover:bg-tint/[0.08]",
               )}
             >
               {item.label}

@@ -1,0 +1,11 @@
+Open questions
+- Scope chi tiết của từng giai đoạn sẽ gồm những chức năng, dữ liệu và đầu ra cụ thể nào?
+- Giai đoạn đầu có bao gồm toàn bộ dữ liệu điểm đến trên toàn thế giới hay cần giới hạn theo khu vực/ưu tiên kinh doanh?
+- Nguồn dữ liệu cụ thể cho từng loại thông tin sẽ lấy từ đâu và phần nào do AI, nhân viên hoặc đối tác cung cấp?
+- Các API/hub dịch vụ nào đã sẵn sàng để tích hợp và dịch vụ nào chỉ hiển thị thông tin trong giai đoạn đầu?
+- Thời gian và chi phí ước tính cho từng giai đoạn là bao nhiêu?
+- Mốc triển khai chính thức và nguồn lực kỹ thuật của GMO sẽ được phân bổ như thế nào?
+- Quy trình kiểm duyệt nội dung AI, review, video và dữ liệu đối tác sẽ được thiết kế ra sao?
+- Phương án kỹ thuật và công nghệ cho microservice frontend tích hợp vào travel.com.vn là gì?
+- Các yêu cầu pháp lý cụ thể cho tính năng nhóm, chia sẻ và review cần được xác nhận đến mức nào?
+- Cách đo lường mục tiêu tăng traffic từ khoảng 500.000 lên 3 triệu lượt mỗi tháng sẽ được thống nhất ra sao?

@@ -7,11 +7,33 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-heading: var(--font-sans);
+  --font-display: var(--font-bricolage), var(--font-sans);
+  --font-voyage: var(--font-playfair), Georgia, serif;
+  --color-sand: var(--sand);
+  --color-sand-deep: var(--sand-deep);
+  --color-coral: var(--coral);
+  --color-coral-ink: var(--coral-ink);
+  --color-deep: var(--deep);
   --color-sky: var(--sky);
   --color-ink: var(--ink);
   --color-ocean: var(--ocean);
   --color-cloud: var(--cloud);
   --color-sunset: var(--sunset);
+  /* Màu đổi theo giao diện sáng/tối (biến --c-* khai báo ở .explorer). */
+  --color-void: var(--c-void);
+  --color-champagne: var(--c-champagne);
+  --color-gold: var(--c-gold);
+  --color-title: var(--c-title);
+  --color-body: var(--c-body);
+  --color-mute: var(--c-mute);
+  --color-tint: var(--c-tint);
+  /* Màu cố định: lớp phủ trên ảnh, khối biển đêm, nhấn hoàng hôn. */
+  --color-shade: #080e14;
+  --color-night: #0d1620;
+  --color-primary-ink: var(--c-primary-ink);
+  --color-glow: #f39c12;
+  --color-cyan-deep: #1e6b8c;
+  --color-paper: #f5efeb;
   --color-sale: var(--sale);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -53,12 +75,18 @@
 
 :root {
   /* Bảng màu lấy từ CSS của travel.com.vn. */
-  --sky: #f7f7f7;
-  --ink: #191919;
+  --sky: #f4f8fb;
+  --ink: #0c1b26;
+  --deep: #062236;
   --ocean: #0046c1;
   --cloud: #d9eeff;
   --sunset: #0391ff;
   --sale: #ed1d24;
+  /* Tông hoàng hôn ven biển cho trang Explorer; Tripi vẫn dùng bảng xanh gốc. */
+  --sand: #fbf6ee;
+  --sand-deep: #f1e6d4;
+  --coral: #ff6b3d;
+  --coral-ink: #b4401a;
   --ease-out-soft: cubic-bezier(0.32, 0.72, 0, 1);
 
   --background: var(--sky);
@@ -256,6 +284,50 @@ html {
   }
 }
 
+/* Cuộn tới đâu hiện dần tới đó; Reveal gắn data-in khi khối vào khung nhìn. */
+.reveal {
+  opacity: 0;
+  transform: translateY(2rem);
+  filter: blur(6px);
+  transition:
+    opacity 0.9s var(--ease-out-soft),
+    transform 0.9s var(--ease-out-soft),
+    filter 0.9s var(--ease-out-soft);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.reveal[data-in] {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+@keyframes drift-zoom {
+  from {
+    transform: scale(1.02);
+  }
+  to {
+    transform: scale(1.12);
+  }
+}
+
+/* Ảnh hero trôi chậm như máy quay lia, tạo cảm giác đang ở đó. */
+@utility animate-drift-zoom {
+  animation: drift-zoom 26s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
+  .animate-drift-zoom {
+    animation: none;
+  }
+}
+
 @keyframes reveal-up {
   from {
     opacity: 0;
@@ -280,5 +352,238 @@ html {
 @media (prefers-reduced-motion: reduce) {
   .animate-reveal {
     animation: none;
+  }
+}
+
+/* Trang Explorer: Phu Quoc Vibe (DESIGN.md). Mặc định tối; [data-theme="light"] trên <html> chuyển sang sáng. */
+/* Màu nền trang: không bị .on-dark ghi đè, dùng cho dải chuyển ảnh hero sang nền. */
+.explorer {
+  --c-page: #080e14;
+}
+
+[data-theme="light"] .explorer {
+  --c-page: #fbf6ee;
+}
+
+/* Dải mờ dần ở chân hero: nhiều điểm dừng để chuyển ảnh sang nền trang không lộ vạch. */
+.hero-fade {
+  background: linear-gradient(
+    to top,
+    var(--c-page) 0%,
+    color-mix(in srgb, var(--c-page) 92%, transparent) 14%,
+    color-mix(in srgb, var(--c-page) 70%, transparent) 34%,
+    color-mix(in srgb, var(--c-page) 38%, transparent) 58%,
+    color-mix(in srgb, var(--c-page) 12%, transparent) 80%,
+    transparent 100%
+  );
+}
+
+.explorer,
+.on-dark {
+  --c-void: #080e14;
+  --c-title: #f8f9fa;
+  --c-champagne: #f4d3a1;
+  --c-gold: #d4a373;
+  --c-body: #cbd5e1;
+  --c-mute: #64748b;
+  --c-tint: #ffffff;
+  --c-primary-ink: #6ea8ff;
+  --c-card: rgba(18, 29, 43, 0.65);
+  --c-card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  --muted-foreground: #94a3b8;
+}
+
+[data-theme="light"] .explorer {
+  --c-void: #fbf6ee;
+  --c-title: #0d1620;
+  --c-champagne: #0046c1;
+  --c-gold: #2f5fb0;
+  --c-primary-ink: #0046c1;
+  --c-body: #334155;
+  --c-mute: #64748b;
+  --c-tint: #0d1620;
+  --c-card: rgba(255, 255, 255, 0.78);
+  --c-card-shadow: 0 10px 30px -14px rgba(13, 40, 90, 0.22);
+  --muted-foreground: #556070;
+}
+
+.explorer {
+  color-scheme: dark;
+  --background: var(--c-void);
+  --foreground: var(--c-body);
+  --border: color-mix(in srgb, var(--c-tint) 8%, transparent);
+  --ring: var(--c-champagne);
+  color: var(--c-body);
+  background-color: var(--c-void);
+  background-image:
+    radial-gradient(60rem 28rem at 90% -8%, rgba(0, 70, 193, 0.28), transparent 70%),
+    radial-gradient(46rem 26rem at -8% 38%, rgba(30, 107, 140, 0.18), transparent 70%),
+    radial-gradient(50rem 26rem at 100% 78%, rgba(0, 70, 193, 0.14), transparent 70%);
+}
+
+[data-theme="light"] .explorer {
+  color-scheme: light;
+  background-image:
+    radial-gradient(60rem 28rem at 90% -8%, rgba(3, 145, 255, 0.14), transparent 70%),
+    radial-gradient(46rem 26rem at -8% 38%, rgba(30, 107, 140, 0.1), transparent 70%),
+    radial-gradient(50rem 26rem at 100% 78%, rgba(0, 70, 193, 0.1), transparent 70%);
+}
+
+/* Logo trắng trên nền tối, giữ màu gốc trên nền sáng. */
+.logo-adapt {
+  filter: brightness(0) invert(1);
+}
+
+[data-theme="light"] .logo-adapt {
+  filter: none;
+}
+
+[data-theme="light"] .grain::after {
+  mix-blend-mode: multiply;
+  opacity: 0.05;
+}
+
+/* Nút đổi giao diện: chỉ hiện biểu tượng của giao diện sẽ chuyển tới. */
+.theme-to-light {
+  display: inline;
+}
+.theme-to-dark {
+  display: none;
+}
+[data-theme="light"] .theme-to-light {
+  display: none;
+}
+[data-theme="light"] .theme-to-dark {
+  display: inline;
+}
+
+/* Hạt phim mờ phủ toàn trang, phá cảm giác phẳng của màu số. */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.1;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Thẻ kính mờ chuẩn. */
+.glass-card {
+  background: var(--c-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid color-mix(in srgb, var(--c-tint) 8%, transparent);
+  border-radius: 20px;
+  box-shadow: var(--c-card-shadow);
+}
+
+/* Nút chính, màu primary #0046c1. */
+.btn-primary {
+  background: linear-gradient(135deg, #0046c1 0%, #1a6ae0 100%);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(0, 70, 193, 0.45);
+  transition:
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 28px rgba(0, 70, 193, 0.6);
+}
+
+.btn-primary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Nút phụ dạng kính. */
+.btn-glass {
+  background: rgba(255, 255, 255, 0.06);
+  color: #f8f9fa;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition:
+    background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-glass:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+}
+
+.btn-glass:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Băng dính washi trong mờ ở mép trên ảnh Polaroid. */
+.washi {
+  background: rgba(244, 211, 161, 0.55);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  clip-path: polygon(0 0, 100% 0, 98% 50%, 100% 100%, 0 100%, 2% 50%);
+}
+
+/* Hoàng hôn: biển đêm với vệt cam phía chân trời, dùng cho các khối nhấn. */
+@utility bg-dusk {
+  background-image:
+    radial-gradient(70% 60% at 85% 115%, rgba(0, 70, 193, 0.6), transparent 70%),
+    radial-gradient(60% 50% at 10% 125%, rgba(3, 145, 255, 0.2), transparent 70%),
+    linear-gradient(165deg, #0d1620 0%, #101c2a 60%, #132536 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+/* Thẻ thời tiết: biển đêm ở giao diện tối, nắng sớm ở giao diện sáng. */
+@utility bg-weather {
+  background-image:
+    radial-gradient(70% 60% at 85% 115%, rgba(0, 70, 193, 0.6), transparent 70%),
+    radial-gradient(60% 50% at 10% 125%, rgba(3, 145, 255, 0.2), transparent 70%),
+    linear-gradient(165deg, #0d1620 0%, #101c2a 60%, #132536 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 34px 60px -34px rgba(0, 0, 0, 0.8);
+}
+
+[data-theme="light"] .explorer .bg-weather {
+  background-image:
+    radial-gradient(70% 60% at 85% 115%, rgba(0, 70, 193, 0.2), transparent 70%),
+    radial-gradient(60% 50% at 10% 125%, rgba(3, 145, 255, 0.12), transparent 70%),
+    linear-gradient(165deg, #ffffff 0%, #fff6ea 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(13, 22, 32, 0.08),
+    0 30px 50px -34px rgba(13, 40, 90, 0.3);
+}
+
+@keyframes scroll-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Thanh tiến độ cuộn thuần CSS; trình duyệt chưa hỗ trợ thì ẩn. */
+.scroll-progress {
+  transform: scaleX(0);
+  display: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  .scroll-progress {
+    display: block;
+    animation: scroll-fill linear both;
+    animation-timeline: scroll(root);
+  }
+}
+
+@media (hover: hover) {
+  .lift {
+    transition: transform 0.6s var(--ease-out-soft);
+  }
+  .lift:hover {
+    transform: translateY(-6px);
   }
 }

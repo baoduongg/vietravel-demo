@@ -21,7 +21,26 @@ const images = [
   phuQuoc.heroImageUrl,
   ...[...phuQuoc.stays, ...phuQuoc.activities].flatMap((place) => (place.imageUrl ? [place.imageUrl] : [])),
 ]
-for (const url of images) assert.ok(url.startsWith(IMAGE_HOST), `ảnh sai host: ${url}`)
+for (const url of images) {
+  const local = url.startsWith("/images/")
+  assert.ok(local || url.startsWith(IMAGE_HOST), `ảnh sai host: ${url}`)
+}
+
+// Ảnh không của Vietravel (ảnh nội bộ trong /public) phải ghi công tác giả và giấy phép.
+for (const place of [...phuQuoc.stays, ...phuQuoc.activities]) {
+  if (place.imageUrl?.startsWith("/images/")) assert.ok(place.credit?.author && place.credit.license, `${place.name} thiếu ghi công ảnh`)
+}
+for (const photo of phuQuoc.gallery) {
+  assert.ok(photo.credit.author && photo.credit.license && photo.credit.url.startsWith("https://commons.wikimedia.org/"), `${photo.src} thiếu ghi công`)
+}
+// Ảnh mới ở khối ẩm thực và di chuyển cũng phải ghi công; món có ảnh thì có credit.
+for (const photo of [phuQuoc.foodPhoto, phuQuoc.airport.photo, phuQuoc.onIslandPhoto]) {
+  assert.ok(photo.credit.author && photo.credit.license && photo.credit.url.startsWith("https://commons.wikimedia.org/"), `${photo.src} thiếu ghi công`)
+}
+for (const dish of phuQuoc.dishes) {
+  if (dish.imageUrl) assert.ok(dish.credit?.author && dish.credit.license, `${dish.name} thiếu ghi công ảnh`)
+}
+for (const video of phuQuoc.videos) assert.match(video.id, /^[A-Za-z0-9_-]{11}$/, `id video sai: ${video.id}`)
 
 // Link đặt chỗ: luôn sang travel.com.vn.
 for (const url of Object.values(phuQuoc.links)) {
