@@ -3,7 +3,7 @@
 import { Tabs } from "radix-ui"
 
 import { Modal } from "@/components/journey/modal"
-import { priceLabel } from "@/lib/journey/labels"
+import { ServiceCard } from "@/components/journey/service-card"
 import { isServiceKind, SERVICE_KINDS, SERVICE_KIND_LABEL, type ServiceItem, type ServiceKind } from "@/types/journey"
 
 interface ServicePickerProps {
@@ -11,17 +11,18 @@ interface ServicePickerProps {
   kind: ServiceKind | null
   onKindChange: (kind: ServiceKind | null) => void
   onAdd: (service: ServiceItem) => void
-  /** serviceId đã có trong kế hoạch, để đổi nhãn nút. */
-  addedIds: Set<string>
+  /** Nơi mục sẽ được thêm vào, ví dụ "Ngày 1". */
+  targetLabel: string
 }
 
-export function ServicePicker({ services, kind, onKindChange, onAdd, addedIds }: ServicePickerProps): React.JSX.Element {
+/** Bảng chọn dịch vụ cho điện thoại; trên máy tính dùng cột danh mục bên trái. */
+export function ServicePicker({ services, kind, onKindChange, onAdd, targetLabel }: ServicePickerProps): React.JSX.Element {
   return (
     <Modal
       open={kind !== null}
       onOpenChange={(open) => !open && onKindChange(null)}
       title="Thêm dịch vụ"
-      description="Mục mới vào nhóm Đang cân nhắc để cả nhóm bình chọn."
+      description={`Bấm nút để thêm vào ${targetLabel}.`}
       wide
     >
       <Tabs.Root value={kind ?? "hotel"} onValueChange={(value) => isServiceKind(value) && onKindChange(value)}>
@@ -45,18 +46,7 @@ export function ServicePicker({ services, kind, onKindChange, onAdd, addedIds }:
               ) : (
                 <ul className="grid gap-3 sm:grid-cols-2">
                   {items.map((service) => (
-                    <li key={service.id} className="glass-card flex flex-col gap-1.5 p-4">
-                      <p className="text-xs font-semibold text-gold">{service.tag}</p>
-                      <h3 className="font-semibold text-title">{service.name}</h3>
-                      <p className="line-clamp-2 text-sm text-muted-foreground">{service.blurb}</p>
-                      <div className="mt-auto flex items-center justify-between gap-3 pt-2">
-                        <p className="text-sm font-semibold text-champagne">{priceLabel(service)}</p>
-                        <button type="button" onClick={() => onAdd(service)} className="btn-primary h-9 shrink-0 rounded-full px-4 text-sm font-semibold">
-                          {addedIds.has(service.id) ? "Thêm lần nữa" : "Thêm"}
-                        </button>
-                      </div>
-                      {service.mock && <p className="text-[11px] text-muted-foreground">Giá tham khảo (demo)</p>}
-                    </li>
+                    <ServiceCard key={service.id} service={service} targetLabel={targetLabel} onAdd={onAdd} />
                   ))}
                 </ul>
               )}

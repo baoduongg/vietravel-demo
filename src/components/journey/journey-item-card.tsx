@@ -3,37 +3,15 @@
 import { useState } from "react"
 import Image from "next/image"
 import { DropdownMenu } from "radix-ui"
-import {
-  BedDoubleIcon,
-  CarIcon,
-  EllipsisIcon,
-  ExternalLinkIcon,
-  MapIcon,
-  MessageCircleIcon,
-  MinusIcon,
-  PlaneIcon,
-  PlusIcon,
-  SendIcon,
-  ThumbsDownIcon,
-  ThumbsUpIcon,
-  TicketIcon,
-  type LucideIcon,
-} from "lucide-react"
+import { EllipsisIcon, ExternalLinkIcon, MessageCircleIcon, MinusIcon, PlusIcon, SendIcon, ThumbsDownIcon, ThumbsUpIcon } from "lucide-react"
 
+import { KIND_ICON } from "@/components/journey/kind-icon"
 import { ICON_BUTTON, INPUT_CLASS, MENU_CLASS, MENU_ITEM_CLASS } from "@/components/journey/styles"
 import { defaultQuantity } from "@/lib/journey/cost"
 import { priceLabel } from "@/lib/journey/labels"
 import { LIMITS } from "@/lib/journey/operations"
 import { cn } from "@/lib/utils"
-import { QUANTITY_LABEL, SERVICE_KIND_LABEL, type JourneyItem, type JourneyOp, type ServiceKind, type Travelers } from "@/types/journey"
-
-const KIND_ICON: Record<ServiceKind, LucideIcon> = {
-  hotel: BedDoubleIcon,
-  flight: PlaneIcon,
-  vehicle: CarIcon,
-  activity: TicketIcon,
-  tour: MapIcon,
-}
+import { QUANTITY_LABEL, SERVICE_KIND_LABEL, type JourneyItem, type JourneyOp, type Travelers } from "@/types/journey"
 
 interface JourneyItemCardProps {
   item: JourneyItem
@@ -91,9 +69,9 @@ export function JourneyItemCard({ item, index, groupSize, dayCount, travelers, c
     <li className="glass-card p-4">
       <div className="flex gap-4">
         {snapshot.imageUrl ? (
-          <Image src={snapshot.imageUrl} alt="" width={64} height={64} className="size-16 shrink-0 rounded-xl object-cover" />
+          <Image src={snapshot.imageUrl} alt="" width={96} height={72} className="h-[72px] w-24 shrink-0 rounded-xl object-cover" />
         ) : (
-          <span aria-hidden className="grid size-16 shrink-0 place-items-center rounded-xl bg-tint/[0.06] text-gold">
+          <span aria-hidden className="grid h-[72px] w-24 shrink-0 place-items-center rounded-xl bg-linear-to-br from-primary-ink/25 via-tint/[0.06] to-gold/25 text-gold">
             <Icon strokeWidth={1.5} className="size-6" />
           </span>
         )}
@@ -107,6 +85,14 @@ export function JourneyItemCard({ item, index, groupSize, dayCount, travelers, c
             {snapshot.mock && <span className="ml-2 rounded-full bg-tint/[0.08] px-2 py-0.5 text-[11px] whitespace-nowrap">Giá tham khảo (demo)</span>}
           </p>
           <p className="mt-0.5 text-xs text-muted-foreground">Thêm bởi {memberName(item.addedBy)}</p>
+          {snapshot.credit && (
+            <p className="text-[11px] text-muted-foreground">
+              Ảnh:{" "}
+              <a href={snapshot.credit.url} target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:underline">
+                {snapshot.credit.author}, {snapshot.credit.license}
+              </a>
+            </p>
+          )}
         </div>
         {canEdit && (
           <DropdownMenu.Root>

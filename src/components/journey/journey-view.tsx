@@ -1,7 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
+import { Tabs } from "radix-ui"
 import { PencilIcon, PlusIcon, WifiOffIcon } from "lucide-react"
 import { toast } from "sonner"
 
@@ -11,12 +12,14 @@ import { JoinForm } from "@/components/journey/join-form"
 import { JourneyInfoForm } from "@/components/journey/journey-info-form"
 import { JourneyItemCard } from "@/components/journey/journey-item-card"
 import { Modal } from "@/components/journey/modal"
+import { ServiceCatalogPanel, type CatalogFilter } from "@/components/journey/service-catalog-panel"
 import { ServicePicker } from "@/components/journey/service-picker"
 import { GHOST_BUTTON, PRIMARY_BUTTON } from "@/components/journey/styles"
 import { useJourney } from "@/hooks/use-journey"
 import { addDays, dayLabel, durationLabel, travelersLabel } from "@/lib/journey/labels"
 import { voteScore } from "@/lib/journey/operations"
 import { formatShortDate } from "@/lib/format"
+import { cn } from "@/lib/utils"
 import type { JourneyItem, JourneyOp, JourneyRole, PublicJourney, ServiceItem, ServiceKind } from "@/types/journey"
 
 interface JourneyViewProps {
@@ -24,19 +27,41 @@ interface JourneyViewProps {
   initial: { journey: PublicJourney; role: JourneyRole }
   services: ServiceItem[]
   bookUrl: string
-  /** Mở sẵn bảng chọn ở tab này (từ nút "Chọn khách sạn cho kế hoạch"). */
+  /** Chọn sẵn loại dịch vụ (từ nút "Chọn khách sạn cho kế hoạch"). */
   openPicker?: ServiceKind
+}
+
+/** null = tab "Đang cân nhắc"; số = ngày trong chuyến. */
+type TabDay = number | null
+
+const CONSIDERING = "considering"
+
+function tabValue(day: TabDay): string {
+  return day === null ? CONSIDERING : `day-${day}`
+}
+
+function parseTab(value: string): TabDay {
+  return value === CONSIDERING ? null : Number(value.slice("day-".length))
 }
 
 export function JourneyView({ token, initial, services, bookUrl, openPicker }: JourneyViewProps): React.JSX.Element {
   const { journey, role, memberId, memberKnown, offline, missing, send, join } = useJourney(token, initial, services)
-  const [pickerKind, setPickerKind] = useState<ServiceKind | null>(openPicker ?? null)
+  const [activeDay, setActiveDay] = useState<TabDay>(1)
+  const [catalogFilter, setCatalogFilter] = useState<CatalogFilter>(openPicker ?? "all")
+  const [pickerKind, setPickerKind] = useState<ServiceKind | null>(null)
   const [editing, setEditing] = useState(false)
   const canEdit = role === "edit" && memberId !== undefined
   const dayCount = journey.nights + 1
+  // Giảm số đêm có thể làm tab đang mở biến mất: quay về ngày cuối còn lại.
+  const currentDay = activeDay !== null && activeDay > dayCount ? dayCount : activeDay
   const memberName = (id: string): string => journey.members.find((member) => member.id === id)?.name ?? "Thành viên"
   const me = memberId ? memberName(memberId) : undefined
   const onOp = (op: JourneyOp): void => void send(op)
+
+  // Trên điện thoại không có cột danh mục: link ?them=<loại> mở bảng chọn thay vào đó.
+  useEffect(() => {
+    if (openPicker && canEdit && window.matchMedia("(max-width: 1023px)").matches) setPickerKind(openPicker)
+  }, [openPicker, canEdit])
 
   if (missing) {
     return (
@@ -49,23 +74,28 @@ export function JourneyView({ token, initial, services, bookUrl, openPicker }: J
     )
   }
 
-  const considering = journey.items.filter((item) => item.day === null).sort((a, b) => voteScore(b) - voteScore(a) || a.order - b.order)
-  const groups: { key: string; title: string; hint?: string; items: JourneyItem[] }[] = [
-    { key: "considering", title: "Đang cân nhắc", hint: "Các lựa chọn để cả nhóm bình chọn. Mục chưa xếp vào ngày chưa tính vào chi phí.", items: considering },
+  const groups: { day: TabDay; label: string; items: JourneyItem[] }[] = [
+    {
+      day: null,
+      label: "Đang cân nhắc",
+      items: journey.items.filter((item) => item.day === null).sort((a, b) => voteScore(b) - voteScore(a) || a.order - b.order),
+    },
     ...Array.from({ length: dayCount }, (_, position) => ({
-      key: `day-${position + 1}`,
-      title: dayLabel(journey.startDate, position + 1),
+      day: position + 1,
+      label: dayLabel(journey.startDate, position + 1),
       items: journey.items.filter((item) => item.day === position + 1).sort((a, b) => a.order - b.order),
     })),
   ]
+  const targetLabel = currentDay === null ? "Cân nhắc" : `Ngày ${currentDay}`
   const dateRange = journey.startDate ? ` · ${formatShortDate(journey.startDate)}–${formatShortDate(addDays(journey.startDate, journey.nights))}` : ""
 
   function handleAdd(service: ServiceItem): void {
-    void send({ type: "addItem", serviceId: service.id }).then((ok) => ok && toast.success(`Đã thêm ${service.name} vào Đang cân nhắc`))
+    const where = currentDay === null ? "Đang cân nhắc" : `Ngày ${currentDay}`
+    void send({ type: "addItem", serviceId: service.id, day: currentDay }).then((ok) => ok && toast.success(`Đã thêm ${service.name} vào ${where}`))
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 pt-32 pb-28 lg:px-6 lg:pb-16">
+    <div className="mx-auto max-w-7xl px-4 pt-32 pb-28 lg:px-6 lg:pb-16">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-sm font-semibold text-gold">Kế hoạch chuyến đi</p>
@@ -112,55 +142,71 @@ export function JourneyView({ token, initial, services, bookUrl, openPicker }: J
 
       {role === "edit" && memberKnown && !memberId && <JoinForm onJoin={join} />}
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_20rem]">
-        <div className="flex flex-col gap-10">
+      <Tabs.Root value={tabValue(currentDay)} onValueChange={(value) => setActiveDay(parseTab(value))} className="mt-8">
+        <Tabs.List aria-label="Ngày trong chuyến" className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 [scrollbar-width:none] lg:mx-0 lg:px-0">
           {groups.map((group) => (
-            <section key={group.key} aria-labelledby={group.key}>
-              <h2 id={group.key} className="font-voyage text-xl font-semibold tracking-tight text-title">
-                {group.title} <span className="text-sm font-normal text-muted-foreground">({group.items.length})</span>
-              </h2>
-              {group.hint && <p className="mt-1 text-sm text-muted-foreground">{group.hint}</p>}
-              {group.items.length === 0 ? (
-                <p className="mt-3 rounded-2xl border border-dashed border-tint/15 p-4 text-sm text-muted-foreground">Chưa có mục nào.</p>
-              ) : (
-                <ul className="mt-3 flex flex-col gap-3">
-                  {group.items.map((item, index) => (
-                    <JourneyItemCard
-                      key={item.id}
-                      item={item}
-                      index={index}
-                      groupSize={group.items.length}
-                      dayCount={dayCount}
-                      travelers={journey.travelers}
-                      canEdit={canEdit}
-                      memberId={memberId}
-                      memberName={memberName}
-                      onOp={onOp}
-                    />
-                  ))}
-                </ul>
-              )}
-            </section>
+            <Tabs.Trigger
+              key={tabValue(group.day)}
+              value={tabValue(group.day)}
+              className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-tint/5 px-4 text-sm font-semibold whitespace-nowrap text-body ring-1 ring-tint/10 outline-none hover:bg-tint/10 focus-visible:ring-2 focus-visible:ring-ring data-[state=active]:bg-champagne data-[state=active]:text-void"
+            >
+              {group.label}
+              <span className="text-xs opacity-70">({group.items.length})</span>
+            </Tabs.Trigger>
           ))}
-          {canEdit && (
-            <button type="button" onClick={() => setPickerKind("hotel")} className={`${PRIMARY_BUTTON} self-start`}>
-              <PlusIcon aria-hidden strokeWidth={1.5} className="size-4" />
-              Thêm dịch vụ
-            </button>
-          )}
-        </div>
-        <CostPanel journey={journey} bookUrl={bookUrl} />
-      </div>
+        </Tabs.List>
 
-      {canEdit && (
-        <ServicePicker
-          services={services}
-          kind={pickerKind}
-          onKindChange={setPickerKind}
-          onAdd={handleAdd}
-          addedIds={new Set(journey.items.map((item) => item.serviceId))}
-        />
-      )}
+        <div className={cn("mt-6 grid gap-8", canEdit && "lg:grid-cols-[20rem_1fr]")}>
+          {canEdit && (
+            <ServiceCatalogPanel
+              services={services}
+              filter={catalogFilter}
+              onFilterChange={setCatalogFilter}
+              targetLabel={targetLabel}
+              onAdd={handleAdd}
+              className="hidden lg:flex"
+            />
+          )}
+          <div className="flex min-w-0 flex-col gap-4">
+            <CostPanel journey={journey} bookUrl={bookUrl} />
+            {groups.map((group) => (
+              <Tabs.Content key={tabValue(group.day)} value={tabValue(group.day)} className="outline-none">
+                {group.day === null && <p className="mb-3 text-sm text-muted-foreground">Các lựa chọn để cả nhóm bình chọn. Mục ở đây chưa tính vào chi phí.</p>}
+                {group.items.length === 0 ? (
+                  <p className="rounded-2xl border border-dashed border-tint/15 p-6 text-center text-sm text-muted-foreground">
+                    {canEdit ? `Chưa có mục nào. Chọn dịch vụ để thêm vào ${group.label}.` : "Chưa có mục nào."}
+                  </p>
+                ) : (
+                  <ul className="flex flex-col gap-3">
+                    {group.items.map((item, index) => (
+                      <JourneyItemCard
+                        key={item.id}
+                        item={item}
+                        index={index}
+                        groupSize={group.items.length}
+                        dayCount={dayCount}
+                        travelers={journey.travelers}
+                        canEdit={canEdit}
+                        memberId={memberId}
+                        memberName={memberName}
+                        onOp={onOp}
+                      />
+                    ))}
+                  </ul>
+                )}
+              </Tabs.Content>
+            ))}
+            {canEdit && (
+              <button type="button" onClick={() => setPickerKind(openPicker ?? "hotel")} className={`${PRIMARY_BUTTON} self-start lg:hidden`}>
+                <PlusIcon aria-hidden strokeWidth={1.5} className="size-4" />
+                Thêm dịch vụ vào {targetLabel}
+              </button>
+            )}
+          </div>
+        </div>
+      </Tabs.Root>
+
+      {canEdit && <ServicePicker services={services} kind={pickerKind} onKindChange={setPickerKind} onAdd={handleAdd} targetLabel={targetLabel} />}
       {canEdit && (
         <Modal open={editing} onOpenChange={setEditing} title="Sửa thông tin chuyến">
           <JourneyInfoForm
