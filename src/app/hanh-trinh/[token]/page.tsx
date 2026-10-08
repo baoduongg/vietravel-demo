@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 
 import { ExplorerShell } from "@/components/explorer/explorer-shell"
+import { ForgetJourney } from "@/components/journey/forget-journey"
 import { JourneyView } from "@/components/journey/journey-view"
 import { PRIMARY_BUTTON } from "@/components/journey/styles"
 import { getGuide } from "@/data/destinations"
@@ -30,6 +31,7 @@ export default async function JourneyPage({ params, searchParams }: PageProps): 
   if (!found || !guide) {
     return (
       <ExplorerShell>
+        <ForgetJourney token={token} />
         <div className="mx-auto flex min-h-[60dvh] max-w-xl flex-col items-center justify-center gap-4 px-4 pt-28 text-center">
           <h1 className="font-voyage text-3xl font-semibold text-title">Không tìm thấy kế hoạch</h1>
           <p className="text-muted-foreground">Link có thể bị thiếu ký tự hoặc kế hoạch đã bị xóa. Quý khách kiểm tra lại link được gửi nhé.</p>

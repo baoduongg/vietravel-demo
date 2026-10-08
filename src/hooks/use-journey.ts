@@ -5,8 +5,9 @@ import axios from "axios"
 import { toast } from "sonner"
 
 import { JourneyError } from "@/lib/journey/errors"
-import { readSaved, saveJourney } from "@/lib/journey/local"
+import { readSaved, removeSaved, saveJourney } from "@/lib/journey/local"
 import { applyOp, type OpDeps } from "@/lib/journey/operations"
+import { newerJourney } from "@/lib/journey/sync"
 import { getErrorMessage } from "@/services/http"
 import { journeyService } from "@/services/journey.service"
 import type { JourneyOp, JourneyRole, PublicJourney, ServiceItem } from "@/types/journey"
@@ -18,6 +19,8 @@ export interface JourneyState {
   role: JourneyRole
   /** Chỉ có khi đã nhập tên trên link sửa và vẫn là thành viên của kế hoạch. */
   memberId: string | undefined
+  /** false cho tới khi đọc xong localStorage; trước đó chưa biết người xem đã nhập tên chưa. */
+  memberKnown: boolean
   offline: boolean
   missing: boolean
   send: (op: JourneyOp) => Promise<boolean>
@@ -27,17 +30,27 @@ export interface JourneyState {
 export function useJourney(token: string, initial: { journey: PublicJourney; role: JourneyRole }, services: ServiceItem[]): JourneyState {
   const { role } = initial
   const [journey, setJourney] = useState(initial.journey)
-  const [savedMemberId, setSavedMemberId] = useState<string>()
+  // null = chưa đọc localStorage (render phía server và lần render đầu).
+  const [savedMemberId, setSavedMemberId] = useState<string | undefined | null>(null)
   const [offline, setOffline] = useState(false)
   const [missing, setMissing] = useState(false)
   const journeyRef = useRef(initial.journey)
+  // Bản server mới nhất đã xác nhận: đích rollback khi thao tác lỗi, và mốc để bỏ kết quả poll đến muộn.
+  const serverRef = useRef(initial.journey)
   const pendingRef = useRef(0)
 
+  const memberKnown = savedMemberId !== null
   const memberId = savedMemberId && journey.members.some((member) => member.id === savedMemberId) ? savedMemberId : undefined
 
   const accept = useCallback((next: PublicJourney) => {
     journeyRef.current = next
     setJourney(next)
+  }, [])
+
+  /** Ghi nhận bản server vừa nhận; trả về bản mới nhất đã biết. */
+  const confirm = useCallback((incoming: PublicJourney): PublicJourney => {
+    serverRef.current = newerJourney(serverRef.current, incoming)
+    return serverRef.current
   }, [])
 
   // Nhớ kế hoạch vào "Kế hoạch của tôi" và lấy lại tên đã nhập trên trình duyệt này.
@@ -54,21 +67,25 @@ export function useJourney(token: string, initial: { journey: PublicJourney; rol
       if (busy || pendingRef.current > 0 || document.hidden) return
       busy = true
       try {
-        const result = await journeyService.get(token, journeyRef.current.version)
+        const result = await journeyService.get(token, serverRef.current.version)
         setOffline(false)
-        if (result && pendingRef.current === 0) {
-          accept(result.journey)
+        // Chỉ nhận bản mới hơn bản server đã biết: phản hồi thao tác của chính mình có thể về trước poll.
+        if (result && pendingRef.current === 0 && result.journey.version > serverRef.current.version) {
+          accept(confirm(result.journey))
           toast("Kế hoạch vừa được cập nhật", { id: "journey-updated" })
         }
       } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.status === 404) setMissing(true)
+        if (axios.isAxiosError(error) && error.response?.status === 404) {
+          removeSaved((item) => item.token === token)
+          setMissing(true)
+        }
         else setOffline(true)
       } finally {
         busy = false
       }
     }, POLL_MS)
     return () => window.clearInterval(timer)
-  }, [token, accept])
+  }, [token, accept, confirm])
 
   const deps = useMemo<OpDeps>(
     () => ({
@@ -92,17 +109,18 @@ export function useJourney(token: string, initial: { journey: PublicJourney; rol
       pendingRef.current += 1
       try {
         const result = await journeyService.op(before.id, { token, memberId, op })
-        accept(result.journey)
+        accept(confirm(result.journey))
         return true
       } catch (error) {
-        accept(before)
+        // Về bản server mới nhất, không về ảnh chụp lúc bấm: thao tác khác có thể đã thành công sau đó.
+        accept(serverRef.current)
         toast.error(getErrorMessage(error, "Chưa lưu được thay đổi, Quý khách thử lại nhé."))
         return false
       } finally {
         pendingRef.current -= 1
       }
     },
-    [accept, deps, memberId, role, token],
+    [accept, confirm, deps, memberId, role, token],
   )
 
   const join = useCallback(
@@ -110,7 +128,7 @@ export function useJourney(token: string, initial: { journey: PublicJourney; rol
       pendingRef.current += 1
       try {
         const result = await journeyService.op(journeyRef.current.id, { token, op: { type: "join", name } })
-        accept(result.journey)
+        accept(confirm(result.journey))
         if (result.memberId) {
           setSavedMemberId(result.memberId)
           saveJourney({ id: result.journey.id, token, title: result.journey.title, role, memberId: result.memberId })
@@ -123,8 +141,8 @@ export function useJourney(token: string, initial: { journey: PublicJourney; rol
         pendingRef.current -= 1
       }
     },
-    [accept, role, token],
+    [accept, confirm, role, token],
   )
 
-  return { journey, role, memberId, offline, missing, send, join }
+  return { journey, role, memberId, memberKnown, offline, missing, send, join }
 }

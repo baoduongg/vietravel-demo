@@ -70,3 +70,14 @@ export function saveJourney(
   }
   return next
 }
+
+/** Bỏ các kế hoạch không còn trên server (link hỏng) để nút "Thêm vào kế hoạch" không kẹt vào chúng. */
+export function removeSaved(match: (item: SavedJourney) => boolean, storage: KeyValueStorage | null = browserStorage()): SavedJourney[] {
+  const next = readSaved(storage).filter((item) => !match(item))
+  try {
+    storage?.setItem(KEY, JSON.stringify(next))
+  } catch {
+    // Bị chặn: không có gì để dọn.
+  }
+  return next
+}

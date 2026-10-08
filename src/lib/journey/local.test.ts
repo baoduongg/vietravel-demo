@@ -1,5 +1,5 @@
 import assert from "node:assert/strict"
-import { readSaved, saveJourney } from "./local"
+import { readSaved, removeSaved, saveJourney } from "./local"
 
 function memoryStorage(initial: Record<string, string> = {}): Pick<Storage, "getItem" | "setItem"> {
   const data = new Map(Object.entries(initial))
@@ -33,5 +33,12 @@ assert.equal(readSaved(storage).length, 2, "không nhân bản theo id")
 saveJourney({ id: "b", token: "edit-b", title: "B", role: "edit", memberId: "m2" }, storage, now)
 const b = readSaved(storage).find((item) => item.id === "b")
 assert.deepEqual([b?.token, b?.role, b?.memberId], ["edit-b", "edit", "m2"])
+
+// Xóa kế hoạch không còn trên server (theo id hoặc token), giữ các mục khác.
+removeSaved((item) => item.token === "edit-b", storage)
+assert.deepEqual(readSaved(storage).map((item) => item.id), ["a"])
+removeSaved((item) => item.id === "a", storage)
+assert.deepEqual(readSaved(storage), [])
+assert.doesNotThrow(() => removeSaved(() => true, throwing))
 
 console.log("local.test OK")

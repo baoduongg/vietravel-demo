@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import axios from "axios"
 import { PlusIcon } from "lucide-react"
 import { toast } from "sonner"
 
@@ -10,7 +11,7 @@ import { Modal } from "@/components/journey/modal"
 import { GHOST_BUTTON } from "@/components/journey/styles"
 import { createJourneyAndSave } from "@/lib/journey/client"
 import { defaultJourneyInfo } from "@/lib/journey/labels"
-import { readSaved, type SavedJourney } from "@/lib/journey/local"
+import { readSaved, removeSaved, type SavedJourney } from "@/lib/journey/local"
 import { cn } from "@/lib/utils"
 import { getErrorMessage } from "@/services/http"
 import { journeyService } from "@/services/journey.service"
@@ -38,6 +39,11 @@ export function AddToPlanButton({
   const [open, setOpen] = useState(false)
   const [choices, setChoices] = useState<SavedJourney[]>([])
 
+  /** Chỉ kế hoạch có link sửa và đã nhập tên mới thêm được mục. */
+  function editableJourneys(): SavedJourney[] {
+    return readSaved().filter((item) => item.role === "edit" && item.memberId)
+  }
+
   async function addTo(saved: SavedJourney): Promise<void> {
     if (!serviceId) {
       router.push(`/hanh-trinh/${saved.token}?them=${pickerKind}`)
@@ -50,13 +56,20 @@ export function AddToPlanButton({
         action: { label: "Xem kế hoạch", onClick: () => router.push(`/hanh-trinh/${saved.token}`) },
       })
     } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        // Kế hoạch không còn trên server (dữ liệu bị xóa, máy chủ mới): bỏ khỏi danh sách và mời tạo kế hoạch khác.
+        removeSaved((item) => item.id === saved.id)
+        setChoices(editableJourneys())
+        setOpen(true)
+        toast.error("Kế hoạch này không còn trên máy chủ, Quý khách chọn hoặc tạo kế hoạch khác nhé.")
+        return
+      }
       toast.error(getErrorMessage(error, "Chưa thêm được vào kế hoạch, Quý khách thử lại nhé."))
     }
   }
 
   function handleClick(): void {
-    // Chỉ kế hoạch có link sửa và đã nhập tên mới thêm được mục.
-    const editable = readSaved().filter((item) => item.role === "edit" && item.memberId)
+    const editable = editableJourneys()
     if (editable.length === 1) {
       void addTo(editable[0])
       return

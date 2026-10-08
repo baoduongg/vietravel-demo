@@ -29,7 +29,7 @@ interface JourneyViewProps {
 }
 
 export function JourneyView({ token, initial, services, bookUrl, openPicker }: JourneyViewProps): React.JSX.Element {
-  const { journey, role, memberId, offline, missing, send, join } = useJourney(token, initial, services)
+  const { journey, role, memberId, memberKnown, offline, missing, send, join } = useJourney(token, initial, services)
   const [pickerKind, setPickerKind] = useState<ServiceKind | null>(openPicker ?? null)
   const [editing, setEditing] = useState(false)
   const canEdit = role === "edit" && memberId !== undefined
@@ -101,7 +101,7 @@ export function JourneyView({ token, initial, services, bookUrl, openPicker }: J
       </header>
 
       <p className="mt-4 flex flex-wrap items-center gap-3 text-sm">
-        <span className="rounded-full bg-tint/[0.08] px-3 py-1 font-semibold">{role === "view" ? "Chỉ xem" : me ? `Đang sửa · ${me}` : "Nhập tên để bắt đầu sửa"}</span>
+        <span className="rounded-full bg-tint/[0.08] px-3 py-1 font-semibold">{role === "view" ? "Chỉ xem" : me ? `Đang sửa · ${me}` : memberKnown ? "Nhập tên để bắt đầu sửa" : "Đang tải…"}</span>
         {offline && (
           <span role="status" className="inline-flex items-center gap-1.5 text-coral">
             <WifiOffIcon aria-hidden strokeWidth={1.5} className="size-4" />
@@ -110,7 +110,7 @@ export function JourneyView({ token, initial, services, bookUrl, openPicker }: J
         )}
       </p>
 
-      {role === "edit" && !memberId && <JoinForm onJoin={join} />}
+      {role === "edit" && memberKnown && !memberId && <JoinForm onJoin={join} />}
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_20rem]">
         <div className="flex flex-col gap-10">
