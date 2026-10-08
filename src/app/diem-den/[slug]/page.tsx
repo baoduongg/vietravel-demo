@@ -3,7 +3,11 @@ import { notFound } from "next/navigation"
 
 import { AnchorNav } from "@/components/explorer/anchor-nav"
 import { DestinationHero } from "@/components/explorer/destination-hero"
+import { EatBlock } from "@/components/explorer/eat-block"
 import { ExplorerShell } from "@/components/explorer/explorer-shell"
+import { GettingThere } from "@/components/explorer/getting-there"
+import { PlayBlock } from "@/components/explorer/play-block"
+import { StayBlock } from "@/components/explorer/stay-block"
 import { WeatherBlock } from "@/components/explorer/weather-block"
 import { destinations, getGuide } from "@/data/destinations"
 
@@ -33,6 +37,10 @@ export default async function DestinationPage({ params }: PageProps): Promise<Re
       <AnchorNav />
       <div className="mx-auto max-w-6xl px-4 lg:px-6">
         <WeatherBlock guide={guide} />
+        <GettingThere guide={guide} />
+        <StayBlock guide={guide} />
+        <EatBlock guide={guide} />
+        <PlayBlock guide={guide} />
       </div>
     </ExplorerShell>
   )
