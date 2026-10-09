@@ -4,7 +4,7 @@ import { useState } from "react"
 
 import { ServiceCard } from "@/components/journey/service-card"
 import { INPUT_CLASS } from "@/components/journey/styles"
-import { normalize } from "@/lib/tour-matching"
+import { matchesQuery } from "@/lib/service-listing"
 import { cn } from "@/lib/utils"
 import { SERVICE_KINDS, SERVICE_KIND_LABEL, type ServiceItem, type ServiceKind } from "@/types/journey"
 
@@ -25,11 +25,6 @@ const FILTERS: { value: CatalogFilter; label: string }[] = [
 ]
 
 /** Khớp không dấu theo tên, tag, mô tả: "vinpearl" hay "an sang" đều được. */
-export function matchesQuery(service: ServiceItem, query: string): boolean {
-  const needle = normalize(query.trim())
-  return !needle || normalize(`${service.name} ${service.tag} ${service.blurb}`).includes(needle)
-}
-
 export function ServiceSearch({ value, onChange }: { value: string; onChange: (value: string) => void }): React.JSX.Element {
   return (
     <input

@@ -5,7 +5,8 @@ import { Tabs } from "radix-ui"
 
 import { Modal } from "@/components/journey/modal"
 import { ServiceCard } from "@/components/journey/service-card"
-import { matchesQuery, ServiceSearch } from "@/components/journey/service-catalog-panel"
+import { ServiceSearch } from "@/components/journey/service-catalog-panel"
+import { matchesQuery } from "@/lib/service-listing"
 import { isServiceKind, SERVICE_KINDS, SERVICE_KIND_LABEL, type ServiceItem, type ServiceKind } from "@/types/journey"
 
 interface ServicePickerProps {
