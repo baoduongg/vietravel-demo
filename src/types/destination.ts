@@ -130,7 +130,6 @@ export interface CostRow {
 /** Cẩm nang ngắn cho trang /diem-den/[slug]/[kind]. */
 export interface ServiceGuide {
   intro: string
-  tips: string[]
   faqs: Faq[]
 }
 

@@ -176,12 +176,6 @@ export const phuQuoc: DestinationGuide = {
   serviceGuides: {
     flight: {
       intro: "Phú Quốc có sân bay quốc tế, bay thẳng từ TP.HCM, Hà Nội, Đà Nẵng, Cần Thơ. Đặt sớm 3–4 tuần thường có giá tốt hơn.",
-      tips: [
-        "Mùa khô (tháng 11–4) và các dịp lễ vé tăng nhanh, nên đặt trước 1–2 tháng.",
-        "Chuyến sáng sớm thường ít trễ hơn chuyến chiều tối mùa mưa.",
-        "Kiểm tra quy định hành lý ký gửi nếu định mang nước mắm, hải sản khô về.",
-        "Sân bay cách Dương Đông khoảng 15 phút xe, có thể đặt đưa đón trước.",
-      ],
       faqs: [
         { question: "Bay từ TP.HCM đến Phú Quốc mất bao lâu?", answer: "Khoảng 1 giờ bay. Từ Hà Nội khoảng 2 giờ 10 phút." },
         { question: "Trẻ em đi máy bay tính giá thế nào?", answer: "Thường trẻ dưới 2 tuổi tính giá em bé, từ 2 đến dưới 12 tuổi tính giá trẻ em. Mức cụ thể tùy hãng bay, Quý khách xem giá khi thêm vào kế hoạch." },
@@ -189,11 +183,6 @@ export const phuQuoc: DestinationGuide = {
     },
     hotel: {
       intro: "Từ homestay gần biển đến villa hồ bơi riêng. Chọn khu Dương Đông nếu thích phố đêm, Bãi Trường để ngắm hoàng hôn, Bắc đảo nếu đi VinWonders.",
-      tips: [
-        "Gia đình có trẻ nhỏ nên chọn resort có hồ bơi nông và câu lạc bộ trẻ em.",
-        "Ở Nam đảo thuận đi cáp treo Hòn Thơm, ở Bắc đảo thuận Safari và VinWonders.",
-        "Mùa mưa nhiều resort giảm giá sâu, đáng cân nhắc nếu không ngại mưa chiều.",
-      ],
       faqs: [
         { question: "Nên ở khu nào tại Phú Quốc?", answer: "Lần đầu đến, Dương Đông hoặc Bãi Trường tiện đi lại và ăn uống. Muốn yên tĩnh, nghỉ dưỡng thì chọn Nam đảo hoặc Bắc đảo." },
         { question: "Giá phòng đã gồm bữa sáng chưa?", answer: "Tùy cơ sở. Giá trên trang là giá tham khảo mỗi phòng mỗi đêm, Quý khách xem mô tả từng nơi." },
@@ -201,11 +190,6 @@ export const phuQuoc: DestinationGuide = {
     },
     vehicle: {
       intro: "Đảo rộng, các điểm cách nhau 20–40 km. Thuê xe máy để tự do, hoặc ô tô có tài xế cho gia đình và nhóm đông.",
-      tips: [
-        "Thuê xe máy cần bằng lái, luôn đội mũ bảo hiểm.",
-        "Ô tô 7 chỗ hợp gia đình có trẻ nhỏ, có thể yêu cầu ghế trẻ em.",
-        "Đặt đưa đón sân bay trước để không phải chờ xe khi hạ cánh.",
-      ],
       faqs: [
         { question: "Có taxi hay xe công nghệ ở Phú Quốc không?", answer: "Có, chủ yếu quanh Dương Đông và sân bay. Đi Nam đảo, Bắc đảo cả ngày thì thuê xe theo ngày thường tiện và rẻ hơn." },
         { question: "Thuê xe máy ở Phú Quốc cần giấy tờ gì?", answer: "Quý khách cần bằng lái xe máy và CCCD hoặc hộ chiếu. Nơi cho thuê thường giữ bản sao giấy tờ hoặc tiền cọc." },
@@ -213,11 +197,6 @@ export const phuQuoc: DestinationGuide = {
     },
     activity: {
       intro: "Cáp treo Hòn Thơm, Safari, VinWonders, lặn ngắm san hô, chợ đêm. Nhiều bãi biển đẹp miễn phí.",
-      tips: [
-        "Lặn ngắm san hô đẹp nhất mùa khô khi biển lặng.",
-        "Cáp treo Hòn Thơm nên đi buổi sáng, chiều thường đông.",
-        "Hoàng hôn đẹp ở Sunset Town và Bãi Trường, đến sớm 1 tiếng.",
-      ],
       faqs: [
         { question: "Trẻ em có được giảm giá vé vui chơi không?", answer: "Phần lớn điểm vui chơi có giá trẻ em theo chiều cao hoặc độ tuổi. Kế hoạch tự tính theo tuổi các bé Quý khách nhập." },
         { question: "Đi VinWonders và Safari trong một ngày được không?", answer: "Được, hai nơi nằm cạnh nhau ở Bắc đảo. Nên đi Safari buổi sáng khi thú hoạt động nhiều, chiều sang VinWonders." },
@@ -225,11 +204,6 @@ export const phuQuoc: DestinationGuide = {
     },
     dining: {
       intro: "Hải sản tươi, gỏi cá trích, bún quậy, ghẹ Hàm Ninh. Từ quán địa phương đến nhà hàng view biển.",
-      tips: [
-        "Ở chợ đêm, hỏi giá theo ký trước khi gọi món hải sản.",
-        "Làng chài Hàm Ninh nổi tiếng ghẹ, nên đi buổi trưa.",
-        "Nhà hàng view biển nên đặt bàn trước giờ hoàng hôn.",
-      ],
       faqs: [
         { question: "Ăn hải sản ở Phú Quốc khoảng bao nhiêu tiền?", answer: "Quán bình dân khoảng 200–400 nghìn mỗi người, nhà hàng view biển từ 500 nghìn trở lên mỗi người." },
         { question: "Ăn uống ở Phú Quốc có hợp với trẻ nhỏ không?", answer: "Nhiều nhà hàng có món không cay và cơm, mì cho trẻ. Quý khách nên dặn quán bớt cay và chọn hải sản chín kỹ cho bé." },
@@ -237,11 +211,6 @@ export const phuQuoc: DestinationGuide = {
     },
     souvenir: {
       intro: "Nước mắm, hồ tiêu, ngọc trai, rượu sim, khô cá: đặc sản Phú Quốc từ các thương hiệu địa phương.",
-      tips: [
-        "Mua nước mắm loại đóng gói dành cho đi máy bay.",
-        "Ngọc trai nên mua ở cơ sở có giấy kiểm định.",
-        "Hồ tiêu và khô cá mua tại vườn, chợ địa phương thường tươi và rẻ hơn.",
-      ],
       faqs: [
         { question: "Mang nước mắm lên máy bay được không?", answer: "Tùy hãng bay, nhiều hãng chỉ nhận loại đóng gói chuyên dụng. Quý khách kiểm tra quy định hành lý trước khi mua." },
         { question: "Mua ngọc trai ở đâu để tránh hàng giả?", answer: "Quý khách nên mua tại cơ sở nuôi cấy có giấy kiểm định đi kèm, tránh mua trôi nổi ở chợ hoặc người bán rong." },
@@ -249,11 +218,6 @@ export const phuQuoc: DestinationGuide = {
     },
     tour: {
       intro: "Tour trọn gói Vietravel gồm vé bay, khách sạn, xe và tham quan, khởi hành từ nhiều thành phố.",
-      tips: [
-        "Tour trọn gói tiện cho gia đình và nhóm đông, không phải lo xe và lịch trình.",
-        "So giá tour với tự túc bằng cách thêm cả hai vào một kế hoạch.",
-        "Ngày khởi hành và giá lấy trực tiếp từ travel.com.vn.",
-      ],
       faqs: [
         { question: "Giá tour đã gồm vé máy bay chưa?", answer: "Đa số tour Phú Quốc của Vietravel đã gồm vé máy bay khứ hồi. Quý khách xem chi tiết trên trang tour." },
         { question: "Trẻ em đi tour tính giá thế nào?", answer: "Theo lưu ý giá trẻ em của Vietravel: dưới 5 tuổi miễn phí, từ 5 đến dưới 12 tuổi tính 75% giá người lớn. Kế hoạch tự tính theo tuổi các bé." },

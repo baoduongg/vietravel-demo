@@ -113,16 +113,6 @@ export default async function ServiceKindPage({ params }: PageProps): Promise<Re
           <ServiceListing services={services} destinationSlug={guide.slug} destinationName={guide.name} />
         </Section>
 
-        {serviceGuide && serviceGuide.tips.length > 0 && (
-          <Section id="meo" title="Mẹo hay">
-            <ul className="grid gap-3 sm:grid-cols-2">
-              {serviceGuide.tips.map((tip) => (
-                <li key={tip} className="glass-card !rounded-2xl p-4 text-body">{tip}</li>
-              ))}
-            </ul>
-          </Section>
-        )}
-
         {GuideBlock && <GuideBlock guide={guide} />}
 
         {serviceGuide && serviceGuide.faqs.length > 0 && <Faq guide={guide} faqs={serviceGuide.faqs} title={`Hỏi đáp về ${label.toLowerCase()}`} />}

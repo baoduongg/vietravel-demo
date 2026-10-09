@@ -7,7 +7,7 @@ Ngày: 2026-10-09 · Nhánh: `feat/explorer-phu-quoc`
 Mỗi điểm đến có một trang tổng hợp cho từng loại dịch vụ, ví dụ `/diem-den/phu-quoc/ve-may-bay`. Trang phục vụ cùng lúc ba nhu cầu:
 
 - **A. So sánh và chọn**: xem hết các lựa chọn, lọc, sắp xếp, thêm thẳng vào kế hoạch (`/hanh-trinh`).
-- **B. Cẩm nang**: nội dung tham khảo (giá tham khảo, mẹo, FAQ) đọc được và tốt cho SEO.
+- **B. Cẩm nang**: nội dung tham khảo (giá tham khảo, FAQ) đọc được và tốt cho SEO.
 - **C. Tôn đối tác**: dịch vụ của đối tác đã duyệt hiện trong danh sách, có nhãn "Đối tác".
 
 Phần này (phần 1) làm A, B và phần C ở mức hiện trong danh sách. Trang công khai riêng cho từng đối tác là **phần 2**, có spec riêng.
@@ -60,8 +60,7 @@ Bọc trong `ExplorerShell`, cùng khung `max-w-6xl` với trang điểm đến.
    Nếu không có giá nào > 0 thì bỏ hai số về giá.
 4. **Danh sách** (`ServiceListing`, client component): xem mục 4. Đặt ngay sau hero để khách so sánh và chọn nhanh.
 5. **Cẩm nang**:
-   - mẹo từ `serviceGuides[kind].tips`, nếu có;
-   - sau đó là khối guide có sẵn: `flight` → `GettingThere`, `hotel` → `StayBlock`, `dining` → `EatBlock`, `activity` → `PlayBlock`; các loại khác không có khối.
+   - khối guide có sẵn: `flight` → `GettingThere`, `hotel` → `StayBlock`, `dining` → `EatBlock`, `activity` → `PlayBlock`; các loại khác không có khối.
 6. **FAQ theo loại**: dùng lại `Faq`, thêm prop tùy chọn `faqs` và `title`; không truyền thì giữ nguyên hành vi cũ (`guide.faqs`). Ẩn khối khi loại không có FAQ.
 7. **CTA cuối**: "Lên kế hoạch {Tên điểm đến}" dẫn tới `/hanh-trinh`.
 
@@ -72,7 +71,6 @@ Thêm vào `DestinationGuide` (`src/types/destination.ts`):
 ```ts
 export interface ServiceGuide {
   intro: string
-  tips: string[]
   faqs: Faq[]
 }
 
@@ -80,8 +78,8 @@ export interface ServiceGuide {
 serviceGuides?: Partial<Record<ServiceKind, ServiceGuide>>
 ```
 
-- Viết nội dung cho đủ 7 loại của Phú Quốc trong `src/data/destinations/phu-quoc.ts`: intro 1–2 câu, 3–5 mẹo, 2–4 câu FAQ. Mọi văn bản đều bằng tiếng Việt, xưng "Quý khách".
-- Mỗi loại thiếu `serviceGuides` thì trang vẫn chạy: không có intro riêng, không có mẹo, không có FAQ.
+- Viết nội dung cho đủ 7 loại của Phú Quốc trong `src/data/destinations/phu-quoc.ts`: intro 1–2 câu, 2–4 câu FAQ. Mọi văn bản đều bằng tiếng Việt, xưng "Quý khách".
+- Mỗi loại thiếu `serviceGuides` thì trang vẫn chạy: không có intro riêng, không có FAQ.
 
 ## 4. Logic danh sách — `src/lib/service-listing.ts`
 
@@ -115,7 +113,7 @@ Các hàm thuần, dùng chung cho server và client:
   - `chipOf` với tag mock và tag đối tác;
   - `chipsOf` trả `[]` khi chỉ có 1 chip;
   - `filterAndSort` theo chip, `partnerOnly`, giá tăng/giảm với giá 0 xếp cuối.
-- `destinations.test.ts`: mỗi `serviceGuides[kind]` của Phú Quốc có intro không rỗng và ít nhất 1 mẹo.
+- `destinations.test.ts`: mỗi `serviceGuides[kind]` của Phú Quốc có intro không rỗng và 2–4 FAQ.
 - Thủ công: `pnpm build` (sinh đủ trang tĩnh), mở `/diem-den/phu-quoc/ve-may-bay` và `/khach-san`, thử lọc/sắp xếp/thêm vào kế hoạch. Thử `/diem-den/phu-quoc/xyz` ra 404. Duyệt một đối tác nhà hàng rồi kiểm nó hiện ở `/an-uong` với badge.
 
 ## Rủi ro
