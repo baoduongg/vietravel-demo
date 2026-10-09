@@ -1,9 +1,13 @@
+import Link from "next/link"
+
 import { Reveal } from "@/components/explorer/reveal"
 
 interface SectionProps {
   id: string
   title: string
   intro?: string
+  /** Link sang trang tổng hợp của khối, vd /diem-den/phu-quoc/khach-san. */
+  moreHref?: string
   children: React.ReactNode
 }
 
@@ -11,7 +15,7 @@ interface SectionProps {
 export const CARD_CLASS =
   "glass-card p-6 sm:p-7"
 
-export function Section({ id, title, intro, children }: SectionProps): React.JSX.Element {
+export function Section({ id, title, intro, moreHref, children }: SectionProps): React.JSX.Element {
   return (
     <section id={id} className="scroll-mt-28 py-10 lg:py-16">
       <Reveal>
@@ -19,6 +23,11 @@ export function Section({ id, title, intro, children }: SectionProps): React.JSX
           {title}
         </h2>
         {intro && <p className="mt-3 max-w-2xl text-base leading-relaxed font-normal text-muted-foreground sm:text-lg">{intro}</p>}
+        {moreHref && (
+          <Link href={moreHref} className="mt-3 inline-block text-sm font-semibold text-primary-ink underline-offset-4 hover:underline">
+            Xem tất cả →
+          </Link>
+        )}
       </Reveal>
       <Reveal className="mt-8 lg:mt-12" delay={120}>
         {children}

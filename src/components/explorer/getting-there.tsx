@@ -5,10 +5,10 @@ import { CtaLink } from "@/components/explorer/cta-link"
 import { Section } from "@/components/explorer/section"
 import type { DestinationGuide } from "@/types/destination"
 
-export function GettingThere({ guide }: { guide: DestinationGuide }): React.JSX.Element {
+export function GettingThere({ guide, moreHref }: { guide: DestinationGuide; moreHref?: string }): React.JSX.Element {
   const { airport, onIslandPhoto } = guide
   return (
-    <Section
+    <Section moreHref={moreHref}
       id="di-chuyen"
       title={`Cách Di Chuyển Đến ${guide.name}`}
       intro="Thời lượng bay và tàu cao tốc ước tính. Lịch trình linh hoạt từ các thành phố lớn."

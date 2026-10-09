@@ -6,9 +6,9 @@ import { Section } from "@/components/explorer/section"
 import { AddToPlanButton } from "@/components/journey/add-to-plan-button"
 import type { DestinationGuide } from "@/types/destination"
 
-export function StayBlock({ guide }: { guide: DestinationGuide }): React.JSX.Element {
+export function StayBlock({ guide, moreHref }: { guide: DestinationGuide; moreHref?: string }): React.JSX.Element {
   return (
-    <Section
+    <Section moreHref={moreHref}
       id="luu-tru"
       title="Khách Sạn & Resort View Biển Đỉnh Cao"
       intro="Từ villa riêng tư ngắm hoàng hôn, resort liền kề khu vui chơi đến khách sạn trung tâm tiện quẩy phố đêm."

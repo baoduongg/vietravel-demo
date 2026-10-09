@@ -3,15 +3,23 @@ import { MessageCircleQuestionIcon, PhoneIcon, PlusIcon, SparklesIcon } from "lu
 
 import { Section } from "@/components/explorer/section"
 import { company } from "@/config/company"
-import type { DestinationGuide } from "@/types/destination"
+import type { DestinationGuide, Faq as FaqItem } from "@/types/destination"
 
-export function Faq({ guide }: { guide: DestinationGuide }): React.JSX.Element {
+export function Faq({
+  guide,
+  faqs = guide.faqs,
+  title = "Giải đáp thắc mắc trước chuyến đi",
+}: {
+  guide: DestinationGuide
+  faqs?: FaqItem[]
+  title?: string
+}): React.JSX.Element {
   return (
-    <Section id="faq" title="Giải đáp thắc mắc trước chuyến đi">
+    <Section id="faq" title={title}>
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
         {/* <summary> phải là con trực tiếp của <details>, nếu không trình duyệt hiện chữ "Details" mặc định và ẩn câu hỏi. */}
         <div className="space-y-3">
-          {guide.faqs.map((item, index) => (
+          {faqs.map((item, index) => (
             <details
               key={item.question}
               open={index === 0}

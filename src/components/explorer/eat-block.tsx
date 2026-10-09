@@ -57,10 +57,10 @@ function DishCard({ dish }: { dish: Dish }): React.JSX.Element {
   )
 }
 
-export function EatBlock({ guide }: { guide: DestinationGuide }): React.JSX.Element {
+export function EatBlock({ guide, moreHref }: { guide: DestinationGuide; moreHref?: string }): React.JSX.Element {
   const { foodPhoto } = guide
   return (
-    <Section
+    <Section moreHref={moreHref}
       id="an-uong"
       title="Food Tour Hải Sản & Đặc Sản Bản Địa"
       intro="Từ gỏi cá trích tươi rói, ghẹ Hàm Ninh chắc ngọt đến bún quậy trứ danh bạn nhất định phải thử."
