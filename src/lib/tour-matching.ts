@@ -12,7 +12,7 @@ const GENERIC_PLACE_PREFIXES = new Set([
 
 /** Bỏ dấu tiếng Việt và viết thường: "Phú Quốc" khớp "phu quoc". */
 export function normalize(value: string): string {
-  return value.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/đ/g, "d").toLowerCase()
+  return value.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/đ/g, "d")
 }
 
 function parseBudget(text: string): number | undefined {

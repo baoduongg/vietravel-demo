@@ -1,9 +1,11 @@
 "use client"
 
+import { useState } from "react"
 import { Tabs } from "radix-ui"
 
 import { Modal } from "@/components/journey/modal"
 import { ServiceCard } from "@/components/journey/service-card"
+import { matchesQuery, ServiceSearch } from "@/components/journey/service-catalog-panel"
 import { isServiceKind, SERVICE_KINDS, SERVICE_KIND_LABEL, type ServiceItem, type ServiceKind } from "@/types/journey"
 
 interface ServicePickerProps {
@@ -17,6 +19,8 @@ interface ServicePickerProps {
 
 /** Bảng chọn dịch vụ cho điện thoại; trên máy tính dùng cột danh mục bên trái. */
 export function ServicePicker({ services, kind, onKindChange, onAdd, targetLabel }: ServicePickerProps): React.JSX.Element {
+  const [query, setQuery] = useState("")
+
   return (
     <Modal
       open={kind !== null}
@@ -25,6 +29,9 @@ export function ServicePicker({ services, kind, onKindChange, onAdd, targetLabel
       description={`Bấm nút để thêm vào ${targetLabel}.`}
       wide
     >
+      <div className="-mt-2 mb-3">
+        <ServiceSearch value={query} onChange={setQuery} />
+      </div>
       <Tabs.Root value={kind ?? "hotel"} onValueChange={(value) => isServiceKind(value) && onKindChange(value)}>
         <Tabs.List aria-label="Loại dịch vụ" className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-2">
           {SERVICE_KINDS.map((option) => (
@@ -38,11 +45,11 @@ export function ServicePicker({ services, kind, onKindChange, onAdd, targetLabel
           ))}
         </Tabs.List>
         {SERVICE_KINDS.map((option) => {
-          const items = services.filter((service) => service.kind === option)
+          const items = services.filter((service) => service.kind === option && matchesQuery(service, query))
           return (
-            <Tabs.Content key={option} value={option} className="mt-4 outline-none">
+            <Tabs.Content key={option} value={option} className="mt-4 h-[50dvh] overflow-y-auto outline-none [scrollbar-width:thin]">
               {items.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Hiện chưa có dịch vụ loại này.</p>
+                <p className="text-sm text-muted-foreground">{query.trim() ? "Không tìm thấy dịch vụ phù hợp." : "Hiện chưa có dịch vụ loại này."}</p>
               ) : (
                 <ul className="grid gap-3 sm:grid-cols-2">
                   {items.map((service) => (
