@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vietravel Explorer · Q&amp;A</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Bảng màu của travel.com.vn */
+      --tea: #191919;
+      --leaf: #0046c1;
+      --leaf-soft: #e6f2ff;
+      --line: #d9eeff;
+      --muted: #636363;
+      --white: #ffffff;
+    }
+
+    @page {
+      size: A4;
+      margin: 14mm 16mm;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--white);
+      font-family: "Mulish", system-ui, sans-serif;
+      color: var(--tea);
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 40px 16px 56px;
+    }
+
+    h1 {
+      color: var(--leaf);
+      font-size: 26px;
+      line-height: 1.3;
+      margin: 0 0 8px;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 13px;
+      margin: 0 0 16px;
+    }
+
+    .lead {
+      background: var(--leaf-soft);
+      border-left: 4px solid var(--leaf);
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin: 0 0 8px;
+    }
+
+    h2 {
+      color: var(--leaf);
+      font-size: 20px;
+      margin: 32px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--line);
+    }
+
+    h3 {
+      font-size: 16px;
+      margin: 22px 0 8px;
+    }
+
+    ul,
+    ol {
+      padding-left: 22px;
+      margin: 0;
+    }
+
+    li {
+      margin: 6px 0;
+    }
+
+    ol li::marker {
+      color: var(--leaf);
+      font-weight: 700;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      min-width: 640px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      vertical-align: top;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    th {
+      background: var(--leaf);
+      color: var(--white);
+      font-weight: 700;
+    }
+
+    td:first-child {
+      font-weight: 700;
+    }
+
+    h2,
+    h3 {
+      break-after: avoid;
+    }
+
+    li,
+    tr {
+      break-inside: avoid;
+    }
+
+    @media print {
+      main {
+        padding: 0;
+        max-width: none;
+      }
+
+      .table-wrap {
+        overflow: visible;
+      }
+
+      table {
+        min-width: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <h1>Vietravel Explorer: tổng hợp hiện trạng và danh sách câu hỏi (Q&amp;A)</h1>
+    <p class="meta">Ngày: 09/10/2026 · Người gửi: GMO · Người nhận: anh Nha (nội dung, phạm vi), anh Khánh (kỹ thuật, API)</p>
+    <p class="lead">Tài liệu này tổng hợp những gì bản demo đang làm được, những điểm chưa khớp với các quyết định trong buổi họp 08/10/2026, và các câu hỏi GMO cần Vietravel trả lời để chốt phạm vi, thời gian và chi phí từng giai đoạn.</p>
+
+    <h2>1. Mục tiêu dự án (theo họp 08/10)</h2>
+    <ul>
+      <li>Đưa Vietravel từ chỗ chỉ bán tour sang gợi ý cả dịch vụ du lịch lẻ (khách sạn, vé bay, ăn uống, vui chơi…).</li>
+      <li>Explorer tạo cảm hứng và cung cấp thông tin điểm đến đủ sâu để khách tin, rồi chuyển khách sang hệ thống đặt chỗ hiện có. Explorer không tự xử lý đặt chỗ ở giai đoạn đầu.</li>
+      <li>KPI: tăng traffic từ khoảng 500.000 lên 3 triệu lượt mỗi tháng. Việc cần làm sớm nhất là từ khóa "khách sạn Phú Quốc" trong khoảng một tháng.</li>
+      <li>Không làm mạng xã hội. Chatbot là đề bài riêng, không thuộc Explorer.</li>
+    </ul>
+
+    <h2>2. Bản demo hiện có</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Phần</th>
+            <th>Khách làm được gì</th>
+            <th>Dữ liệu</th>
+            <th>Trạng thái</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Trang chủ</td>
+            <td>Xem điểm đến, chọn nhanh theo sở thích, xem thời tiết, tìm tour toàn thế giới, AI gợi ý chuyến đi</td>
+            <td>Tour thật lấy từ travel.com.vn</td>
+            <td>Chạy được</td>
+          </tr>
+          <tr>
+            <td>Trang điểm đến Phú Quốc</td>
+            <td>Thời tiết thật, mùa đẹp 12 tháng, di chuyển, lưu trú, ăn uống, vui chơi, lịch trình 3N2Đ, chi phí ước tính, review, tour đang bán, hỏi đáp</td>
+            <td>Nội dung soạn tay, thời tiết từ Open-Meteo, tour thật</td>
+            <td>Chạy được</td>
+          </tr>
+          <tr>
+            <td>Kế hoạch chuyến đi</td>
+            <td>Tạo kế hoạch, mời bạn bè bằng link (sửa hoặc chỉ xem), xếp dịch vụ theo ngày, bình chọn, bình luận, tự tính chi phí</td>
+            <td>Chỉ tour là thật; khách sạn, vé bay, thuê xe là dữ liệu mẫu</td>
+            <td>Chạy được</td>
+          </tr>
+          <tr>
+            <td>Review điểm đến</td>
+            <td>Gửi review (số sao, người đi cùng, tháng đi, nội dung)</td>
+            <td>Review mẫu trộn với review khách gửi</td>
+            <td>Chạy được, <strong>chưa có bước duyệt</strong></td>
+          </tr>
+          <tr>
+            <td>Đối tác</td>
+            <td>Đăng ký thương hiệu và sản phẩm; Vietravel duyệt; sản phẩm đã duyệt xuất hiện trong kho dịch vụ của Kế hoạch</td>
+            <td>Do đối tác nhập</td>
+            <td>Bản đầu tiên</td>
+          </tr>
+          <tr>
+            <td>Trợ lý Tripi</td>
+            <td>Hỏi bằng giọng nói hoặc chữ, nhân vật 3D trả lời bằng giọng tiếng Việt kèm thẻ tour</td>
+            <td>Tour thật</td>
+            <td>Đã làm xong, cần khóa dịch vụ AI và giọng nói để bật</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Giới hạn kỹ thuật của bản demo</h3>
+    <ul>
+      <li>Dịch vụ khách sạn, vé bay, thuê xe là dữ liệu mẫu, chờ API từ các hub.</li>
+      <li>Tour đang được đọc từ trang web travel.com.vn, chưa có nguồn dữ liệu chính thức.</li>
+      <li>Kế hoạch và đối tác chưa gắn với tài khoản: danh sách kế hoạch và quyền quản lý cửa hàng chỉ lưu trên trình duyệt, đổi máy là mất.</li>
+    </ul>
+
+    <h2>3. Danh sách tính năng</h2>
+
+    <h3>Chung</h3>
+    <ul>
+      <li><strong>Đăng nhập demo</strong>: Bảo vệ bằng mật khẩu chung, đăng nhập xong quay về đúng trang đang xem.</li>
+      <li><strong>Tiện ích toàn trang</strong>: Chuyển giao diện sáng/tối, âm thanh nền, nút nổi "Hỏi Tripi".</li>
+    </ul>
+
+    <h3>Trang chủ</h3>
+    <ul>
+      <li><strong>Chọn vibe nhanh</strong>: 5 chủ đề (biển, lặn san hô, vui chơi, ẩm thực, tour giá tốt) dẫn tới nội dung phù hợp.</li>
+      <li><strong>Thời tiết tháng này</strong>: Nhiệt độ, mô tả, mẹo đi và link dự báo cả năm ở Phú Quốc.</li>
+      <li><strong>Lưới điểm đến</strong>: Phú Quốc đã mở, 7 điểm khác gắn nhãn "Sắp mở bán".</li>
+      <li><strong>Tìm tour toàn thế giới</strong>: Gõ quốc gia hoặc thành phố, kết quả lấy trực tiếp từ travel.com.vn.</li>
+      <li><strong>AI gợi ý chuyến đi</strong>: Lọc theo vibe, ngân sách, nơi khởi hành; trả 6 tour kèm mức phù hợp và nút thêm vào kế hoạch.</li>
+      <li><strong>Tour ưu đãi và Vì sao chọn Vietravel</strong>: Tour Phú Quốc với giá, lịch thật; 4 lợi ích khi đi cùng Vietravel.</li>
+    </ul>
+
+    <h3>Trang điểm đến Phú Quốc</h3>
+    <ul>
+      <li><strong>Mở đầu và mục lục</strong>: Chỉ số nhanh, 5 trải nghiệm nổi bật, thanh mục lục dính để nhảy tới từng phần.</li>
+      <li><strong>Ảnh và video</strong>: Video flycam, ảnh có ghi công tác giả và giấy phép.</li>
+      <li><strong>Thời tiết và mùa đẹp</strong>: Thời tiết trực tiếp, dự báo 4 ngày, biểu đồ 12 tháng kèm lời khuyên.</li>
+      <li><strong>Di chuyển</strong>: Bay hoặc tàu từ 6 nơi, phương tiện trên đảo, lưu ý giấy tờ.</li>
+      <li><strong>Lưu trú</strong>: 4 khu vực, lọc theo người đi cùng (gia đình, cặp đôi, bạn bè).</li>
+      <li><strong>Ẩm thực và vui chơi</strong>: 6 món nên thử kèm nơi ăn; 9 điểm chơi lọc theo người đi cùng.</li>
+      <li><strong>Lịch trình mẫu 3N2Đ</strong>: Chia tab theo ngày, lưu cả ngày vào kế hoạch.</li>
+      <li><strong>Chi phí và hành trang</strong>: Dự toán chi phí tự túc theo hạng mục, checklist đồ mang theo.</li>
+      <li><strong>Review</strong>: Điểm trung bình, form gửi review có kiểm tra nội dung.</li>
+      <li><strong>Tour, hỏi đáp và CTA</strong>: Tour đang mở bán, 6 câu hỏi thường gặp, nút đặt tour, hỏi Tripi, gọi hotline.</li>
+    </ul>
+
+    <h3>Kế hoạch chuyến đi</h3>
+    <ul>
+      <li><strong>Tạo và quản lý kế hoạch</strong>: Tên chuyến, ngày đi, số đêm, số người lớn và trẻ em; danh sách lưu trên trình duyệt.</li>
+      <li><strong>Lên kế hoạch cùng nhau</strong>: Chia sẻ link sửa hoặc chỉ xem, người được mời nhập tên là tham gia, thay đổi đồng bộ sau vài giây.</li>
+      <li><strong>Xếp lịch theo ngày</strong>: Thêm, xóa, chuyển dịch vụ giữa các ngày, đổi số lượng.</li>
+      <li><strong>Bình chọn và bình luận</strong>: Cả nhóm bình chọn, bình luận từng dịch vụ.</li>
+      <li><strong>Kho dịch vụ</strong>: Khách sạn, vé bay, thuê xe, hoạt động, tour và sản phẩm đối tác đã duyệt, có ảnh và bộ lọc.</li>
+      <li><strong>Chi phí tự động</strong>: Tính tổng theo số người lớn, trẻ em và số lượng từng dịch vụ.</li>
+      <li><strong>AI tư vấn kế hoạch</strong>: Chọn phong cách chuyến đi, nhận gợi ý dịch vụ để thêm vào.</li>
+      <li><strong>Nút "Thêm vào kế hoạch"</strong>: Có ở lịch trình mẫu, khách sạn, điểm chơi, danh sách tour và AI gợi ý.</li>
+    </ul>
+
+    <h3>Đối tác</h3>
+    <ul>
+      <li><strong>Đăng ký đối tác</strong>: Gửi thương hiệu (sản phẩm địa phương, nhà hàng, khách sạn), sản phẩm và thông tin liên hệ.</li>
+      <li><strong>Cửa hàng của bạn</strong>: Xem trạng thái duyệt, sửa thông tin thương hiệu, ảnh đại diện, thêm/sửa/xóa sản phẩm.</li>
+      <li><strong>Xét duyệt của Vietravel</strong>: Xem đối tác kèm liên hệ, chuyển trạng thái chờ duyệt, đã duyệt, từ chối.</li>
+      <li><strong>Đưa vào kho dịch vụ</strong>: Sản phẩm của đối tác đã duyệt xuất hiện trong kho dịch vụ của Kế hoạch.</li>
+    </ul>
+
+    <h3>Trợ lý Tripi</h3>
+    <ul>
+      <li><strong>Hỏi đa cách</strong>: Nói (Chrome, Edge), gõ chữ hoặc gửi kèm ảnh.</li>
+      <li><strong>Nhân vật 3D</strong>: Đổi Robot hoặc Người, khẩu hình khớp giọng, phông cảnh theo chủ đề.</li>
+      <li><strong>Tư vấn tour bằng AI</strong>: Hiểu điểm đến, ngân sách, thời gian; chỉ gợi ý tour còn ngày khởi hành, trả lời tối đa 3 câu kèm thẻ tour.</li>
+      <li><strong>Giọng nói tiếng Việt</strong>: Đọc câu trả lời, đọc số tiền tự nhiên, có phụ đề và trạng thái nghe, nghĩ, nói.</li>
+    </ul>
+
+    <h2>4. Câu hỏi cần Vietravel trả lời</h2>
+
+    <h3>A. Phạm vi và giai đoạn</h3>
+    <ol start="1">
+      <li>Giai đoạn 1 gồm chính xác những phần nào: chỉ trang Điểm đến, hay có cả Kế hoạch, Review và Đối tác như bản demo?</li>
+      <li>Giai đoạn 1 làm bao nhiêu điểm đến, gồm những điểm nào và theo thứ tự ưu tiên nào?</li>
+      <li>Mốc ra mắt chính thức là khi nào? Mục tiêu "khách sạn Phú Quốc trong khoảng một tháng" tính từ ngày nào?</li>
+    </ol>
+
+    <h3>B. Tích hợp travel.com.vn và các hub dịch vụ</h3>
+    <ol start="4">
+      <li>Mô hình microservice frontend dùng công nghệ gì?</li>
+      <li>Những hub và API nào đã sẵn sàng: tour, khách sạn, vé bay, combo, thuê xe? Mỗi hub đã có tài liệu API, môi trường thử và giới hạn số lần gọi chưa?</li>
+      <li>Có nguồn dữ liệu tour chính thức (API hoặc feed) để thay việc đọc từ trang web không?</li>
+      <li>Đường dẫn đúng cho trang khách sạn Phú Quốc và trang vé máy bay là gì? Hay trang khách sạn Phú Quốc chưa tồn tại?</li>
+      <li>Có cần gắn mã theo dõi (UTM, affiliate) vào các nút "Đặt" để đo chuyển đổi từ Explorer không?</li>
+    </ol>
+
+    <h3>C. Dữ liệu và nội dung</h3>
+    <ol start="9">
+      <li>Danh sách trường dữ liệu bắt buộc cho một điểm đến là gì? (Theo action item)</li>
+      <li>Phần nào do AI tạo, phần nào nhân viên nhập, phần nào đối tác cung cấp? Ai duyệt, và duyệt bằng công cụ gì (có cần CMS không)?</li>
+      <li>Có lấy được giá trẻ em, phần "đã gồm / chưa gồm" và chính sách hoàn hủy của từng tour qua API không?</li>
+      <li>Vietravel có kho ảnh và video có bản quyền không, hay vẫn dùng ảnh giấy phép mở kèm ghi công tác giả?</li>
+      <li>Giai đoạn 1 có cần tiếng Anh hoặc ngôn ngữ khác không?</li>
+    </ol>
+
+    <h3>D. Thành viên và Kế hoạch chuyến đi</h3>
+    <ol start="14">
+      <li>Thành viên đăng nhập bằng tài khoản travel.com.vn có sẵn, hay chỉ cần link chia sẻ như bản demo?</li>
+      <li>Kế hoạch có cần chuyển thành đơn đặt hoặc giỏ hàng không, hay chỉ để tham khảo?</li>
+      <li>Các tính năng "Tôi đã ở đây", lưu điểm đến và video trải nghiệm có làm ở giai đoạn 1 không?</li>
+    </ol>
+
+    <h3>E. Review và kiểm duyệt</h3>
+    <ol start="17">
+      <li>Review được duyệt trước rồi mới đăng, hay đăng ngay rồi gỡ sau? Có cần xác thực người viết đã thực sự đi (ví dụ theo mã booking) không?</li>
+      <li>Yêu cầu pháp lý cho review và chia sẻ trong nhóm cần đáp ứng đến mức nào (quản lý nội dung trên mạng, bảo vệ dữ liệu cá nhân)?</li>
+    </ol>
+
+    <h3>F. Đối tác</h3>
+    <ol start="19">
+      <li>Xác minh đối tác bằng cách nào: giấy phép kinh doanh, giấy tờ chứng minh quyền sở hữu, hay gọi điện xác nhận?</li>
+      <li>Đối tác có cần tài khoản đăng nhập riêng để tự cập nhật dịch vụ không?</li>
+      <li>Mô hình hợp tác là gì: hoa hồng, phí niêm yết hay miễn phí? Đối tác có được gắn link đặt hàng của riêng mình không?</li>
+      <li>Nhân viên Vietravel duyệt đối tác trên hệ thống nội bộ có sẵn, hay cần một trang quản trị riêng có phân quyền?</li>
+    </ol>
+
+    <h3>G. SEO, AEO, GEO và đo lường</h3>
+    <ol start="23">
+      <li>Yêu cầu SEO cụ thể gồm những gì: cấu trúc URL, dữ liệu có cấu trúc (schema), sitemap? Có cần giữ hoặc chuyển hướng URL cũ của travel.com.vn không?</li>
+      <li>KPI 3 triệu lượt mỗi tháng đo bằng công cụ nào (GA4, Search Console)? Tính riêng trang Explorer hay toàn bộ travel.com.vn?</li>
+      <li>Ngoài "khách sạn Phú Quốc", danh sách từ khóa dịch vụ lẻ ưu tiên gồm những từ nào?</li>
+    </ol>
+
+    <h3>H. Hạ tầng và vận hành</h3>
+    <ol start="26">
+      <li>Explorer chạy trên hạ tầng của Vietravel, của GMO hay trên dịch vụ đám mây (ví dụ Vercel)? Dùng cơ sở dữ liệu nào?</li>
+      <li>Nếu dùng AI (tạo nội dung, gợi ý chuyến đi), Vietravel có ưu tiên nhà cung cấp nào không? Bên nào chịu chi phí sử dụng?</li>
+      <li>Sau khi bàn giao, ai vận hành và cập nhật nội dung hằng ngày?</li>
+    </ol>
+  </main>
+</body>
+
+</html>

@@ -49,3 +49,18 @@ export async function PUT(request: Request, { params }: RouteContext): Promise<N
     return NextResponse.json({ error: "Chưa lưu được sản phẩm, vui lòng thử lại." }, { status: 500, headers: NO_STORE })
   }
 }
+
+/** Chủ cửa hàng xóa thương hiệu: body `{ editToken }`. */
+export async function DELETE(request: Request, { params }: RouteContext): Promise<NextResponse<{ ok: true } | ApiError>> {
+  const { id } = await params
+  const body = (await request.json().catch(() => null)) as { editToken?: unknown } | null
+  try {
+    const store = getPartnerStore()
+    if (!(await store.findOwned(id, body?.editToken))) return NextResponse.json({ error: FORBIDDEN }, { status: 403, headers: NO_STORE })
+    if (!(await store.remove(id))) return NextResponse.json({ error: "Không tìm thấy thương hiệu." }, { status: 404, headers: NO_STORE })
+    return NextResponse.json({ ok: true }, { headers: NO_STORE })
+  } catch (error) {
+    console.error("[partners]", error)
+    return NextResponse.json({ error: "Chưa xóa được thương hiệu, vui lòng thử lại." }, { status: 500, headers: NO_STORE })
+  }
+}

@@ -37,4 +37,8 @@ export const partnerService = {
     const { data } = await http.put<{ partner: Partner }>(`/partners/${encodeURIComponent(id)}/info`, { ...info, editToken })
     return data.partner
   },
+
+  async remove(id: string, editToken: string): Promise<void> {
+    await http.delete(`/partners/${encodeURIComponent(id)}`, { data: { editToken } })
+  },
 }

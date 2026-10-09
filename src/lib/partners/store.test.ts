@@ -57,6 +57,12 @@ async function main(): Promise<void> {
   assert.ok(!JSON.stringify(await store.list()).includes("base64"))
   assert.equal(await store.setImage("khong-co", "data:image/jpeg;base64,AAAA"), null)
 
+  // Xóa bỏ cả bản ghi lẫn ảnh, không đụng đối tác khác
+  assert.equal(await store.remove(a.id), true)
+  assert.deepEqual((await store.list()).map((p) => p.id), [b.id])
+  assert.equal(await store.getImage(a.id), null)
+  assert.equal(await store.remove(a.id), false)
+
   await rm(dir, { recursive: true })
 }
 

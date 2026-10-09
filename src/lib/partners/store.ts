@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto"
-import { mkdir, readFile, writeFile } from "node:fs/promises"
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises"
 import path from "node:path"
 
 import type { Redis } from "@upstash/redis"
@@ -32,6 +32,8 @@ export interface PartnerStore {
   /** Ảnh đại diện (data URL) lưu tách khỏi bản ghi để danh sách không nặng; null nếu không có id này. */
   setImage(id: string, dataUrl: string): Promise<Partner | null>
   getImage(id: string): Promise<string | null>
+  /** Xóa bản ghi và ảnh; false nếu không có id này. */
+  remove(id: string): Promise<boolean>
 }
 
 function create(input: PartnerInput): StoredPartner & { editToken: string } {
@@ -139,6 +141,18 @@ export class FilePartnerStore implements PartnerStore {
       throw error
     }
   }
+
+  async remove(id: string): Promise<boolean> {
+    const removed = await this.serialize("partners", async () => {
+      const all = await this.readAll()
+      const rest = all.filter((partner) => partner.id !== id)
+      if (rest.length === all.length) return false
+      await writeJsonAtomic(this.file, rest)
+      return true
+    })
+    if (removed) await rm(this.imageFile(id), { force: true })
+    return removed
+  }
 }
 
 /** Cho serverless (Vercel): list Redis `partners`, LPUSH + LTRIM nên mới nhất trước. */
@@ -195,6 +209,15 @@ export class RedisPartnerStore implements PartnerStore {
 
   getImage(id: string): Promise<string | null> {
     return this.redis.get<string>(`partner-image:${id}`)
+  }
+
+  // Đánh dấu theo vị trí rồi LREM dấu đó: LREM theo giá trị JSON dễ lệch thứ tự khóa. Cùng giới hạn chen ngang như update.
+  async remove(id: string): Promise<boolean> {
+    const index = (await this.readAll()).findIndex((partner) => partner.id === id)
+    if (index < 0) return false
+    const tombstone = `deleted:${id}`
+    await this.redis.multi().lset("partners", index, tombstone).lrem("partners", 1, tombstone).del(`partner-image:${id}`).exec()
+    return true
   }
 
   async add(input: PartnerInput): Promise<{ partner: Partner; editToken: string }> {

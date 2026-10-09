@@ -1,8 +1,9 @@
 "use client"
 
-import { AlertTriangleIcon, ArrowLeftIcon, PencilIcon } from "lucide-react"
+import { AlertTriangleIcon, ArrowLeftIcon, PencilIcon, Trash2Icon } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
@@ -11,7 +12,7 @@ import { BrandFields, draftFromPartner, draftToInfo, type BrandDraft, type Desti
 import { ProductList } from "@/components/partner/product-list"
 import { ProductRowsEditor, toProducts, toRow, type ProductRow } from "@/components/partner/product-rows-editor"
 import { PartnerStatusBadge, STATUS_NOTE } from "@/components/partner/status-badge"
-import { readPartnerToken, savePartnerId } from "@/lib/partners/local"
+import { forgetPartner, readPartnerToken, savePartnerId } from "@/lib/partners/local"
 import { partnerImageUrl } from "@/lib/partners/services"
 import { getErrorMessage } from "@/services/http"
 import { partnerService } from "@/services/partner.service"
@@ -41,6 +42,8 @@ export function PartnerDetail({ id, destinations }: PartnerDetailProps): React.J
   const [rows, setRows] = useState<ProductRow[] | null>(null)
   const [draft, setDraft] = useState<BrandDraft | null>(null)
   const [busy, setBusy] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     const controller = new AbortController()
@@ -82,6 +85,19 @@ export function PartnerDetail({ id, destinations }: PartnerDetailProps): React.J
     event.preventDefault()
     if (!draft || !partner) return
     void save(() => partnerService.setInfo(id, readPartnerToken(id) ?? "", draftToInfo(draft, partner.kind)), () => setDraft(null), "Đã lưu thông tin.", "Chưa lưu được thông tin, vui lòng thử lại.")
+  }
+
+  async function handleDelete(): Promise<void> {
+    setBusy(true)
+    try {
+      await partnerService.remove(id, readPartnerToken(id) ?? "")
+      forgetPartner(id)
+      toast.success("Đã xóa thương hiệu.")
+      router.push("/doi-tac")
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Chưa xóa được thương hiệu, vui lòng thử lại."))
+      setBusy(false)
+    }
   }
 
   const back = (
@@ -197,6 +213,30 @@ export function PartnerDetail({ id, destinations }: PartnerDetailProps): React.J
           </form>
         ) : (
           <ProductList products={partner.products} />
+        )}
+      </section>
+
+      <section aria-labelledby="delete-heading" className="glass-card flex flex-wrap items-center justify-between gap-3 p-6 sm:p-7">
+        <div>
+          <h2 id="delete-heading" className="font-heading text-lg font-bold text-title">
+            Xóa thương hiệu
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">Xóa vĩnh viễn thương hiệu, ảnh và sản phẩm; dịch vụ sẽ không còn trong phần lên kế hoạch.</p>
+        </div>
+        {confirmDelete ? (
+          <div className="flex flex-wrap gap-2">
+            <button type="button" disabled={busy} onClick={() => void handleDelete()} className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-red-600 px-4 text-sm font-semibold whitespace-nowrap text-white outline-none hover:bg-red-700 focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60">
+              {busy ? "Đang xóa…" : "Xóa vĩnh viễn"}
+            </button>
+            <button type="button" disabled={busy} onClick={() => setConfirmDelete(false)} className={GHOST_BUTTON}>
+              Hủy
+            </button>
+          </div>
+        ) : (
+          <button type="button" onClick={() => setConfirmDelete(true)} className={GHOST_BUTTON}>
+            <Trash2Icon aria-hidden className="size-4" />
+            Xóa thương hiệu
+          </button>
         )}
       </section>
     </div>

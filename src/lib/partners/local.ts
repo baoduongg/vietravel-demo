@@ -43,3 +43,15 @@ export function savePartnerToken(id: string, token: string): void {
     // Bộ nhớ đầy hoặc bị chặn: đăng ký vẫn nằm trên server, chỉ mất quyền sửa.
   }
 }
+
+/** Sau khi xóa thương hiệu: bỏ id và mã sửa khỏi trình duyệt. */
+export function forgetPartner(id: string): void {
+  try {
+    const tokens = readTokens()
+    delete tokens[id]
+    browserStorage()?.setItem(TOKEN_KEY, JSON.stringify(tokens))
+    browserStorage()?.setItem(KEY, JSON.stringify(readPartnerIds().filter((item) => item !== id)))
+  } catch {
+    // Bộ nhớ bị chặn: id thừa chỉ khiến server trả rỗng cho nó.
+  }
+}
