@@ -1,6 +1,6 @@
 /**
  * Phân loại cảm xúc, phong cách du lịch và không khí (Vibe & Emotion Taxonomy)
- * Dùng để làm giàu dữ liệu ngữ nghĩa và hỗ trợ tìm kiếm theo cảm xúc cho các tour Vietravel.
+ * Dùng để tìm tour theo cảm xúc khi khách không nêu điểm đến, ngày hay ngân sách.
  */
 
 export interface VibeCategory {
@@ -8,7 +8,6 @@ export interface VibeCategory {
   name: string
   keywords: string[]
   destinations: string[]
-  description: string
 }
 
 export const VIBE_CATEGORIES: VibeCategory[] = [
@@ -20,7 +19,6 @@ export const VIBE_CATEGORIES: VibeCategory[] = [
       "thư thái", "an yên", "reset bản thân", "thiền", "nghỉ ngơi", "không ồn ào", "tươi mát"
     ],
     destinations: ["Đà Lạt", "Yên Tử", "Ninh Bình", "Tràng An", "Hà Giang", "Pù Luông", "Côn Đảo", "Huế", "Mai Châu", "Mộc Châu", "Sapa", "Ba Bể"],
-    description: "Không gian thoáng đãng, gần gũi thiên nhiên, thanh tịnh để phục hồi năng lượng tinh thần."
   },
   {
     id: "romantic_honeymoon",
@@ -30,7 +28,6 @@ export const VIBE_CATEGORIES: VibeCategory[] = [
       "hẹn hò", "hoàng hôn", "ấm cúng", "sang trọng"
     ],
     destinations: ["Đà Lạt", "Phú Quốc", "Bà Nà Hills", "Hội An", "Nha Trang", "Paris", "Venice", "Maldives", "Jeju", "Santorini", "Đà Nẵng"],
-    description: "Cảnh quan thơ mộng, bầu không khí ngọt ngào, dịch vụ cao cấp dành riêng cho các cặp đôi."
   },
   {
     id: "mist_mountain_cool",
@@ -40,7 +37,6 @@ export const VIBE_CATEGORIES: VibeCategory[] = [
       "không khí trong lành", "mùa đông", "áo ấm", "cao nguyên"
     ],
     destinations: ["Sapa", "Fansipan", "Đà Lạt", "Hà Giang", "Mộc Châu", "Bà Nà", "Tây Bắc", "Bảo Lộc", "Bạch Mộc Lương Tử", "Tam Đảo"],
-    description: "Khí hậu mát mẻ quanh năm, se se lạnh, biển mây bồng bềnh và núi non hùng vĩ."
   },
   {
     id: "beach_sunshine",
@@ -50,7 +46,6 @@ export const VIBE_CATEGORIES: VibeCategory[] = [
       "resort", "nghỉ dưỡng biển", "nhiệt đới", "sóng biển", "bờ cát"
     ],
     destinations: ["Phú Quốc", "Nha Trang", "Quy Nhơn", "Phan Thiết", "Mũi Né", "Đà Nẵng", "Côn Đảo", "Vũng Tàu", "Phuket", "Bali", "Pattaya"],
-    description: "Bãi cát trắng trải dài, nước biển trong xanh, hải sản tươi ngon và các hoạt động thể thao biển."
   },
   {
     id: "culture_heritage",
@@ -60,7 +55,6 @@ export const VIBE_CATEGORIES: VibeCategory[] = [
       "kiến trúc xưa", "hoài niệm", "lăng tẩm", "cố đô", "làng nghề"
     ],
     destinations: ["Hội An", "Huế", "Hà Nội", "Ninh Bình", "Côn Đảo", "Đền Hùng", "Angkor Wat", "Kyoto", "Bắc Kinh", "Xiêm Riệp", "Luang Prabang"],
-    description: "Khám phá các giá trị lịch sử lâu đời, kiến trúc cổ xưa và nét đẹp văn hóa độc đáo."
   },
   {
     id: "spiritual_pilgrimage",
@@ -70,7 +64,6 @@ export const VIBE_CATEGORIES: VibeCategory[] = [
       "hành hương", "linh thiêng", "tượng phật", "chùa bái đính", "yên tử"
     ],
     destinations: ["Yên Tử", "Bái Đính", "Chùa Hương", "Tây Thiên", "Côn Đảo", "Chùa Tam Chúc", "Chùa Bà Tây Ninh", "Chùa Vàng", "Ấn Độ", "Tây Tạng", "Myanmar"],
-    description: "Hành trình viếng thăm các chốn linh thiêng để tìm kiếm sự bình an trong tâm hồn."
   },
   {
     id: "modern_shopping_checkin",
@@ -80,7 +73,6 @@ export const VIBE_CATEGORIES: VibeCategory[] = [
       "thành phố lớn", "trung tâm thương mại", "ẩm thực đường phố", "vui chơi giải trí", "công viên chủ đề"
     ],
     destinations: ["Bangkok", "Singapore", "Tokyo", "Seoul", "Thượng Hải", "Hồng Kông", "Dubai", "Kuala Lumpur", "Bà Nà Hills", "VinWonders"],
-    description: "Những điểm check-in rực rỡ, thiên đường mua sắm sầm uất và các tổ hợp vui chơi giải trí hàng đầu."
   },
   {
     id: "family_cruise_relax",
@@ -90,7 +82,6 @@ export const VIBE_CATEGORIES: VibeCategory[] = [
       "không leo trèo", "nghỉ dưỡng", "trọn gói", "cao cấp", "ẩm thực phong phú"
     ],
     destinations: ["Hạ Long", "Lan Hạ", "Đà Nẵng", "Phú Quốc", "Nha Trang", "Singapore Cruise", "Bangkok"],
-    description: "Lịch trình thong thả, di chuyển thuận tiện, phù hợp cho cả người cao tuổi và các em nhỏ."
   },
   {
     id: "autumn_foliage_snow",
@@ -100,6 +91,5 @@ export const VIBE_CATEGORIES: VibeCategory[] = [
       "mùa lúa chín", "cảnh sắc bốn mùa", "rực rỡ"
     ],
     destinations: ["Hà Giang", "Mù Cang Chải", "Hàn Quốc", "Nhật Bản", "Châu Âu", "Bắc Kinh", "Cửu Trại Câu", "Sapa", "Trương Gia Giới"],
-    description: "Chiêm ngưỡng những cảnh tượng thiên nhiên kỳ diệu theo mùa: mùa vàng lúa chín, lá phong rực rỡ hay tuyết phủ trắng xoá."
   }
 ]

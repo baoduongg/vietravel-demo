@@ -26,8 +26,9 @@ export function parseReviewInput(body: unknown, now: Date = new Date()): ParsedR
     const match = typeof input.month === "string" ? MONTH.exec(input.month) : null
     if (!match) return { ok: false, error: "Tháng đi không hợp lệ." }
     const [, year, month] = match
-    const current = now.getFullYear() * 12 + now.getMonth()
-    if (Number(year) * 12 + Number(month) - 1 > current) return { ok: false, error: "Tháng đi không được ở tương lai." }
+    // Tháng theo giờ Việt Nam, không theo đồng hồ server (thường là UTC). Không import todayIso: file này chạy cả ở client.
+    const currentMonth = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Ho_Chi_Minh" }).format(now).slice(0, 7)
+    if (`${year}-${month}` > currentMonth) return { ok: false, error: "Tháng đi không được ở tương lai." }
     trip = `${companion} · Tháng ${Number(month)}/${year}`
   }
 

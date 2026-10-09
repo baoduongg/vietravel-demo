@@ -17,6 +17,8 @@ assert.ok(noMonth.ok && noMonth.review.trip === "Cặp đôi")
 assert.ok(parseReviewInput({ ...valid, month: "2026-10" }, now).ok)
 assert.equal(parseReviewInput({ ...valid, month: "2026-11" }, now).ok, false)
 assert.equal(parseReviewInput({ ...valid, month: "2026-13" }, now).ok, false)
+// 23:00 UTC ngày 31/10 đã là 6 giờ sáng 1/11 ở Việt Nam
+assert.ok(parseReviewInput({ ...valid, month: "2026-11" }, new Date("2026-10-31T23:00:00Z")).ok)
 
 assert.equal(parseReviewInput(null, now).ok, false)
 assert.equal(parseReviewInput({ ...valid, nick: "   " }, now).ok, false)

@@ -1,6 +1,6 @@
 import type { ChatMessage } from "@/types/chat"
 import type { Tour } from "@/types/tour"
-import { VIBE_CATEGORIES } from "@/lib/vector-rag/semantic-taxonomy"
+import { VIBE_CATEGORIES } from "@/lib/vibe-taxonomy"
 
 const MAX_CANDIDATES = 5
 const MONEY_LIMIT = /(?:dưới|tối đa|không quá|thấp hơn)\s*(\d[\d. ]*)\s*(triệu|tr|nghìn|ngàn|k)?/i
@@ -10,7 +10,8 @@ const GENERIC_PLACE_PREFIXES = new Set([
   "chua", "den", "dinh", "vinh", "dao", "bai", "thanh", "pho", "khu", "lang", "dong", "song", "nui", "thac", "tuyen", "hanh", "trinh", "tour"
 ])
 
-function normalize(value: string): string {
+/** Bỏ dấu tiếng Việt và viết thường: "Phú Quốc" khớp "phu quoc". */
+export function normalize(value: string): string {
   return value.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/đ/g, "d").toLowerCase()
 }
 

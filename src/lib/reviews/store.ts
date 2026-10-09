@@ -1,7 +1,11 @@
 import { randomUUID } from "node:crypto"
-import { mkdir, readFile, rename, writeFile } from "node:fs/promises"
+import { readFile } from "node:fs/promises"
 import path from "node:path"
 
+import type { Redis } from "@upstash/redis"
+
+import { keyedQueue, writeJsonAtomic } from "@/lib/file-queue"
+import { redisFromEnv } from "@/lib/redis"
 import type { Review, UserReview } from "@/types/destination"
 
 /** Giữ số review mới nhất mỗi điểm đến để file không phình mãi. */
@@ -18,7 +22,7 @@ export interface ReviewStore {
  * Giống FileJourneyStore: hàng đợi ghi chỉ đúng khi chạy MỘT server Node.
  */
 export class FileReviewStore implements ReviewStore {
-  private readonly queues = new Map<string, Promise<unknown>>()
+  private readonly serialize = keyedQueue()
 
   constructor(private readonly dir: string) {}
 
@@ -36,29 +40,35 @@ export class FileReviewStore implements ReviewStore {
   }
 
   add(slug: string, review: Review): Promise<UserReview> {
-    const previous = this.queues.get(slug) ?? Promise.resolve()
-    const run = previous.then(async () => {
+    return this.serialize(slug, async () => {
       const created: UserReview = { ...review, id: randomUUID(), createdAt: new Date().toISOString() }
-      const next = [created, ...(await this.list(slug))].slice(0, MAX_STORED_REVIEWS)
-      await mkdir(this.dir, { recursive: true })
-      const target = this.file(slug)
-      const temp = `${target}.${process.pid}.${Date.now()}.tmp`
-      await writeFile(temp, JSON.stringify(next, null, 2))
-      await rename(temp, target)
+      await writeJsonAtomic(this.file(slug), [created, ...(await this.list(slug))].slice(0, MAX_STORED_REVIEWS))
       return created
     })
-    const settled = run.catch(() => undefined)
-    this.queues.set(slug, settled)
-    void settled.then(() => {
-      if (this.queues.get(slug) === settled) this.queues.delete(slug)
-    })
-    return run
+  }
+}
+
+/** Cho serverless (Vercel): mỗi điểm đến một list Redis `reviews:<slug>`, LPUSH + LTRIM nên mới nhất trước. */
+export class RedisReviewStore implements ReviewStore {
+  constructor(private readonly redis: Redis) {}
+
+  list(slug: string): Promise<UserReview[]> {
+    return this.redis.lrange<UserReview>(`reviews:${slug}`, 0, MAX_STORED_REVIEWS - 1)
+  }
+
+  async add(slug: string, review: Review): Promise<UserReview> {
+    const created: UserReview = { ...review, id: randomUUID(), createdAt: new Date().toISOString() }
+    await this.redis.multi().lpush(`reviews:${slug}`, created).ltrim(`reviews:${slug}`, 0, MAX_STORED_REVIEWS - 1).exec()
+    return created
   }
 }
 
 const globalStore = globalThis as typeof globalThis & { reviewStore?: ReviewStore }
 
 export function getReviewStore(): ReviewStore {
-  globalStore.reviewStore ??= new FileReviewStore(process.env.REVIEW_DATA_DIR ?? path.join(process.cwd(), ".data", "reviews"))
+  if (!globalStore.reviewStore) {
+    const redis = redisFromEnv()
+    globalStore.reviewStore = redis ? new RedisReviewStore(redis) : new FileReviewStore(process.env.REVIEW_DATA_DIR ?? path.join(process.cwd(), ".data", "reviews"))
+  }
   return globalStore.reviewStore
 }

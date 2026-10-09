@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server"
 
-import { company, MAX_RECOMMENDED_TOURS, TOUR_TAG } from "@/config/company"
+import { company, MAX_RECOMMENDED_TOURS } from "@/config/company"
 import { findToursByCode, getUpcomingTours, inferToursFromReply, todayIso } from "@/data/tours"
+import { splitTourTag, toSpokenText } from "@/lib/reply-text"
 import { selectRelevantTours } from "@/lib/tour-matching"
-import { searchToursHybrid } from "@/lib/vector-rag/vector-store"
+import { searchToursByVibe } from "@/lib/vibe-search"
 import { buildSystemPrompt, buildTourContext } from "@/lib/system-prompt"
 import type { ApiError, ChatMessage, ChatResponse } from "@/types/chat"
 
@@ -14,10 +15,7 @@ const DEFAULT_MODEL = "gemini-3.5-flash-lite"
 const REQUEST_TIMEOUT_MS = 30000
 const MAX_RETRIES = 2
 const MAX_TURNS = 10
-const MAX_SENTENCES = 3
 const MAX_MESSAGE_LENGTH = 1000
-/** Ranh giới câu, trừ dấu chấm sau chữ viết tắt như "TP." trong "TP. Hồ Chí Minh". */
-const SENTENCE_BREAK = /(?<=[.!?…])(?<!(?:^|\s)(?:TP|Tp|Q|P|TX|TT)\.)\s+/
 
 type GeminiPart = { text: string } | { inlineData: { mimeType: string; data: string } }
 
@@ -151,36 +149,6 @@ function hotlineReply(): string {
   return `Dạ em chưa trả lời được câu này, Quý khách vui lòng gọi tổng đài ${company.hotline} để được hỗ trợ ạ.`
 }
 
-function splitTourTag(raw: string): { speech: string; codes: string[] } {
-  // Model đôi khi viết sai hoa thường (ví dụ "TOURs:"), nên tìm không phân biệt hoa thường.
-  const index = raw.toUpperCase().lastIndexOf(TOUR_TAG)
-  if (index === -1) return { speech: raw, codes: [] }
-  const codes = raw
-    .slice(index + TOUR_TAG.length)
-    .split(/[\s,]+/)
-    .map((code) => code.trim().toUpperCase())
-    .filter((code) => /^[A-Z0-9]+$/.test(code))
-  return { speech: raw.slice(0, index), codes: [...new Set(codes)].slice(0, MAX_RECOMMENDED_TOURS) }
-}
-
-function toSpokenText(raw: string): string {
-  const plain = raw
-    .replace(/```[\s\S]*?```/g, " ")
-    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
-    .replace(/[*_#`>~|[\]{}<>]/g, "")
-    .replace(/^\s*[-+•]\s+/gm, "")
-    .replace(/^\s*\d+[.)]\s+/gm, "")
-    .replace(/\p{Extended_Pictographic}/gu, "")
-    .replace(/\s+/g, " ")
-    .trim()
-  return plain
-    .split(SENTENCE_BREAK)
-    .map((sentence) => sentence.trim())
-    .filter(Boolean)
-    .slice(0, MAX_SENTENCES)
-    .join(" ")
-}
-
 function errorResponse(error: string, status: number): NextResponse<ApiError> {
   return NextResponse.json({ error }, { status })
 }
@@ -223,8 +191,8 @@ export async function POST(request: Request): Promise<NextResponse<ChatResponse 
         .map((m) => m.content)
         .join(" ")
       if (userText.trim()) {
-        const hybridResult = await searchToursHybrid({ query: userText, tours: upcoming, apiKey })
-        if (hybridResult.tours.length > 0) match = hybridResult
+        const vibeResult = searchToursByVibe(userText, upcoming)
+        if (vibeResult.tours.length > 0) match = vibeResult
       }
     }
 

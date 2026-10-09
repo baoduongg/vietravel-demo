@@ -47,6 +47,8 @@ for (const bad of [
   { ...valid, travelers: { adults: 2, childAges: Array(11).fill(3) } },
   { ...valid, travelers: { adults: 2 } },
   { ...valid, startDate: "01/11/2026" },
+  { ...valid, startDate: "2026-02-31" },
+  { ...valid, startDate: "2026-13-01" },
   { ...valid, memberName: "" },
   { ...valid, destinationSlug: "da-nang" },
 ]) {

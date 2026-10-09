@@ -17,7 +17,11 @@ export default async function middleware(request: NextRequest): Promise<NextResp
     return NextResponse.next()
   }
 
-  const expected = await hashPassword(process.env.DEMO_PASSWORD ?? "")
+  // Thiếu mật khẩu thì đóng cửa: hash của chuỗi rỗng ai cũng biết.
+  const password = process.env.DEMO_PASSWORD
+  if (!password) return NextResponse.json({ error: "Máy chủ chưa cấu hình DEMO_PASSWORD." }, { status: 503 })
+
+  const expected = await hashPassword(password)
   const cookie = request.cookies.get(AUTH_COOKIE)?.value
 
   if (cookie === expected) {

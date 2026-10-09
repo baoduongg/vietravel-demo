@@ -60,7 +60,10 @@ function text(value: unknown, max: number, label: string): string {
 
 function isoDate(value: unknown): string | null {
   if (value === null || value === undefined || value === "") return null
-  if (typeof value !== "string" || !ISO_DATE.test(value) || Number.isNaN(Date.parse(value))) bad("Ngày đi không hợp lệ.")
+  if (typeof value !== "string" || !ISO_DATE.test(value)) bad("Ngày đi không hợp lệ.")
+  // Date.parse nhận "2026-02-31" (lùi sang 3/3), nên so lại ngày sau khi parse.
+  const time = Date.parse(value)
+  if (Number.isNaN(time) || new Date(time).toISOString().slice(0, 10) !== value) bad("Ngày đi không hợp lệ.")
   return value
 }
 
