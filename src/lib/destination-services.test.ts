@@ -25,6 +25,15 @@ async function main(): Promise<void> {
   console.error = original
   assert.equal(fallback.length, getServices("phu-quoc").length)
 
+  // Lỗi nội bộ của Next (đánh dấu render động khi đọc Redis no-store) phải được ném tiếp, không nuốt.
+  const dynamicUsage = Object.assign(new Error("Dynamic server usage"), { digest: "DYNAMIC_SERVER_USAGE" })
+  await assert.rejects(
+    destinationServices(phuQuoc, async () => {
+      throw dynamicUsage
+    }),
+    dynamicUsage,
+  )
+
   console.log("destination-services: ok")
 }
 
