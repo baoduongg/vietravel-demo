@@ -1,6 +1,6 @@
 import assert from "node:assert/strict"
 
-import { isShortTiktok, isValidVideo, MAX_REVIEW_VIDEOS, parseVideoUrl } from "@/lib/reviews/video"
+import { isShortTiktok, isValidVideo, MAX_REVIEW_VIDEOS, parseVideoUrl, videoLinksIn } from "@/lib/reviews/video"
 
 const yt = { platform: "youtube", id: "dQw4w9WgXcQ" }
 for (const url of [
@@ -59,5 +59,13 @@ assert.ok(!isValidVideo({ platform: "tiktok", id: "dQw4w9WgXcQ" }))
 assert.ok(!isValidVideo(null))
 assert.ok(!isValidVideo("dQw4w9WgXcQ"))
 assert.equal(MAX_REVIEW_VIDEOS, 3)
+
+// Link video dán thẳng trong phần cảm nhận: lấy ra, bỏ dấu câu dính cuối, bỏ link không phải video.
+assert.deepEqual(
+  videoLinksIn("Xem nè https://youtu.be/dQw4w9WgXcQ, và (https://vt.tiktok.com/ZSabc123/). Trang https://travel.com.vn nữa"),
+  ["https://youtu.be/dQw4w9WgXcQ", "https://vt.tiktok.com/ZSabc123/"],
+)
+assert.deepEqual(videoLinksIn("tiktok.com/@a/video/7312345678901234567!"), ["tiktok.com/@a/video/7312345678901234567"])
+assert.deepEqual(videoLinksIn("Biển đẹp lắm."), [])
 
 console.log("reviews/video: ok")

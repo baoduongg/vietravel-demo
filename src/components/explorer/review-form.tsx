@@ -7,7 +7,7 @@ import { toast } from "sonner"
 import { ReviewVideoPlayer } from "@/components/explorer/review-video"
 import { GHOST_BUTTON, INPUT_CLASS, PRIMARY_BUTTON } from "@/components/journey/styles"
 import { COMPANIONS, REVIEW_LIMITS } from "@/lib/reviews/validate"
-import { isShortTiktok, MAX_REVIEW_VIDEOS, parseVideoUrl } from "@/lib/reviews/video"
+import { isShortTiktok, MAX_REVIEW_VIDEOS, parseVideoUrl, videoLinksIn } from "@/lib/reviews/video"
 import { cn } from "@/lib/utils"
 import { getErrorMessage } from "@/services/http"
 import { reviewService } from "@/services/review.service"
@@ -18,6 +18,11 @@ const RATING_LABELS = ["Rất tệ", "Chưa ổn", "Tạm được", "Hài lòng
 function currentMonth(): string {
   const now = new Date()
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`
+}
+
+/** Link rút gọn TikTok cần server đọc chuyển hướng; link đầy đủ parse ngay trên trình duyệt. */
+async function toVideo(link: string): Promise<ReviewVideo | null> {
+  return parseVideoUrl(link) ?? (isShortTiktok(link) ? reviewService.resolveVideo(link) : null)
 }
 
 interface ReviewFormProps {
@@ -44,8 +49,7 @@ export function ReviewForm({ slug, destinationName, onCreated }: ReviewFormProps
     if (!videoUrl.trim()) return
     setAdding(true)
     try {
-      // Link rút gọn TikTok cần server đọc chuyển hướng; link đầy đủ parse ngay.
-      const video = parseVideoUrl(videoUrl) ?? (isShortTiktok(videoUrl) ? await reviewService.resolveVideo(videoUrl) : null)
+      const video = await toVideo(videoUrl)
       if (!video) {
         toast.error("Link chưa đúng, Quý khách dán link video YouTube hoặc TikTok nhé.")
         return
@@ -63,6 +67,31 @@ export function ReviewForm({ slug, destinationName, onCreated }: ReviewFormProps
     }
   }
 
+  /**
+   * Khách hay dán link rồi bấm Gửi luôn (quên "Thêm") hoặc dán link vào phần cảm nhận:
+   * gom cả hai cùng video đã thêm. Link trong ô video sai thì chặn gửi; link trong cảm nhận đọc không được thì bỏ qua.
+   */
+  async function collectVideos(): Promise<ReviewVideo[] | null> {
+    const collected = [...videos]
+    const pending = videoUrl.trim()
+    for (const link of [pending, ...videoLinksIn(text)].filter(Boolean)) {
+      const video = await toVideo(link).catch(() => null)
+      if (!video) {
+        if (link !== pending) continue
+        toast.error("Link video chưa đúng, Quý khách sửa hoặc xóa link rồi gửi lại nhé.")
+        return null
+      }
+      if (!collected.some((item) => item.platform === video.platform && item.id === video.id)) collected.push(video)
+    }
+    if (collected.length > MAX_REVIEW_VIDEOS) {
+      toast.error(`Tối đa ${MAX_REVIEW_VIDEOS} video cho mỗi review.`)
+      return null
+    }
+    setVideos(collected)
+    setVideoUrl("")
+    return collected
+  }
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault()
     if (!rating) {
@@ -71,7 +100,9 @@ export function ReviewForm({ slug, destinationName, onCreated }: ReviewFormProps
     }
     setBusy(true)
     try {
-      const review = await reviewService.create(slug, { nick, companion, month, rating, text, videos })
+      const collected = await collectVideos()
+      if (!collected) return
+      const review = await reviewService.create(slug, { nick, companion, month, rating, text, videos: collected })
       onCreated(review)
       setNick("")
       setCompanion("")

@@ -58,3 +58,11 @@ export function isValidVideo(value: unknown): value is ReviewVideo {
   if (typeof id !== "string") return false
   return (platform === "youtube" && YOUTUBE_ID.test(id)) || (platform === "tiktok" && TIKTOK_ID.test(id))
 }
+
+/** Link video khách dán thẳng trong phần cảm nhận (bỏ ngoặc, dấu câu dính hai đầu). */
+export function videoLinksIn(text: string): string[] {
+  return text
+    .split(/\s+/)
+    .map((token) => token.replace(/^[("'“[]+/, "").replace(/[.,;:!?)"'”\]]+$/, ""))
+    .filter((token) => token && (parseVideoUrl(token) !== null || isShortTiktok(token)))
+}
