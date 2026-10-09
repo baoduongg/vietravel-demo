@@ -32,7 +32,8 @@ export function ServiceHub({ guide, services, current }: ServiceHubProps): React
                 aria-current={kind === current ? "page" : undefined}
                 className={cn(
                   "glass-card flex items-center gap-3 !rounded-2xl px-4 py-3 outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                  kind === current && "bg-champagne text-void",
+                  // .glass-card không nằm trong @layer nên thắng utility: cần ! để đè nền thẻ.
+                  kind === current && "!bg-champagne !border-champagne text-void",
                 )}
               >
                 <Icon aria-hidden strokeWidth={1.5} className="size-5 shrink-0" />
