@@ -30,3 +30,10 @@ export interface TourCatalog {
   scrapedAt: string
   tours: Tour[]
 }
+
+export interface TourSearchResponse {
+  query: string
+  tours: Tour[]
+  /** Trang kết quả đầy đủ trên travel.com.vn. */
+  searchUrl: string
+}

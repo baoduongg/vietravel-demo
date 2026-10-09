@@ -1,5 +1,5 @@
 # DESIGN SYSTEM SPECIFICATION: PHU QUOC VIBE
-**Version:** 1.2.0  
+**Version:** 1.3.0  
 **Concept:** Editorial Dark Luxury, Storytelling Travel & Curated Hospitality[cite: 3, 5]  
 **Target:** Web Desktop & Mobile Responsive  
 
@@ -15,23 +15,57 @@
 
 ## 2. Hệ Thống Màu Sắc (Color Palette)
 
-### 2.1. Nền & Cấu trúc (Dark Canvas)
-* `--color-bg-base`: `#080E14` (Đen xanh đại dương tầng sâu - Dark Void)
-* `--color-bg-surface`: `#0D1620` (Xanh hải quân đêm dùng cho các khối section)[cite: 5]
-* `--color-surface-card`: `rgba(18, 29, 43, 0.65)` (Kính mờ xanh khói tối)[cite: 5]
-* `--color-border-subtle`: `rgba(255, 255, 255, 0.08)` (Viền hairline mảnh 1px phân tách các khối)
+Giao diện có hai theme (tối mặc định, sáng qua nút đổi theme, lưu `data-theme` trên `<html>`). Mọi màu khai báo một lần trong [src/app/globals.css](src/app/globals.css); component dùng token, không viết mã màu cứng.
 
-### 2.2. Màu Điểm Nhấn & Cảm Xúc (Sunset Accent)
-* `--color-sunset-orange`: `#E26D38` (Cam rực rỡ mặt trời lặn - Primary CTA)[cite: 5]
-* `--color-sunset-glow`: `#F39C12` (Vàng hoàng hôn dùng cho dải gradient hover)[cite: 5]
-* `--color-golden-sand`: `#D4A373` (Vàng cát mịn màng cho các chi tiết nhãn và icon phụ)[cite: 5]
-* `--color-deep-cyan`: `#1E6B8C` (Xanh ngọc biển Nam đảo dùng cho điểm nhấn lặn biển/thiên nhiên)[cite: 5]
+### 2.1. Màu Chủ Đạo (Primary — Vietravel Blue)
+* `--ocean` / `--primary`: `#0046C1` (Xanh Vietravel — màu thương hiệu, nút CTA chính, chip/tab đang chọn, nút khi rê chuột)
+* `--primary-foreground`: `#FFFFFF`
+* Gradient nút chính `.btn-primary`: `linear-gradient(135deg, #0046C1 0%, #1A66E0 50%, #0046C1 100%)`, bóng `rgba(0, 70, 193, 0.5)`
+* Nút xanh biển `.btn-ocean`: `linear-gradient(135deg, #0046C1 0%, #00A3CC 100%)`
+* `--c-primary-ink` / `primary-ink` (chữ, icon, nền mờ, viền theo primary): `#0046C1` ở theme sáng, `#6BA4FF` ở theme tối và trong khối `.on-dark` (cùng sắc độ, sáng hơn để đủ tương phản)
+* `--c-champagne`: màu tương tác (tab đang chọn, chữ khi rê chuột), cùng giá trị với `primary-ink`
+* `--ring` (viền focus): `#0046C1` trên trang thường, `#3B7BFF` trong khu Explorer (thấy rõ trên cả nền tối và sáng)
+* Thanh tiến trình cuộn: `#0046C1 → #1A66E0 → #00C8FF`
+* Chữ nhấn trong tiêu đề `.text-gradient-brand`: sáng `#071426 → #0046C1 → #1A66E0`; tối `#FFFFFF → #8AB8FF → #3B7BFF` (trong khối `.on-dark` luôn dùng bản tối)
 
-### 2.3. Hệ Thống Màu Chữ (Typography Contrast)
-* `--color-text-title`: `#FFFFFF` / `#F8F9FA` (Trắng tinh khiết với độ tương phản cao nhất)[cite: 5]
-* `--color-text-editorial`: `#F4D3A1` (Màu vàng champagne dành cho tiêu đề thơ ca H1/H2)[cite: 5]
-* `--color-text-body`: `#CBD5E1` (Xám tro ngả bạc, giảm mỏi mắt khi đọc dài trên nền tối)
-* `--color-text-muted`: `#64748B` (Xám mờ dành cho metadata, footer, số thứ tự index)[cite: 5]
+### 2.2. Màu Nhấn Phụ (Sunset Accent)
+Cam hoàng hôn không còn là màu chính. Chỉ dùng cho: giá tour và tổng chi phí, badge giảm giá/"Hot" (`from-orange-500 to-rose-500`), khối khuyến mãi giá, biểu đồ mùa (cam = tháng đẹp), chip buổi trong ngày, sao đánh giá và icon mặt trời (amber), ánh hoàng hôn trên ảnh hero, băng dính washi.
+* `--sunset` / `--coral` / `accent-coral`: `#FF5E36` (Cam hoàng hôn)
+* `--coral-ink`: `#C83D16` (Cam đậm cho chữ nhỏ trên nền sáng)
+* `accent-sun` / `glow`: `#FFA114` (Vàng hoàng hôn)
+* `accent-cyan`: `#00C8FF`, `cyan-deep`: `#1E6B8C` (Xanh ngọc biển — lặn biển, thiên nhiên, độ ẩm/mưa)
+* `accent-mint`: `#00D284` (Trạng thái tốt: "Lý tưởng", "Match")
+* `--sale`: `#FF334B` (Giảm giá)
+
+### 2.3. Nền & Bề Mặt (theo theme)
+| Token | Theme tối | Theme sáng | Ứng dụng |
+| :--- | :--- | :--- | :--- |
+| `--c-void` / `--c-page` | `#070D14` | `#FAF8F5` | Nền trang |
+| `night` | `#0B1522` | — | Khối nền tối cố định |
+| `shade` | `#070D14` | `#070D14` | Lớp phủ tối trên ảnh |
+| `--c-card` | `rgba(13, 23, 36, 0.72)` | `rgba(255, 255, 255, 0.86)` | Thẻ kính mờ `.glass-card` |
+| `--c-card-shadow` | `0 20px 40px -15px rgba(0,0,0,.65)` | `0 20px 40px -18px rgba(0,80,200,.14)` | Đổ bóng thẻ |
+| Viền | `--c-tint` 10% | `--c-tint` 10% | Viền hairline 1px |
+
+### 2.4. Màu Chữ (theo theme)
+| Token | Theme tối | Theme sáng | Ứng dụng |
+| :--- | :--- | :--- | :--- |
+| `--c-title` | `#FFFFFF` | `#071426` | Tiêu đề, chữ nhấn |
+| `--c-body` | `#D1DBE6` | `#334155` | Đoạn văn |
+| `--c-mute` / `muted-foreground` | `#8292A4` / `#94A3B8` | `#64748B` | Metadata, chú thích |
+| `--c-champagne` | `#6BA4FF` | `#0046C1` | Tab đang chọn, chữ khi rê chuột |
+| `--c-gold` | `#FFA114` | `#C2410C` | Giá tiền, tổng chi phí |
+| `--c-tint` | `#FFFFFF` | `#071426` | Màu gốc cho viền/nền mờ (`tint/5`, `tint/10`…) |
+
+### 2.5. Quy Tắc Dùng Màu
+* **Nút hành động chính** (Đặt tour, Khám phá, Hỏi Tripi, Bắt đầu lên kế hoạch) luôn là `.btn-primary` xanh `#0046C1`. Mỗi khối chỉ một nút primary; nút phụ dùng `.btn-glass`.
+* **Chip/tab đang chọn**: `bg-primary text-white ring-primary`. Nút phụ khi rê chuột: `hover:bg-primary hover:text-white`.
+* **Nhãn section, icon chức năng, link, viền khi rê chuột, ô icon**: `text-primary-ink`, `bg-primary-ink/10–15`, `ring-primary-ink/30`, `border-primary-ink/40`. Không dùng `orange-*` cho các vai trò này.
+* **Màu bôi đen chữ** (`::selection`) và viền hover của `.glass-card`/`.double-bezel`: primary.
+* **Màu báo lỗi/xoá**: `text-coral`.
+* **Khối nằm trên ảnh hoặc nền tối cố định** gắn class `.on-dark`: giữ bảng màu theme tối dù trang đang ở theme sáng.
+* **Theme sáng**: các màu chữ `orange/cyan-300/400`, `emerald-400`, `rose-400` tự đổi sang tông đậm (`--coral-ink`, cyan-700…) để đạt tương phản; không cần thêm class riêng. Với chữ nhỏ cần ghi đè thủ công, dùng biến thể `light:` (ví dụ `light:text-coral-ink`).
+* Không dùng biến thể `dark:` của Tailwind: nó theo cài đặt hệ điều hành, không theo nút đổi theme.
 
 ---
 
@@ -59,7 +93,7 @@
 * **Visual:** Header trong suốt cố định (Sticky Header) với hiệu ứng làm mờ nền khi cuộn (`backdrop-filter: blur(20px)`).
 * **Trái:** Logo chữ mảnh dạng Signature: *Phú Quốc Vibe*[cite: 5].
 * **Giữa:** Thanh điều hướng mỏng: `Cảm hứng` • `Sản phẩm` • `Dịch vụ riêng` • `Nhật ký hành trình` • `Về chúng tôi`[cite: 5].
-* **Phải:** Nút bo tròn viền gradient hoặc cam hoàng hôn: *"Bắt đầu hành trình"*[cite: 5].
+* **Phải:** Nút bo tròn màu primary xanh Vietravel `#0046C1`: *"Bắt đầu hành trình"*[cite: 5].
 
 ### 4.2. Hero Section (Visual Empathy)
 * **Khung cảnh:** Hình ảnh góc rộng bờ biển lúc hoàng hôn buông xuống, ánh mặt trời cam phản chiếu trên mặt nước tĩnh lặng[cite: 5].
@@ -99,24 +133,26 @@ Bố cục lưới 3 cột hiển thị năng lực cốt lõi của công ty du
 ```css
 /* Card Kính Mờ Chuẩn (Standard Glass Card) */
 .glass-card {
-  background: rgba(18, 29, 43, 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  background: var(--c-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid color-mix(in srgb, var(--c-tint) 10%, transparent);
+  border-radius: 24px;
+  box-shadow: var(--c-card-shadow), inset 0 1px 1px rgba(255, 255, 255, 0.12);
 }
 
-/* Nút Bấm Chính Hoàng Hôn (Sunset Glow CTA) */
-.btn-sunset-primary {
-  background: linear-gradient(135deg, #E26D38 0%, #F39C12 100%);
+/* Nút Bấm Chính (Primary CTA — Vietravel Blue) */
+.btn-primary {
+  background: linear-gradient(135deg, #0046C1 0%, #1A66E0 50%, #0046C1 100%);
+  background-size: 200% auto;
   color: #FFFFFF;
   border-radius: 9999px;
-  box-shadow: 0 4px 20px rgba(226, 109, 56, 0.35);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 24px -4px rgba(0, 70, 193, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
-.btn-sunset-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 28px rgba(226, 109, 56, 0.55);
+.btn-primary:hover {
+  background-position: right center;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 32px -4px rgba(0, 70, 193, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.4);
 }
+```

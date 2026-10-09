@@ -38,34 +38,47 @@ export function JourneysHome({ destinationSlug, destinationName }: JourneysHomeP
   return (
     <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_26rem]">
       <section aria-labelledby="ke-hoach-da-luu">
-        <h2 id="ke-hoach-da-luu" className="font-voyage text-2xl font-semibold tracking-tight text-title">
-          Kế hoạch trên trình duyệt này
+        <h2 id="ke-hoach-da-luu" className="font-heading text-xl sm:text-2xl font-extrabold tracking-tight text-title">
+          Kế hoạch đã lưu trên máy
         </h2>
         {saved === null ? null : saved.length === 0 ? (
-          <p className="mt-4 text-muted-foreground">Chưa có kế hoạch nào. Tạo kế hoạch mới, hoặc mở link mời bạn bè gửi cho Quý khách.</p>
+          <div className="mt-4 rounded-2xl bg-tint/[0.02] border border-dashed border-tint/15 p-6 text-center">
+            <p className="text-xs sm:text-sm text-muted-foreground">Chưa có kế hoạch nào. Hãy tạo kế hoạch mới hoặc mở link do bạn bè chia sẻ.</p>
+          </div>
         ) : (
           <ul className="mt-4 flex flex-col gap-3">
             {saved.map((item) => (
               <li key={item.id}>
                 <Link
                   href={`/hanh-trinh/${item.token}`}
-                  className="glass-card flex items-center justify-between gap-4 p-5 outline-none hover:ring-tint/20 focus-visible:ring-2 focus-visible:ring-ring"
+                  className="glass-card flex items-center justify-between gap-4 p-5 outline-none hover:border-primary-ink/40 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-ring transition-all"
                 >
-                  <span className="font-semibold text-title">{item.title}</span>
-                  <span className="shrink-0 rounded-full bg-tint/[0.08] px-3 py-1 text-xs font-semibold">{item.role === "edit" ? "Được sửa" : "Chỉ xem"}</span>
+                  <div>
+                    <span className="font-heading font-bold text-title">{item.title}</span>
+                    <p className="text-xs text-muted-foreground mt-0.5">Tự động đồng bộ cùng nhóm</p>
+                  </div>
+                  <span className="shrink-0 rounded-full bg-primary-ink/15 px-3 py-1 text-xs font-bold text-primary-ink">
+                    {item.role === "edit" ? "✨ Được sửa & Dùng AI" : "Chỉ xem"}
+                  </span>
                 </Link>
               </li>
             ))}
           </ul>
         )}
-        <p className="mt-4 text-xs text-muted-foreground">Danh sách chỉ lưu trên trình duyệt này. Mở trên máy khác thì dùng link mời.</p>
+        <p className="mt-4 text-xs text-muted-foreground">💡 Danh sách được lưu an toàn trên trình duyệt này. Muốn cùng sửa trên điện thoại hoặc máy khác, hãy dùng nút Mời bạn bè.</p>
       </section>
-      <section aria-labelledby="tao-ke-hoach" className="glass-card p-6">
-        <h2 id="tao-ke-hoach" className="font-voyage text-2xl font-semibold tracking-tight text-title">
-          Tạo kế hoạch {destinationName}
-        </h2>
-        <div className="mt-5">
-          <JourneyInfoForm initial={defaultJourneyInfo(destinationName)} askName submitLabel="Tạo kế hoạch" onSubmit={handleCreate} />
+
+      <section aria-labelledby="tao-ke-hoach" className="double-bezel shadow-xl">
+        <div className="double-bezel-inner p-6 sm:p-7">
+          <div className="flex items-center gap-2 mb-1">
+            <h2 id="tao-ke-hoach" className="font-heading text-xl font-extrabold tracking-tight text-title">
+              Tạo kế hoạch {destinationName}
+            </h2>
+          </div>
+          <p className="text-xs text-muted-foreground mb-4">AI sẽ tự động đề xuất khách sạn và lịch trình ngay sau khi tạo.</p>
+          <div>
+            <JourneyInfoForm initial={defaultJourneyInfo(destinationName)} askName submitLabel="Bắt đầu lên kế hoạch" onSubmit={handleCreate} />
+          </div>
         </div>
       </section>
     </div>

@@ -26,7 +26,7 @@ export function CostPanel({ journey, bookUrl }: CostPanelProps): React.JSX.Eleme
       <div className="glass-card hidden items-center justify-between gap-4 px-5 py-3 lg:flex">
         <p className="text-sm">
           <span className="font-semibold text-gold">Chi phí dự kiến</span>{" "}
-          <span className="font-sans text-xl font-bold tracking-tight text-champagne">~{formatVnd(cost.totalVnd)}</span>
+          <span className="font-sans text-xl font-bold tracking-tight text-gold">~{formatVnd(cost.totalVnd)}</span>
           <span className="text-muted-foreground"> · ~{formatVnd(cost.perAdultVnd)} / người lớn</span>
         </p>
         <button type="button" onClick={() => setOpen(true)} className="btn-primary h-9 shrink-0 rounded-full px-4 text-sm font-semibold">
@@ -35,7 +35,7 @@ export function CostPanel({ journey, bookUrl }: CostPanelProps): React.JSX.Eleme
       </div>
       <div className="fixed inset-x-3 bottom-3 z-40 flex items-center justify-between gap-3 rounded-full bg-void/90 py-2 pr-2 pl-5 shadow-2xl ring-1 ring-tint/10 backdrop-blur-xl lg:hidden">
         <p className="text-sm">
-          Tổng <span className="font-bold text-champagne">~{shortVnd(cost.totalVnd)}</span>
+          Tổng <span className="font-bold text-gold">~{shortVnd(cost.totalVnd)}</span>
         </p>
         <button type="button" onClick={() => setOpen(true)} className="btn-primary h-10 rounded-full px-4 text-sm font-semibold">
           Xem chi tiết

@@ -99,6 +99,22 @@ export interface Review {
   text: string
 }
 
+/** Review do khách gửi từ trang điểm đến, lưu ở server. */
+export interface UserReview extends Review {
+  id: string
+  createdAt: string
+}
+
+/** Dữ liệu form gửi review; trip được server ghép từ companion và month. */
+export interface ReviewInput {
+  nick: string
+  companion: string
+  /** "YYYY-MM", bỏ trống nếu không nhớ. */
+  month?: string
+  rating: number
+  text: string
+}
+
 export interface Faq {
   question: string
   answer: string

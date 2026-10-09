@@ -6,6 +6,7 @@ import { Tabs } from "radix-ui"
 import { PencilIcon, PlusIcon, WifiOffIcon } from "lucide-react"
 import { toast } from "sonner"
 
+import { AiJourneyAdvisor } from "@/components/journey/ai-journey-advisor"
 import { CostPanel } from "@/components/journey/cost-panel"
 import { InviteDialog } from "@/components/journey/invite-dialog"
 import { JoinForm } from "@/components/journey/join-form"
@@ -66,7 +67,7 @@ export function JourneyView({ token, initial, services, bookUrl, openPicker }: J
   if (missing) {
     return (
       <div className="mx-auto flex min-h-[60dvh] max-w-xl flex-col items-center justify-center gap-4 px-4 pt-28 text-center">
-        <h1 className="font-voyage text-3xl font-semibold text-title">Kế hoạch này không còn tồn tại</h1>
+        <h1 className="font-heading text-3xl font-extrabold text-title">Kế hoạch này không còn tồn tại</h1>
         <Link href="/hanh-trinh" className={PRIMARY_BUTTON}>
           Về Kế hoạch của tôi
         </Link>
@@ -98,9 +99,9 @@ export function JourneyView({ token, initial, services, bookUrl, openPicker }: J
     <div className="mx-auto max-w-7xl px-4 pt-32 pb-28 lg:px-6 lg:pb-16">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm font-semibold text-gold">Kế hoạch chuyến đi</p>
-          <h1 className="font-voyage text-3xl font-semibold tracking-tight text-title sm:text-4xl">{journey.title}</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="text-xs font-bold uppercase tracking-wider text-primary-ink">Kế hoạch chuyến đi Vietravel</p>
+          <h1 className="font-heading text-3xl font-extrabold tracking-tight text-title sm:text-4xl">{journey.title}</h1>
+          <p className="mt-2 text-sm text-muted-foreground font-medium">
             {durationLabel(journey.nights)}
             {dateRange} · {travelersLabel(journey.travelers)}
           </p>
@@ -111,13 +112,13 @@ export function JourneyView({ token, initial, services, bookUrl, openPicker }: J
               <li
                 key={member.id}
                 title={member.name}
-                className="grid size-9 place-items-center rounded-full bg-champagne text-sm font-bold text-void ring-2 ring-void"
+                className="grid size-9 place-items-center rounded-full bg-gradient-to-tr from-orange-500 to-amber-500 text-sm font-extrabold text-white ring-2 ring-background shadow-sm"
               >
                 {member.name.charAt(0).toUpperCase()}
               </li>
             ))}
             {journey.members.length > 6 && (
-              <li className="grid size-9 place-items-center rounded-full bg-tint/10 text-xs font-bold ring-2 ring-void">+{journey.members.length - 6}</li>
+              <li className="grid size-9 place-items-center rounded-full bg-tint/10 text-xs font-bold ring-2 ring-background">+{journey.members.length - 6}</li>
             )}
           </ul>
           {canEdit && (
@@ -131,7 +132,7 @@ export function JourneyView({ token, initial, services, bookUrl, openPicker }: J
       </header>
 
       <p className="mt-4 flex flex-wrap items-center gap-3 text-sm">
-        <span className="rounded-full bg-tint/[0.08] px-3 py-1 font-semibold">{role === "view" ? "Chỉ xem" : me ? `Đang sửa · ${me}` : memberKnown ? "Nhập tên để bắt đầu sửa" : "Đang tải…"}</span>
+        <span className="rounded-full bg-tint/[0.08] px-3 py-1 font-semibold text-title">{role === "view" ? "Chỉ xem" : me ? `Đang sửa · ${me}` : memberKnown ? "Nhập tên để bắt đầu sửa" : "Đang tải…"}</span>
         {offline && (
           <span role="status" className="inline-flex items-center gap-1.5 text-coral">
             <WifiOffIcon aria-hidden strokeWidth={1.5} className="size-4" />
@@ -142,16 +143,29 @@ export function JourneyView({ token, initial, services, bookUrl, openPicker }: J
 
       {role === "edit" && memberKnown && !memberId && <JoinForm onJoin={join} />}
 
-      <Tabs.Root value={tabValue(currentDay)} onValueChange={(value) => setActiveDay(parseTab(value))} className="mt-8">
+      {/* AI Smart Journey Advisor & Auto-Planner */}
+      <div className="mt-8">
+        <AiJourneyAdvisor
+          journey={journey}
+          services={services}
+          canEdit={canEdit}
+          onAddService={async (service, day) => {
+            const ok = await send({ type: "addItem", serviceId: service.id, day })
+            return ok
+          }}
+        />
+      </div>
+
+      <Tabs.Root value={tabValue(currentDay)} onValueChange={(value) => setActiveDay(parseTab(value))} className="mt-4">
         <Tabs.List aria-label="Ngày trong chuyến" className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 [scrollbar-width:none] lg:mx-0 lg:px-0">
           {groups.map((group) => (
             <Tabs.Trigger
               key={tabValue(group.day)}
               value={tabValue(group.day)}
-              className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-tint/5 px-4 text-sm font-semibold whitespace-nowrap text-body ring-1 ring-tint/10 outline-none hover:bg-tint/10 focus-visible:ring-2 focus-visible:ring-ring data-[state=active]:bg-champagne data-[state=active]:text-void"
+              className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-tint/5 px-4 text-sm font-bold whitespace-nowrap text-body ring-1 ring-tint/10 outline-none hover:bg-tint/10 focus-visible:ring-2 focus-visible:ring-ring data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
             >
               {group.label}
-              <span className="text-xs opacity-70">({group.items.length})</span>
+              <span className="text-xs opacity-75">({group.items.length})</span>
             </Tabs.Trigger>
           ))}
         </Tabs.List>

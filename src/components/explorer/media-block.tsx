@@ -24,8 +24,8 @@ function Photo({ photo, className }: { photo: GalleryPhoto; className?: string }
 
 /** Hàng 1: video cao bên trái, bốn ảnh xếp hai cột bên phải. Hàng 2 đảo lại: hai ảnh bên trái, video rộng bên phải. */
 export function MediaBlock({ guide }: { guide: DestinationGuide }): React.JSX.Element {
-  const [videoA, videoB] = guide.videos
-  const [first, second] = [guide.gallery.slice(0, 4), guide.gallery.slice(4, 6)]
+  const [videoA] = guide.videos
+  const first = guide.gallery.slice(0, 4)
 
   return (
     <Section id="hinh-anh" title={`${guide.name} qua hình ảnh và video`} intro="Xem trước biển, hoàng hôn và những điểm sôi động nhất trước khi chọn lịch trình.">

@@ -13,9 +13,14 @@ export default function JourneysPage(): React.JSX.Element {
   return (
     <ExplorerShell>
       <div className="mx-auto max-w-6xl px-4 pt-32 pb-16 lg:px-6">
-        <h1 className="font-voyage text-[2rem] leading-tight font-medium tracking-[-0.01em] text-champagne sm:text-4xl">Kế hoạch của tôi</h1>
-        <p className="mt-3 max-w-2xl text-muted-foreground">
-          Chọn khách sạn, vé máy bay, xe và điểm vui chơi cho chuyến đi, xếp theo ngày, rồi mời gia đình, bạn bè cùng bình chọn. Giá trong kế hoạch là giá tham khảo.
+        <div className="inline-flex items-center gap-2 rounded-full bg-primary-ink/15 px-3.5 py-1 text-xs font-bold text-primary-ink ring-1 ring-primary-ink/30 mb-3">
+          <span>Kế Hoạch & Trợ Lý Du Lịch</span>
+        </div>
+        <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-title leading-tight">
+          Lên Kế Hoạch Chuyến Đi <span className="text-gradient-brand">Cùng Bạn Bè & AI</span>
+        </h1>
+        <p className="mt-3 max-w-2xl text-sm sm:text-base text-muted-foreground leading-relaxed">
+          Tùy chọn khách sạn, vé máy bay, xe và điểm vui chơi, để AI tự động xếp theo ngày hoặc mời gia đình, bạn bè cùng bình chọn.
         </p>
         <JourneysHome destinationSlug={phuQuoc.slug} destinationName={phuQuoc.name} />
       </div>

@@ -11,7 +11,7 @@ interface ExplorerShellProps {
 export function ExplorerShell({ children, showTripi = true }: ExplorerShellProps): React.JSX.Element {
   return (
     <div className="explorer grain relative min-h-dvh">
-      <div aria-hidden className="scroll-progress fixed inset-x-0 top-0 z-50 h-[3px] origin-left bg-linear-to-r from-amber-300 via-coral to-fuchsia-500" />
+      <div aria-hidden className="scroll-progress fixed inset-x-0 top-0 z-50 h-[3px] origin-left bg-linear-to-r from-ocean via-[#1a66e0] to-accent-cyan" />
       <ExplorerHeader />
       {/* Kéo nội dung lên dưới thanh điều hướng nổi để ảnh hero tràn mép trên. */}
       <main className="-mt-[4.25rem]">{children}</main>

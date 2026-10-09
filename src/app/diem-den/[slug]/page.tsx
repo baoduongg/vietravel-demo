@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 
-import { AnchorNav } from "@/components/explorer/anchor-nav"
 import { CostChecklist } from "@/components/explorer/cost-checklist"
 import { DestinationHero } from "@/components/explorer/destination-hero"
 import { EatBlock } from "@/components/explorer/eat-block"
@@ -55,7 +54,7 @@ export default async function DestinationPage({ params }: PageProps): Promise<Re
         <PlayBlock guide={guide} />
         <Itinerary guide={guide} />
         <CostChecklist guide={guide} minTourPriceVnd={tours[0]?.priceVnd ?? null} />
-        <Reviews guide={guide} />
+        <Reviews slug={guide.slug} destinationName={guide.name} reviews={guide.reviews} />
         <Section id="tour" title={`Tour ${guide.name} đang mở bán`} intro="Giá và ngày khởi hành lấy từ travel.com.vn. Bấm Xem và đặt để chuyển sang trang tour của Vietravel.">
           <TourList tours={tours} hotline={company.hotline} planDestination={{ slug: guide.slug, name: guide.name }} />
         </Section>

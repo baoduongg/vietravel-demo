@@ -28,7 +28,7 @@ export function buttonClass(variant: Variant = "primary", className?: string): s
 /** Vòng tròn chứa mũi tên nằm sát mép phải nút; mũi tên nhích chéo khi rê chuột. */
 export function ArrowChip(): React.JSX.Element {
   return (
-    <span className="grid size-9 place-items-center rounded-full bg-current/10 transition-transform duration-500 ease-soft group-hover:translate-x-0.5 group-hover:-translate-y-px group-hover:scale-105">
+    <span className=" grid size-9 place-items-center rounded-full bg-current/10 transition-transform duration-500 ease-soft group-hover:translate-x-0.5 group-hover:-translate-y-px group-hover:scale-105">
       <ArrowUpRightIcon aria-hidden strokeWidth={1.5} className="size-4" />
     </span>
   )
@@ -39,7 +39,8 @@ export function CtaLink({ href, children, variant = "primary", className }: CtaL
   return (
     <a href={href} target="_blank" rel="noreferrer" className={buttonClass(variant, className)}>
       {children}
-      <ArrowChip />
+      {/* <ArrowChip /> */}
+      <ArrowUpRightIcon aria-hidden strokeWidth={1.5} className="size-4 mr-auto" />
     </a>
   )
 }
