@@ -1,15 +1,17 @@
 "use client"
 
-import { StarIcon } from "lucide-react"
+import { StarIcon, XIcon } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 
-import { INPUT_CLASS, PRIMARY_BUTTON } from "@/components/journey/styles"
+import { ReviewVideoPlayer } from "@/components/explorer/review-video"
+import { GHOST_BUTTON, INPUT_CLASS, PRIMARY_BUTTON } from "@/components/journey/styles"
 import { COMPANIONS, REVIEW_LIMITS } from "@/lib/reviews/validate"
+import { isShortTiktok, MAX_REVIEW_VIDEOS, parseVideoUrl } from "@/lib/reviews/video"
 import { cn } from "@/lib/utils"
 import { getErrorMessage } from "@/services/http"
 import { reviewService } from "@/services/review.service"
-import type { UserReview } from "@/types/destination"
+import type { ReviewVideo, UserReview } from "@/types/destination"
 
 const RATING_LABELS = ["Rất tệ", "Chưa ổn", "Tạm được", "Hài lòng", "Tuyệt vời"]
 
@@ -32,8 +34,34 @@ export function ReviewForm({ slug, destinationName, onCreated }: ReviewFormProps
   const [hover, setHover] = useState(0)
   const [text, setText] = useState("")
   const [busy, setBusy] = useState(false)
+  const [videos, setVideos] = useState<ReviewVideo[]>([])
+  const [videoUrl, setVideoUrl] = useState("")
+  const [adding, setAdding] = useState(false)
 
   const shown = hover || rating
+
+  async function addVideo(): Promise<void> {
+    if (!videoUrl.trim()) return
+    setAdding(true)
+    try {
+      // Link rút gọn TikTok cần server đọc chuyển hướng; link đầy đủ parse ngay.
+      const video = parseVideoUrl(videoUrl) ?? (isShortTiktok(videoUrl) ? await reviewService.resolveVideo(videoUrl) : null)
+      if (!video) {
+        toast.error("Link chưa đúng, Quý khách dán link video YouTube hoặc TikTok nhé.")
+        return
+      }
+      if (videos.some((item) => item.platform === video.platform && item.id === video.id)) {
+        toast.error("Video này đã được thêm.")
+        return
+      }
+      setVideos((current) => [...current, video])
+      setVideoUrl("")
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Chưa đọc được link, Quý khách thử lại nhé."))
+    } finally {
+      setAdding(false)
+    }
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault()
@@ -43,13 +71,15 @@ export function ReviewForm({ slug, destinationName, onCreated }: ReviewFormProps
     }
     setBusy(true)
     try {
-      const review = await reviewService.create(slug, { nick, companion, month, rating, text })
+      const review = await reviewService.create(slug, { nick, companion, month, rating, text, videos })
       onCreated(review)
       setNick("")
       setCompanion("")
       setMonth("")
       setRating(0)
       setText("")
+      setVideos([])
+      setVideoUrl("")
       toast.success("Cảm ơn Quý khách đã chia sẻ cảm nhận!")
     } catch (error) {
       toast.error(getErrorMessage(error, "Chưa gửi được review, Quý khách thử lại nhé."))
@@ -138,6 +168,52 @@ export function ReviewForm({ slug, destinationName, onCreated }: ReviewFormProps
           {text.trim().length}/{REVIEW_LIMITS.textMax}
         </span>
       </label>
+
+      <fieldset>
+        <legend className="text-sm font-semibold text-title">
+          Video (YouTube, TikTok) <span className="font-normal text-muted-foreground">không bắt buộc, tối đa {MAX_REVIEW_VIDEOS}</span>
+        </legend>
+        {videos.length < MAX_REVIEW_VIDEOS && (
+          <div className="mt-2 flex items-center gap-2">
+            <input
+              type="url"
+              inputMode="url"
+              aria-label="Link video YouTube hoặc TikTok"
+              value={videoUrl}
+              onChange={(event) => setVideoUrl(event.target.value)}
+              onKeyDown={(event) => {
+                // Enter thêm video thay vì gửi cả form.
+                if (event.key === "Enter") {
+                  event.preventDefault()
+                  void addVideo()
+                }
+              }}
+              placeholder="Dán link, ví dụ https://youtu.be/… hoặc https://vt.tiktok.com/…"
+              className={cn(INPUT_CLASS, "mt-0 flex-1")}
+            />
+            <button type="button" onClick={() => void addVideo()} disabled={adding || !videoUrl.trim()} className={GHOST_BUTTON}>
+              {adding ? "Đang đọc…" : "Thêm"}
+            </button>
+          </div>
+        )}
+        {videos.length > 0 && (
+          <ul aria-label="Xem trước video" className="mt-3 grid gap-3 sm:grid-cols-3">
+            {videos.map((video) => (
+              <li key={`${video.platform}:${video.id}`} className="relative">
+                <ReviewVideoPlayer video={video} />
+                <button
+                  type="button"
+                  onClick={() => setVideos((current) => current.filter((item) => item !== video))}
+                  aria-label="Bỏ video này"
+                  className="absolute top-2 right-2 grid size-8 place-items-center rounded-full bg-shade/70 text-white outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <XIcon aria-hidden className="size-4" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </fieldset>
 
       <button type="submit" disabled={busy} className={cn(PRIMARY_BUTTON, "self-start")}>
         {busy ? "Đang gửi…" : "Gửi review"}

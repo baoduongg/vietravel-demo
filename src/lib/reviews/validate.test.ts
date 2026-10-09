@@ -30,4 +30,18 @@ assert.equal(parseReviewInput({ ...valid, rating: "5" }, now).ok, false)
 assert.equal(parseReviewInput({ ...valid, text: "ngắn" }, now).ok, false)
 assert.equal(parseReviewInput({ ...valid, text: "a".repeat(501) }, now).ok, false)
 
+// Video: tùy chọn; chỉ giữ platform + id hợp lệ, tối đa 3, bỏ trùng; mảng rỗng thì không lưu trường videos.
+const yt = { platform: "youtube", id: "dQw4w9WgXcQ" }
+const tt = { platform: "tiktok", id: "7312345678901234567" }
+const withVideos = parseReviewInput({ ...valid, videos: [yt, { ...tt, url: "https://evil.com" }] }, now)
+assert.ok(withVideos.ok)
+assert.deepEqual(withVideos.review.videos, [yt, tt])
+const noVideos = parseReviewInput({ ...valid, videos: [] }, now)
+assert.ok(noVideos.ok && !("videos" in noVideos.review))
+const dedup = parseReviewInput({ ...valid, videos: [yt, yt] }, now)
+assert.ok(dedup.ok && dedup.review.videos?.length === 1)
+assert.equal(parseReviewInput({ ...valid, videos: [yt, tt, { platform: "youtube", id: "aaaaaaaaaaa" }, { platform: "youtube", id: "bbbbbbbbbbb" }] }, now).ok, false)
+assert.equal(parseReviewInput({ ...valid, videos: [{ platform: "vimeo", id: "123" }] }, now).ok, false)
+assert.equal(parseReviewInput({ ...valid, videos: "https://youtu.be/dQw4w9WgXcQ" }, now).ok, false)
+
 console.log("validate.test.ts: ok")

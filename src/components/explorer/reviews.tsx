@@ -3,6 +3,7 @@
 import { CheckCircle2Icon, QuoteIcon, StarIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 
+import { ReviewVideoPlayer } from "@/components/explorer/review-video"
 import { ReviewForm } from "@/components/explorer/review-form"
 import { Section } from "@/components/explorer/section"
 import { cn } from "@/lib/utils"
@@ -128,6 +129,13 @@ export function Reviews({ slug, destinationName, reviews }: ReviewsProps): React
                 <Stars rating={review.rating} size="size-3.5" />
               </div>
               <p className="text-sm leading-relaxed text-body">“{review.text}”</p>
+              {review.videos && review.videos.length > 0 && (
+                <div className="grid gap-2">
+                  {review.videos.map((video) => (
+                    <ReviewVideoPlayer key={`${video.platform}:${video.id}`} video={video} />
+                  ))}
+                </div>
+              )}
             </li>
           ))}
         </ul>

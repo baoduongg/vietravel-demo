@@ -99,6 +99,13 @@ export interface Review {
   trip: string
   rating: 1 | 2 | 3 | 4 | 5
   text: string
+  /** Video YouTube/TikTok khách dán link; chỉ lưu id, không lưu link gốc. */
+  videos?: ReviewVideo[]
+}
+
+export interface ReviewVideo {
+  platform: "youtube" | "tiktok"
+  id: string
 }
 
 /** Review do khách gửi từ trang điểm đến, lưu ở server. */
@@ -115,6 +122,7 @@ export interface ReviewInput {
   month?: string
   rating: number
   text: string
+  videos?: ReviewVideo[]
 }
 
 export interface Faq {

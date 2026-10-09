@@ -1,4 +1,5 @@
-import type { Review } from "@/types/destination"
+import { isValidVideo, MAX_REVIEW_VIDEOS } from "@/lib/reviews/video"
+import type { Review, ReviewVideo } from "@/types/destination"
 
 /** Dùng chung client và server để form chặn trước cùng giới hạn với API. */
 export const REVIEW_LIMITS = { nickLength: 40, textMin: 10, textMax: 500 } as const
@@ -41,5 +42,15 @@ export function parseReviewInput(body: unknown, now: Date = new Date()): ParsedR
   if (text.length < REVIEW_LIMITS.textMin) return { ok: false, error: `Cảm nhận cần ít nhất ${REVIEW_LIMITS.textMin} ký tự.` }
   if (text.length > REVIEW_LIMITS.textMax) return { ok: false, error: `Cảm nhận tối đa ${REVIEW_LIMITS.textMax} ký tự.` }
 
-  return { ok: true, review: { nick, trip, rating: rating as Review["rating"], text } }
+  let videos: ReviewVideo[] = []
+  if (input.videos !== undefined) {
+    if (!Array.isArray(input.videos) || !input.videos.every(isValidVideo)) return { ok: false, error: "Link video không hợp lệ." }
+    // Chỉ giữ platform + id (bỏ trường thừa như link gốc), bỏ video trùng.
+    const unique = new Map(input.videos.map(({ platform, id }) => [`${platform}:${id}`, { platform, id }]))
+    videos = [...unique.values()]
+    if (videos.length > MAX_REVIEW_VIDEOS) return { ok: false, error: `Tối đa ${MAX_REVIEW_VIDEOS} video cho mỗi review.` }
+  }
+
+  const review: Review = { nick, trip, rating: rating as Review["rating"], text }
+  return { ok: true, review: videos.length ? { ...review, videos } : review }
 }
