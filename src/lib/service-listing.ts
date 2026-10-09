@@ -19,6 +19,7 @@ export function kindFromSlug(slug: string): ServiceKind | undefined {
   return SLUG_KIND.get(slug)
 }
 
+/** Khớp không dấu theo tên, tag, mô tả: "vinpearl" hay "an sang" đều được. */
 export function matchesQuery(service: ServiceItem, query: string): boolean {
   const needle = normalize(query.trim())
   return !needle || normalize(`${service.name} ${service.tag} ${service.blurb}`).includes(needle)
@@ -37,10 +38,14 @@ export function isPartnerService(service: Pick<ServiceItem, "id">): boolean {
   return service.id.startsWith(PARTNER_PREFIX)
 }
 
-/** Tag mock: "Phân khúc · Khu vực"; tag đối tác: "Thương hiệu · Phân khúc · Khu vực". */
+/**
+ * Tag mock: "Phân khúc · Khu vực". Tag đối tác: "Thương hiệu · Phân khúc · Khu vực", chỉ khách sạn có phân khúc;
+ * thiếu phân khúc thì không ra chip để khu vực không lẫn vào hàng phân khúc. Đếm từ cuối vì tên thương hiệu có thể chứa " · ".
+ */
 export function chipOf(service: ServiceItem): string | undefined {
   const parts = service.tag.split(" · ").map((part) => part.trim())
-  return (isPartnerService(service) ? parts[1] : parts[0]) || undefined
+  if (!isPartnerService(service)) return parts[0] || undefined
+  return parts.length >= 3 ? parts.at(-2) || undefined : undefined
 }
 
 /** Ít hơn 2 chip thì lọc vô nghĩa: trả rỗng để ẩn hàng chip. */

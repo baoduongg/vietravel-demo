@@ -41,7 +41,7 @@ Không làm (YAGNI):
   | `dac-san` | `souvenir` |
   | `tour` | `tour` |
 
-- Cách render: `revalidate = 1800` (giống trang điểm đến). `generateStaticParams` sinh mọi cặp (điểm đến đang mở × 7 loại). Slug điểm đến hoặc slug loại không hợp lệ thì trả `notFound()`.
+- Cách render: `revalidate = 1800` (giống trang điểm đến). Khi dùng Redis, store đối tác đọc bằng fetch `no-store` nên trang (cả trang điểm đến) render động mỗi request; `destinationServices` gọi `unstable_rethrow` để không nuốt tín hiệu này. `generateStaticParams` sinh mọi cặp (điểm đến đang mở × 7 loại). Slug điểm đến hoặc slug loại không hợp lệ thì trả `notFound()`.
 - Dữ liệu: `getServices(slug, kind)` nối với `getPartnerServices(slug, guide.links.tours)` rồi lọc theo `kind`, cùng cách trang `/hanh-trinh/[token]` đang gộp. Lỗi đọc store đối tác không được làm hỏng trang: bắt lỗi và hiện danh sách không có đối tác.
 - Loại có 0 dịch vụ vẫn render trang (cẩm nang vẫn có ích) và hiện thông báo "Hiện chưa có dịch vụ loại này".
 - `generateMetadata`: title `"{Nhãn loại} {Tên điểm đến} · Vietravel Explorer"`. Description lấy `serviceGuides[kind].intro`, nếu không có thì dùng `guide.intro`.
@@ -55,13 +55,13 @@ Bọc trong `ExplorerShell`, cùng khung `max-w-6xl` với trang điểm đến.
 3. **Hero ngắn**: tiêu đề `"{Nhãn loại} tại {Tên điểm đến}"`, intro, và 3 số tự tính:
    - số lựa chọn;
    - "Giá từ" = giá thấp nhất có `priceVnd > 0`, kèm `PRICE_UNIT_LABEL` của mục đó;
-   - khoảng giá thấp nhất–cao nhất.
+   - khoảng giá thấp nhất–cao nhất, chỉ hiện khi hai đầu khác giá và cùng đơn vị giá.
 
    Nếu không có giá nào > 0 thì bỏ hai số về giá.
-4. **Cẩm nang**:
-   - dùng lại khối guide có sẵn: `flight` → `GettingThere`, `hotel` → `StayBlock`, `dining` → `EatBlock`, `activity` → `PlayBlock`; các loại khác không có khối;
-   - sau đó là danh sách `serviceGuides[kind].tips`, nếu có.
-5. **Danh sách** (`ServiceListing`, client component): xem mục 4.
+4. **Danh sách** (`ServiceListing`, client component): xem mục 4. Đặt ngay sau hero để khách so sánh và chọn nhanh.
+5. **Cẩm nang**:
+   - mẹo từ `serviceGuides[kind].tips`, nếu có;
+   - sau đó là khối guide có sẵn: `flight` → `GettingThere`, `hotel` → `StayBlock`, `dining` → `EatBlock`, `activity` → `PlayBlock`; các loại khác không có khối.
 6. **FAQ theo loại**: dùng lại `Faq`, thêm prop tùy chọn `faqs` và `title`; không truyền thì giữ nguyên hành vi cũ (`guide.faqs`). Ẩn khối khi loại không có FAQ.
 7. **CTA cuối**: "Lên kế hoạch {Tên điểm đến}" dẫn tới `/hanh-trinh`.
 
@@ -90,7 +90,7 @@ Các hàm thuần, dùng chung cho server và client:
 - `KIND_SLUG: Record<ServiceKind, string>`, `kindFromSlug(slug): ServiceKind | undefined`.
 - `priceStats(services): { count: number; min?: ServiceItem; max?: ServiceItem }`, chỉ xét mục có `priceVnd > 0`.
 - `isPartnerService(service): boolean`: id có tiền tố của `partnerServiceId`.
-- `chipOf(service): string | undefined`: tách `tag` theo `" · "`. Đối tác lấy đoạn thứ 2 (phân khúc), mục khác lấy đoạn thứ nhất.
+- `chipOf(service): string | undefined`: tách `tag` theo `" · "`. Mục khác lấy đoạn thứ nhất. Đối tác lấy đoạn áp chót (phân khúc) khi tag có ít nhất 3 đoạn; thiếu phân khúc (đối tác không phải khách sạn) thì không ra chip.
 - `chipsOf(services): string[]`: các chip khác nhau theo thứ tự xuất hiện. Trả `[]` nếu có ít hơn 2 chip, tức là ẩn hàng chip.
 - `filterAndSort(services, { query, chip, partnerOnly, sort })`:
   - `query` dùng lại `matchesQuery` của `service-catalog-panel`;

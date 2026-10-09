@@ -38,6 +38,10 @@ assert.equal(chipOf(item({ tag: "Tiết kiệm · Ông Lang" })), "Tiết kiệm
 assert.equal(chipOf(partner), "Cao cấp")
 assert.equal(chipOf(item({ tag: "" })), undefined)
 assert.equal(chipOf(item({ id: "partner-a-b", tag: "Chỉ tên" })), undefined)
+// Đối tác không phải khách sạn (không có phân khúc): tag "Thương hiệu · Khu vực" không ra chip khu vực.
+assert.equal(chipOf(item({ id: "partner-a-b", tag: "Xe Gió · Dương Đông" })), undefined)
+// Tên thương hiệu có " · " vẫn lấy đúng phân khúc.
+assert.equal(chipOf(item({ id: "partner-a-b", tag: "Nhà · Gió · Cao cấp · Bãi Trường" })), "Cao cấp")
 
 // chipsOf: duy nhất, theo thứ tự xuất hiện; < 2 chip thì ẩn hàng chip.
 assert.deepEqual(chipsOf([item({ tag: "Tiết kiệm · A" }), item({ tag: "Cao cấp · B" }), item({ tag: "Tiết kiệm · C" })]), ["Tiết kiệm", "Cao cấp"])

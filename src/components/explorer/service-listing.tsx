@@ -105,7 +105,7 @@ function ListingCard({ service, destinationSlug, destinationName }: { service: S
     <li className="glass-card flex flex-col overflow-hidden p-0">
       <div className="relative aspect-video">
         {service.imageUrl ? (
-          <Image src={service.imageUrl} alt={service.name} fill sizes="(min-width:1024px) 360px, (min-width:640px) 45vw, 90vw" className="object-cover" />
+          <Image src={service.imageUrl} alt="" fill sizes="(min-width:1024px) 360px, (min-width:640px) 45vw, 90vw" className="object-cover" />
         ) : (
           <span aria-hidden className="absolute inset-0 grid place-items-center bg-linear-to-br from-primary-ink/25 via-tint/[0.06] to-gold/25 text-gold">
             <Icon strokeWidth={1.25} className="size-10" />

@@ -24,7 +24,6 @@ const FILTERS: { value: CatalogFilter; label: string }[] = [
   ...SERVICE_KINDS.map((kind) => ({ value: kind, label: SERVICE_KIND_LABEL[kind] })),
 ]
 
-/** Khớp không dấu theo tên, tag, mô tả: "vinpearl" hay "an sang" đều được. */
 export function ServiceSearch({ value, onChange }: { value: string; onChange: (value: string) => void }): React.JSX.Element {
   return (
     <input

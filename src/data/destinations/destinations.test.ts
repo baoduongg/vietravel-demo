@@ -72,7 +72,6 @@ for (const tour of tours) assert.ok(`${tour.name} ${tour.region}`.toLowerCase().
 for (let i = 1; i < tours.length; i += 1) assert.ok(tours[i - 1].priceVnd <= tours[i].priceVnd)
 assert.deepEqual(toursForDestination(phuQuoc, "2099-01-01"), [])
 
-console.log("destinations.test OK")
 
 // Cẩm nang theo loại dịch vụ: Phú Quốc có đủ 7 loại, mỗi loại có intro, mẹo và FAQ.
 for (const kind of SERVICE_KINDS) {
@@ -80,5 +79,8 @@ for (const kind of SERVICE_KINDS) {
   assert.ok(serviceGuide, `${kind} thiếu cẩm nang`)
   assert.ok(serviceGuide.intro.trim(), `${kind} thiếu intro`)
   assert.ok(serviceGuide.tips.length >= 1 && serviceGuide.tips.every((tip) => tip.trim()), `${kind} thiếu mẹo`)
-  assert.ok(serviceGuide.faqs.length >= 1, `${kind} thiếu FAQ`)
+  assert.ok(serviceGuide.tips.length >= 3 && serviceGuide.tips.length <= 5, `${kind} cần 3–5 mẹo`)
+  assert.ok(serviceGuide.faqs.length >= 2 && serviceGuide.faqs.length <= 4, `${kind} cần 2–4 FAQ`)
 }
+
+console.log("destinations.test OK")

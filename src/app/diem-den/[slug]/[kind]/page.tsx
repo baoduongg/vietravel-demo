@@ -95,7 +95,8 @@ export default async function ServiceKindPage({ params }: PageProps): Promise<Re
                 <dd className="text-xl font-bold text-champagne">{priceLabel(min)}</dd>
               </div>
             )}
-            {min && max && max !== min && (
+            {/* Chỉ hiện khoảng giá khi hai đầu khác giá và cùng đơn vị (vd không trộn /ngày với /lượt). */}
+            {min && max && max.priceVnd !== min.priceVnd && max.priceUnit === min.priceUnit && (
               <div>
                 <dt className="text-xs text-muted-foreground">Khoảng giá</dt>
                 <dd className="text-xl font-bold text-title">

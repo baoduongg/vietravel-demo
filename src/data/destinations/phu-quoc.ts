@@ -208,6 +208,7 @@ export const phuQuoc: DestinationGuide = {
       ],
       faqs: [
         { question: "Có taxi hay xe công nghệ ở Phú Quốc không?", answer: "Có, chủ yếu quanh Dương Đông và sân bay. Đi Nam đảo, Bắc đảo cả ngày thì thuê xe theo ngày thường tiện và rẻ hơn." },
+        { question: "Thuê xe máy ở Phú Quốc cần giấy tờ gì?", answer: "Quý khách cần bằng lái xe máy và CCCD hoặc hộ chiếu. Nơi cho thuê thường giữ bản sao giấy tờ hoặc tiền cọc." },
       ],
     },
     activity: {
@@ -219,6 +220,7 @@ export const phuQuoc: DestinationGuide = {
       ],
       faqs: [
         { question: "Trẻ em có được giảm giá vé vui chơi không?", answer: "Phần lớn điểm vui chơi có giá trẻ em theo chiều cao hoặc độ tuổi. Kế hoạch tự tính theo tuổi các bé Quý khách nhập." },
+        { question: "Đi VinWonders và Safari trong một ngày được không?", answer: "Được, hai nơi nằm cạnh nhau ở Bắc đảo. Nên đi Safari buổi sáng khi thú hoạt động nhiều, chiều sang VinWonders." },
       ],
     },
     dining: {
@@ -230,6 +232,7 @@ export const phuQuoc: DestinationGuide = {
       ],
       faqs: [
         { question: "Ăn hải sản ở Phú Quốc khoảng bao nhiêu tiền?", answer: "Quán bình dân khoảng 200–400 nghìn mỗi người, nhà hàng view biển từ 500 nghìn trở lên mỗi người." },
+        { question: "Ăn uống ở Phú Quốc có hợp với trẻ nhỏ không?", answer: "Nhiều nhà hàng có món không cay và cơm, mì cho trẻ. Quý khách nên dặn quán bớt cay và chọn hải sản chín kỹ cho bé." },
       ],
     },
     souvenir: {
@@ -241,6 +244,7 @@ export const phuQuoc: DestinationGuide = {
       ],
       faqs: [
         { question: "Mang nước mắm lên máy bay được không?", answer: "Tùy hãng bay, nhiều hãng chỉ nhận loại đóng gói chuyên dụng. Quý khách kiểm tra quy định hành lý trước khi mua." },
+        { question: "Mua ngọc trai ở đâu để tránh hàng giả?", answer: "Quý khách nên mua tại cơ sở nuôi cấy có giấy kiểm định đi kèm, tránh mua trôi nổi ở chợ hoặc người bán rong." },
       ],
     },
     tour: {
@@ -252,6 +256,7 @@ export const phuQuoc: DestinationGuide = {
       ],
       faqs: [
         { question: "Giá tour đã gồm vé máy bay chưa?", answer: "Đa số tour Phú Quốc của Vietravel đã gồm vé máy bay khứ hồi. Quý khách xem chi tiết trên trang tour." },
+        { question: "Trẻ em đi tour tính giá thế nào?", answer: "Theo lưu ý giá trẻ em của Vietravel: dưới 5 tuổi miễn phí, từ 5 đến dưới 12 tuổi tính 75% giá người lớn. Kế hoạch tự tính theo tuổi các bé." },
       ],
     },
   },
