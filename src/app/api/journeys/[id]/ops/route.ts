@@ -22,7 +22,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
     // Quyền lấy từ token, không tin role do client gửi lên.
     const actor = { role: found.role, memberId: typeof memberId === "string" ? memberId : undefined }
-    const journey = await store.update(id, (current) => applyOp(current, op, actor, serverDeps(current.destinationSlug)))
+    // Điểm đến của kế hoạch không đổi, nên tải trước dịch vụ được.
+    const deps = await serverDeps(found.journey.destinationSlug)
+    const journey = await store.update(id, (current) => applyOp(current, op, actor, deps))
     // Hàng đợi ghi tuần tự nên thành viên cuối chính là người vừa join.
     const joinedId = isJoin(op) ? journey.members.at(-1)?.id : undefined
     return NextResponse.json<JourneyOpResponse>({ journey: forRole(journey, found.role), memberId: joinedId }, { headers: NO_STORE })

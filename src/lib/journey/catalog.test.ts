@@ -13,8 +13,8 @@ assert.equal(slugify("Dinh Cậu và Thiền viện Trúc Lâm Hộ Quốc"), "d
 assert.equal(slugify("Đường Đi  "), "duong-di")
 assert.equal(tourServiceId("NDSGN8701"), "tour-NDSGN8701")
 
-// Đủ 5 loại; đúng 6 khách sạn mock.
-for (const kind of SERVICE_KINDS) assert.ok(getServices("phu-quoc", kind, today).length > 0, `thiếu loại ${kind}`)
+// Đủ các loại có sẵn (Ăn uống, Đặc sản chỉ đến từ đối tác đã duyệt); đúng 6 khách sạn mock.
+for (const kind of SERVICE_KINDS.filter((kind) => kind !== "dining" && kind !== "souvenir")) assert.ok(getServices("phu-quoc", kind, today).length > 0, `thiếu loại ${kind}`)
 assert.equal(getServices("phu-quoc", "hotel", today).length, 6)
 
 // id không trùng.

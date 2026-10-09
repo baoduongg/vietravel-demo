@@ -1,16 +1,18 @@
 import type { PhotoCredit } from "@/types/destination"
 
-export type ServiceKind = "hotel" | "flight" | "vehicle" | "activity" | "tour"
-export type PriceUnit = "per_person" | "per_room_night" | "per_day" | "per_booking"
+export type ServiceKind = "hotel" | "flight" | "vehicle" | "activity" | "dining" | "souvenir" | "tour"
+export type PriceUnit = "per_person" | "per_room_night" | "per_day" | "per_booking" | "per_item"
 export type JourneyRole = "edit" | "view"
 
-export const SERVICE_KINDS: ServiceKind[] = ["hotel", "flight", "vehicle", "activity", "tour"]
+export const SERVICE_KINDS: ServiceKind[] = ["hotel", "flight", "vehicle", "activity", "dining", "souvenir", "tour"]
 
 export const SERVICE_KIND_LABEL: Record<ServiceKind, string> = {
   hotel: "Khách sạn",
   flight: "Vé máy bay",
   vehicle: "Thuê xe",
   activity: "Vui chơi",
+  dining: "Ăn uống",
+  souvenir: "Đặc sản",
   tour: "Tour",
 }
 
@@ -19,6 +21,7 @@ export const PRICE_UNIT_LABEL: Record<PriceUnit, string> = {
   per_room_night: "/ phòng / đêm",
   per_day: "/ ngày",
   per_booking: "/ lượt",
+  per_item: "/ sản phẩm",
 }
 
 export const QUANTITY_LABEL: Record<PriceUnit, string> = {
@@ -26,6 +29,7 @@ export const QUANTITY_LABEL: Record<PriceUnit, string> = {
   per_room_night: "Số phòng",
   per_day: "Số xe",
   per_booking: "Số lượt",
+  per_item: "Số lượng",
 }
 
 export function isServiceKind(value: unknown): value is ServiceKind {

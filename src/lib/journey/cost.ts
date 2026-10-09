@@ -38,6 +38,7 @@ export function itemCost(item: Pick<JourneyItem, "snapshot" | "quantity">, night
     case "per_day":
       return priceVnd * (nights + 1) * quantity
     case "per_booking":
+    case "per_item":
       return priceVnd * quantity
   }
 }

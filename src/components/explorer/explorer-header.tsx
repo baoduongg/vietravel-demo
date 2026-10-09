@@ -10,6 +10,7 @@ const NAV = [
   { href: "/diem-den/phu-quoc#tour", label: "Tour & Ưu đãi", hot: true },
   { href: "/hanh-trinh", label: "Kế hoạch của tôi" },
   { href: "/tripi", label: "Hỏi Tripi AI" },
+  { href: "/doi-tac", label: "Đối tác" },
 ]
 
 export function ExplorerHeader(): React.JSX.Element {

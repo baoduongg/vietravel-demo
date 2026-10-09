@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server"
 
 export const AUTH_COOKIE = "demo_auth"
 const PUBLIC_PATHS = new Set(["/login", "/api/login"])
+const PARTNER_IMAGE = /^\/api\/partners\/[^/]+\/image\/\d+$/
 
 export async function hashPassword(password: string): Promise<string> {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(password))
@@ -13,7 +14,8 @@ export async function hashPassword(password: string): Promise<string> {
 export default async function middleware(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl
 
-  if (PUBLIC_PATHS.has(pathname) || pathname.startsWith("/_next") || pathname === "/favicon.ico") {
+  // Ảnh đối tác: bộ tối ưu next/image tải không kèm cookie đăng nhập (giống /images/).
+  if (PUBLIC_PATHS.has(pathname) || pathname.startsWith("/_next") || pathname === "/favicon.ico" || PARTNER_IMAGE.test(pathname)) {
     return NextResponse.next()
   }
 

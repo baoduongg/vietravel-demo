@@ -9,6 +9,7 @@ import { getGuide } from "@/data/destinations"
 import { getServices } from "@/lib/journey/catalog"
 import { forRole } from "@/lib/journey/operations"
 import { getJourneyStore } from "@/lib/journey/store"
+import { getPartnerServices } from "@/lib/partners/store"
 import { isServiceKind } from "@/types/journey"
 
 export const dynamic = "force-dynamic"
@@ -49,7 +50,7 @@ export default async function JourneyPage({ params, searchParams }: PageProps): 
       <JourneyView
         token={token}
         initial={{ journey: forRole(found.journey, found.role), role: found.role }}
-        services={getServices(guide.slug)}
+        services={[...getServices(guide.slug), ...(await getPartnerServices(guide.slug, guide.links.tours))]}
         bookUrl={guide.links.tours}
         openPicker={isServiceKind(them) ? them : undefined}
       />

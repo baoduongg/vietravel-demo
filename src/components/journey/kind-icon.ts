@@ -1,4 +1,4 @@
-import { BedDoubleIcon, CarIcon, MapIcon, PlaneIcon, TicketIcon, type LucideIcon } from "lucide-react"
+import { BedDoubleIcon, CarIcon, MapIcon, PlaneIcon, ShoppingBagIcon, TicketIcon, UtensilsIcon, type LucideIcon } from "lucide-react"
 
 import type { ServiceKind } from "@/types/journey"
 
@@ -8,5 +8,7 @@ export const KIND_ICON: Record<ServiceKind, LucideIcon> = {
   flight: PlaneIcon,
   vehicle: CarIcon,
   activity: TicketIcon,
+  dining: UtensilsIcon,
+  souvenir: ShoppingBagIcon,
   tour: MapIcon,
 }
