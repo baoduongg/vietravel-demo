@@ -1,3 +1,5 @@
+import type { ServiceKind } from "@/types/journey"
+
 export type Audience = "family" | "couple" | "friends"
 
 export const AUDIENCE_LABEL: Record<Audience, string> = {
@@ -125,6 +127,13 @@ export interface CostRow {
   range: string
 }
 
+/** Cẩm nang ngắn cho trang /diem-den/[slug]/[kind]. */
+export interface ServiceGuide {
+  intro: string
+  tips: string[]
+  faqs: Faq[]
+}
+
 export interface DestinationGuide {
   slug: string
   name: string
@@ -157,5 +166,7 @@ export interface DestinationGuide {
   packing: string[]
   reviews: Review[]
   faqs: Faq[]
+  /** Thiếu loại nào thì trang loại đó chỉ có danh sách, không có cẩm nang riêng. */
+  serviceGuides?: Partial<Record<ServiceKind, ServiceGuide>>
   links: { hotels: string; flights: string; tours: string }
 }

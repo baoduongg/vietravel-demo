@@ -2,6 +2,7 @@ import assert from "node:assert/strict"
 import { destinations, getGuide } from "./index"
 import { phuQuoc } from "./phu-quoc"
 import { toursForDestination } from "@/lib/destination-tours"
+import { SERVICE_KINDS } from "@/types/journey"
 
 const IMAGE_HOST = "https://s3-cmc.travel.com.vn/"
 const today = "2026-10-08"
@@ -72,3 +73,12 @@ for (let i = 1; i < tours.length; i += 1) assert.ok(tours[i - 1].priceVnd <= tou
 assert.deepEqual(toursForDestination(phuQuoc, "2099-01-01"), [])
 
 console.log("destinations.test OK")
+
+// Cẩm nang theo loại dịch vụ: Phú Quốc có đủ 7 loại, mỗi loại có intro, mẹo và FAQ.
+for (const kind of SERVICE_KINDS) {
+  const serviceGuide = phuQuoc.serviceGuides?.[kind]
+  assert.ok(serviceGuide, `${kind} thiếu cẩm nang`)
+  assert.ok(serviceGuide.intro.trim(), `${kind} thiếu intro`)
+  assert.ok(serviceGuide.tips.length >= 1 && serviceGuide.tips.every((tip) => tip.trim()), `${kind} thiếu mẹo`)
+  assert.ok(serviceGuide.faqs.length >= 1, `${kind} thiếu FAQ`)
+}
