@@ -13,12 +13,15 @@ import { Itinerary } from "@/components/explorer/itinerary"
 import { PlayBlock } from "@/components/explorer/play-block"
 import { Reviews } from "@/components/explorer/reviews"
 import { Section } from "@/components/explorer/section"
+import { ServiceHub } from "@/components/explorer/service-hub"
 import { StayBlock } from "@/components/explorer/stay-block"
 import { TourList } from "@/components/explorer/tour-list"
 import { WeatherBlock } from "@/components/explorer/weather-block"
 import { company } from "@/config/company"
 import { destinations, getGuide } from "@/data/destinations"
+import { destinationServices } from "@/lib/destination-services"
 import { toursForDestination } from "@/lib/destination-tours"
+import { KIND_SLUG } from "@/lib/service-listing"
 
 export const revalidate = 1800
 
@@ -40,6 +43,8 @@ export default async function DestinationPage({ params }: PageProps): Promise<Re
   const guide = getGuide((await params).slug)
   if (!guide) notFound()
   const tours = toursForDestination(guide)
+  const services = await destinationServices(guide)
+  const more = (kind: keyof typeof KIND_SLUG): string => `/diem-den/${guide.slug}/${KIND_SLUG[kind]}`
 
   return (
     <ExplorerShell>
@@ -47,11 +52,14 @@ export default async function DestinationPage({ params }: PageProps): Promise<Re
       {/* <AnchorNav /> */}
       <div className="mx-auto max-w-6xl px-4 lg:px-6">
         <MediaBlock guide={guide} />
+        <Section id="dich-vu" title={`Dịch vụ tại ${guide.name}`} intro="Xem và so sánh từng loại dịch vụ, thêm thẳng vào kế hoạch chuyến đi.">
+          <ServiceHub guide={guide} services={services} />
+        </Section>
         <WeatherBlock guide={guide} />
-        <GettingThere guide={guide} />
-        <StayBlock guide={guide} />
-        <EatBlock guide={guide} />
-        <PlayBlock guide={guide} />
+        <GettingThere guide={guide} moreHref={more("flight")} />
+        <StayBlock guide={guide} moreHref={more("hotel")} />
+        <EatBlock guide={guide} moreHref={more("dining")} />
+        <PlayBlock guide={guide} moreHref={more("activity")} />
         <Itinerary guide={guide} />
         <CostChecklist guide={guide} minTourPriceVnd={tours[0]?.priceVnd ?? null} />
         <Reviews slug={guide.slug} destinationName={guide.name} reviews={guide.reviews} />
