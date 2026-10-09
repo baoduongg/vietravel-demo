@@ -1,7 +1,7 @@
 "use client"
 
 import { CheckCircle2Icon, QuoteIcon, StarIcon } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { ReviewVideoPlayer } from "@/components/explorer/review-video"
 import { ReviewForm } from "@/components/explorer/review-form"
@@ -35,7 +35,7 @@ const AVATAR_COLORS = [
 interface ReviewsProps {
   slug: string
   destinationName: string
-  /** Review soạn sẵn trong guide; review đầu tiên luôn là thẻ nổi bật. */
+  /** Review soạn sẵn trong guide. Thẻ nổi bật là review mới nhất: của khách nếu có, không thì review soạn sẵn đầu tiên. */
   reviews: Review[]
 }
 
@@ -45,6 +45,8 @@ function isUserReview(review: Review): review is UserReview {
 
 export function Reviews({ slug, destinationName, reviews }: ReviewsProps): React.JSX.Element {
   const [userReviews, setUserReviews] = useState<UserReview[]>([])
+  const [justAdded, setJustAdded] = useState<string | null>(null)
+  const featuredRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -53,10 +55,16 @@ export function Reviews({ slug, destinationName, reviews }: ReviewsProps): React
     return () => controller.abort()
   }, [slug])
 
-  const [featured, ...curated] = reviews
-  // Review khách mới gửi đứng đầu cột bên phải
-  const rest: Review[] = [...userReviews, ...curated]
-  const all = [...userReviews, ...reviews]
+  // Mới nhất trước: review khách (server trả mới nhất trước) rồi tới review soạn sẵn.
+  const all: Review[] = [...userReviews, ...reviews]
+  const [featured, ...rest] = all
+
+  // Gửi xong cuộn lên thẻ nổi bật để khách thấy review của mình (form nằm dưới, cách xa).
+  useEffect(() => {
+    if (!justAdded) return
+    const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    featuredRef.current?.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "center" })
+  }, [justAdded])
   const average = all.reduce((sum, review) => sum + review.rating, 0) / Math.max(all.length, 1)
 
   return (
@@ -67,7 +75,7 @@ export function Reviews({ slug, destinationName, reviews }: ReviewsProps): React
     >
       <div className="grid gap-5 lg:grid-cols-[1.1fr_1fr]">
         {featured && (
-          <figure className="relative flex flex-col gap-8 overflow-hidden rounded-[2rem] bg-dusk p-7 sm:p-9 text-title shadow-2xl lift">
+          <figure ref={featuredRef} className="relative flex flex-col gap-8 overflow-hidden rounded-[2rem] bg-dusk p-7 sm:p-9 text-title shadow-2xl lift">
             {/* Điểm trung bình lấp phần đầu thẻ thay cho khoảng trống */}
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-baseline gap-2">
@@ -87,6 +95,14 @@ export function Reviews({ slug, destinationName, reviews }: ReviewsProps): React
               </p>
             </blockquote>
 
+            {featured.videos && featured.videos.length > 0 && (
+              <div className="grid gap-3 sm:grid-cols-2">
+                {featured.videos.map((video) => (
+                  <ReviewVideoPlayer key={`${video.platform}:${video.id}`} video={video} />
+                ))}
+              </div>
+            )}
+
             <figcaption className="flex flex-wrap items-center gap-3.5 border-t border-tint/10 pt-6">
               <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-tr from-orange-400 to-rose-500 font-heading text-base font-extrabold text-white shadow-md">
                 {featured.nick.charAt(0)}
@@ -95,8 +111,14 @@ export function Reviews({ slug, destinationName, reviews }: ReviewsProps): React
                 <div className="flex flex-wrap items-center gap-1.5">
                   <p className="font-heading text-base font-bold text-title">{featured.nick}</p>
                   <span className="inline-flex items-center gap-1 rounded-full bg-primary-ink/15 px-2 py-0.5 text-[10px] font-bold text-primary-ink">
-                    <CheckCircle2Icon aria-hidden className="size-3" />
-                    Đã đi tour
+                    {isUserReview(featured) ? (
+                      "Mới"
+                    ) : (
+                      <>
+                        <CheckCircle2Icon aria-hidden className="size-3" />
+                        Đã đi tour
+                      </>
+                    )}
                   </span>
                 </div>
                 <p className="mt-0.5 text-xs text-muted-foreground">{featured.trip}</p>
@@ -141,7 +163,14 @@ export function Reviews({ slug, destinationName, reviews }: ReviewsProps): React
         </ul>
       </div>
 
-      <ReviewForm slug={slug} destinationName={destinationName} onCreated={(review) => setUserReviews((current) => [review, ...current])} />
+      <ReviewForm
+        slug={slug}
+        destinationName={destinationName}
+        onCreated={(review) => {
+          setUserReviews((current) => [review, ...current])
+          setJustAdded(review.id)
+        }}
+      />
     </Section>
   )
 }
